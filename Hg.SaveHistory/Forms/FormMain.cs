@@ -1370,7 +1370,7 @@ namespace Hg.SaveHistory.Forms
                             SetToolStripStatusStyle(toolStripStatus, IconChar.QuestionCircle, Color.Blue);
                             break;
                         case MessageType.Warning:
-                            SetToolStripStatusStyle(toolStripStatus, IconChar.ExclamationTriangle, Color.Yellow);
+                            SetToolStripStatusStyle(toolStripStatus, IconChar.ExclamationTriangle, Color.Orange);
                             break;
                     }
 

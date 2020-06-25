@@ -97,7 +97,7 @@ To unpin a profile, click the trash can icon.
 
 ## F.A.Q.
 
-1. Sometime the Archive/Active/Nuke action fails
+1. Sometimes the Archive/Active/Nuke action fails
 
 This can happens if the target folder is currently open in a windows explorer (even if not selected)
 
@@ -110,8 +110,11 @@ This tool is the second iteration of the same idea. It is based on Hg.DoomHistor
 Now the tool support a script system, using lua, which allow to add support for any game and any application!
 
 Beta testers:
+
 [RedW4rr10r](https://www.twitch.tv/redw4rr10r) : found the first bug ;)
+
 [x_ByteMe_x](https://www.twitch.tv/x_byteme_x)
+
 [IAmAllstin](https://www.twitch.tv/iamallstin)
 
 
