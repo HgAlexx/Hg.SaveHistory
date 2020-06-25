@@ -124,56 +124,17 @@ Predefine columns are:
 - string Notes
 --]]
 
-local snapshotGetCustomValue = function(snapshot, key)
-    if snapshot.CustomValues:ContainsKey(key) then
-        return snapshot.CustomValues[key]
-    end 
-    return nil
-end
-
 local columnDiff = EngineSnapshotColumnDefinition()
 columnDiff.Key = "Difficulty"
 columnDiff.HeaderText = "Difficulty"
-columnDiff.Sort = function(s1, s2)
-    local v1 = snapshotGetCustomValue(s1, "Difficulty")
-    local v2 = snapshotGetCustomValue(s2, "Difficulty")
-    if v1 and v2 then
-        return v1.Value - v2.Value
-    end
-    return 0
-end
 engine:AddSnapshotColumnDefinition(columnDiff)
 
 local columnPlayed = EngineSnapshotColumnDefinition()
 columnPlayed.Key = "PlayedTime"
 columnPlayed.HeaderText = "Played Time"
-columnPlayed.Sort = function(s1, s2)
-    local v1 = snapshotGetCustomValue(s1, "PlayedTime")
-    local v2 = snapshotGetCustomValue(s2, "PlayedTime")
-    if v1 and v2 then
-        return TimeSpan.Compare(v1.Value, v2.Value);
-    end
-    return 0
-end
 engine:AddSnapshotColumnDefinition(columnPlayed)
 
 local columnDeath = EngineSnapshotColumnDefinition()
 columnDeath.Key = "Death"
 columnDeath.HeaderText = "🕱"
-columnDeath.Sort = function(s1, s2)
-    local v1 = snapshotGetCustomValue(s1, "Death")
-    local v2 = snapshotGetCustomValue(s2, "Death")
-    if v1 and v2 then
-        if v1.Value == v2.Value then
-            return 0
-        end
-        if v1.Value == "" then
-            return 1
-        end
-        if v2.Value == "" then
-            return -1
-        end
-    end
-    return 0
-end
 engine:AddSnapshotColumnDefinition(columnDeath)

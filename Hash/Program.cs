@@ -10,8 +10,8 @@ namespace Hash
     {
         #region Fields & Properties
 
-        private const string CodeFile = 
-@"using System.Collections.Generic;
+        private const string CodeFile =
+            @"using System.Collections.Generic;
 
 // THIS FILE IS GENERATED: DO NOT EDIT
 namespace Hg.SaveHistory

@@ -299,6 +299,15 @@ namespace Hg.SaveHistory.Managers
             _settingsContent = JsonConvert.SerializeObject(_settings, Formatting.Indented,
                 new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Auto});
 
+            string folder = Path.GetDirectoryName(_settingsFilePath);
+            if (folder != null)
+            {
+                if (!Directory.Exists(folder))
+                {
+                    Directory.CreateDirectory(folder);
+                }
+            }
+
             File.WriteAllText(_settingsFilePath, _settingsContent);
         }
 

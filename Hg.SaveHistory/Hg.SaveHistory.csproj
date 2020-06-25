@@ -68,6 +68,9 @@
     <Reference Include="AeroWizard, Version=2.2.7.0, Culture=neutral, PublicKeyToken=915e74f5d64b8f37, processorArchitecture=MSIL">
       <HintPath>..\packages\AeroWizard.2.2.7\lib\net45\AeroWizard.dll</HintPath>
     </Reference>
+    <Reference Include="BouncyCastle.Crypto, Version=1.8.6.0, Culture=neutral, PublicKeyToken=0e99375e54769942">
+      <HintPath>..\packages\BouncyCastle.1.8.6.1\lib\BouncyCastle.Crypto.dll</HintPath>
+    </Reference>
     <Reference Include="FontAwesome.Sharp, Version=5.13.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FontAwesome.Sharp.5.13.0\lib\net472\FontAwesome.Sharp.dll</HintPath>
     </Reference>
@@ -94,6 +97,7 @@
     <Compile Include="API\EngineSetting.cs" />
     <Compile Include="API\EngineSettingCheckbox.cs" />
     <Compile Include="API\EngineSettingCombobox.cs" />
+    <Compile Include="API\EngineSettingTextbox.cs" />
     <Compile Include="API\EngineSettingFolderBrowser.cs" />
     <Compile Include="API\EngineSettingKind.cs" />
     <Compile Include="API\EngineSnapshot.cs" />
@@ -101,6 +105,7 @@
     <Compile Include="API\EngineSnapshotColumnDefinition.cs" />
     <Compile Include="API\EngineSnapshotCustomValue.cs" />
     <Compile Include="API\EngineSnapshotCustomValueBase.cs" />
+    <Compile Include="API\EngineSnapshotCustomValueBoolean.cs" />
     <Compile Include="API\EngineSnapshotCustomValueDateTime.cs" />
     <Compile Include="API\EngineSnapshotCustomValueInteger.cs" />
     <Compile Include="API\EngineSnapshotCustomValueString.cs" />
@@ -113,6 +118,8 @@
     <Compile Include="API\EventHandlerSnapshotsChanged.cs" />
     <Compile Include="API\HgExceptionHandler.cs" />
     <Compile Include="API\HgConverter.cs" />
+    <Compile Include="API\HgScriptSpecific.cs" />
+    <Compile Include="API\HgSteamHelper.cs" />
     <Compile Include="API\HgUtility.cs" />
     <Compile Include="API\Logger.cs" />
     <Compile Include="API\MessageEventHandler.cs" />
@@ -250,7 +257,6 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="API.md" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -271,6 +277,18 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Scripts\DOOM2016\Utility.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\DOOMEternal\DOOMEternal.toc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\DOOMEternal\Engine.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\DOOMEternal\Setup.lua">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Scripts\DOOMEternal\Utility.lua">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

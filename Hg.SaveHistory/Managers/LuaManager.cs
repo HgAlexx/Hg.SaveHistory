@@ -100,6 +100,12 @@ namespace Hg.SaveHistory.Managers
                     profileFile.Settings.Add(new ProfileSettingString
                         {Name = settingFolder.Name, Value = settingFolder.Value, Kind = settingFolder.Kind});
                 }
+
+                if (setting is EngineSettingTextbox settingTextbox)
+                {
+                    profileFile.Settings.Add(new ProfileSettingString
+                        {Name = settingTextbox.Name, Value = settingTextbox.Value, Kind = settingTextbox.Kind});
+                }
             }
         }
 
@@ -136,9 +142,11 @@ namespace Hg.SaveHistory.Managers
                 nameof(EngineSettingFolderBrowser),
                 nameof(EngineSettingCombobox),
                 nameof(EngineSettingCheckbox),
+                nameof(EngineSettingTextbox),
 
                 nameof(EngineSnapshotColumnDefinition),
 
+                nameof(EngineSnapshotCustomValueBoolean),
                 nameof(EngineSnapshotCustomValueDateTime),
                 nameof(EngineSnapshotCustomValueInteger),
                 nameof(EngineSnapshotCustomValueString),
@@ -155,6 +163,10 @@ namespace Hg.SaveHistory.Managers
                 // Hg Global functions
                 nameof(HgUtility),
                 nameof(HgConverter),
+                nameof(HgSteamHelper),
+
+                // Hg Scripts Specific
+                nameof(HgScriptSpecific),
 
                 // Utility lua functions
                 //"Utility",
@@ -232,6 +244,12 @@ namespace Hg.SaveHistory.Managers
                         setting is ProfileSettingBoolean profileSettingBoolean)
                     {
                         engineSettingCheckbox.Value = profileSettingBoolean.Value;
+                    }
+
+                    if (engineSetting is EngineSettingTextbox engineSettingTextbox &&
+                        setting is ProfileSettingString profileSettingString2)
+                    {
+                        engineSettingTextbox.Value = profileSettingString2.Value;
                     }
                 }
             }

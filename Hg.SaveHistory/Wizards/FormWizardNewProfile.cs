@@ -287,12 +287,35 @@ namespace Hg.SaveHistory.Wizards
             {
                 if (setting is EngineSettingCombobox settingCombobox)
                 {
-                    sb.AppendLine($"- {settingCombobox.Caption}: {settingCombobox.Value}");
+                    string s = "";
+                    if (settingCombobox.Values.ContainsKey(settingCombobox.Value))
+                    {
+                        s = settingCombobox.Values[settingCombobox.Value];
+                    }
+
+                    sb.AppendLine($"- {settingCombobox.Caption}: {s}");
                 }
 
                 if (setting is EngineSettingFolderBrowser settingFolder)
                 {
                     sb.AppendLine($"- {settingFolder.Caption}: {settingFolder.Value}");
+                }
+
+                if (setting is EngineSettingCheckbox settingCheckbox)
+                {
+                    if (settingCheckbox.Value)
+                    {
+                        sb.AppendLine($"- {settingCheckbox.Caption}: Checked");
+                    }
+                    else
+                    {
+                        sb.AppendLine($"- {settingCheckbox.Caption}: Unchecked");
+                    }
+                }
+
+                if (setting is EngineSettingTextbox settingTextbox)
+                {
+                    sb.AppendLine($"- {settingTextbox.Caption}: {settingTextbox.Value}");
                 }
             }
 

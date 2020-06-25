@@ -12,6 +12,23 @@ namespace Hg.SaveHistory.API
             return dateTimeOffset.ToUnixTimeSeconds();
         }
 
+        public static Guid? StringToGuid(string guid)
+        {
+            try
+            {
+                if (Guid.TryParse(guid, out var g))
+                {
+                    return g;
+                }
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception.Message);
+            }
+
+            return null;
+        }
+
         public static DateTime UnixToDateTime(long unix)
         {
             return DateTimeOffset.FromUnixTimeSeconds(unix).LocalDateTime;

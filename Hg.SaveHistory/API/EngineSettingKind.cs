@@ -7,6 +7,7 @@ namespace Hg.SaveHistory.API
     public enum EngineSettingKind
     {
         None,
+        Hidden,
         Setup,
         Runtime,
     }
