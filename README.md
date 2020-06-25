@@ -66,7 +66,8 @@ On the home page you will see:
 - Recently opened backup profiles
 - Pinned backup profiles
 
-To pin a profile, click the pin in the recent profiles list.
+To pin a profile, click the pin icon in the recent profiles list.
+
 To unpin a profile, click the trash can icon.
 
 
@@ -111,11 +112,11 @@ Now the tool support a script system, using lua, which allow to add support for 
 
 Beta testers:
 
-[RedW4rr10r](https://www.twitch.tv/redw4rr10r) : found the first bug ;)
+- [RedW4rr10r](https://www.twitch.tv/redw4rr10r): The first bug slayer
 
-[x_ByteMe_x](https://www.twitch.tv/x_byteme_x)
+- [x_ByteMe_x](https://www.twitch.tv/x_byteme_x): The suggestions slayer
 
-[IAmAllstin](https://www.twitch.tv/iamallstin)
+- [IAmAllstin](https://www.twitch.tv/iamallstin): The origin slayer
 
 
 
