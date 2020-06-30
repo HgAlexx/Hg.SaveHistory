@@ -204,7 +204,7 @@ namespace Hg.SaveHistory.Managers
             return AutoBackupStatus.Disabled;
         }
 
-        private void DoOnEvent(EngineWatcherEventType eventType, object args)
+        private void DoOnEvent(EngineWatcherEventType eventType, object arg)
         {
             if (_exiting)
             {
@@ -215,7 +215,7 @@ namespace Hg.SaveHistory.Managers
             {
                 try
                 {
-                    _watcher.OnEvent?.Call(eventType, args);
+                    _watcher.OnEvent?.Call(eventType, arg);
                 }
                 catch (Exception ex)
                 {

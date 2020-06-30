@@ -45,7 +45,7 @@ namespace Hg.SaveHistory.API
                         {
                             if (mustWait.Call(fileInfo.Name).First() is bool b && b)
                             {
-                                Utilities.Logger.Debug("CopyFiles: mustWait returned true for file ", fileInfo.Name, ", wait a bit");
+                                Utilities.Logger.Information("CopyFiles: mustWait returned true for file ", fileInfo.Name, ", wait a bit");
                                 needToWait = true;
                                 break;
                             }

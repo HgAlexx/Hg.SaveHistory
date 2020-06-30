@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json;
 using NLua;
@@ -53,6 +54,21 @@ namespace Hg.SaveHistory.API
             }
 
             return null;
+        }
+
+        public override string ToString()
+        {
+            string value = "";
+            if (!string.IsNullOrEmpty(SavedAtToStringFormat))
+            {
+                value += SavedAt.ToString(SavedAtToStringFormat);
+            }
+            else
+            {
+                value += SavedAt.ToString(CultureInfo.InvariantCulture);
+            }
+
+            return value;
         }
 
         #endregion

@@ -263,7 +263,7 @@ namespace Tests.Scripts
 
                 Assert.DoesNotThrow(() =>
                 {
-                    luaManager.ActiveEngine.ActionSnapshotBackup(ActionSource.HotKey, files.Value.SnapshotDeath != "");
+                    luaManager.ActiveEngine.ActionSnapshotBackup(ActionSource.HotKey, (files.Value.SnapshotDeath != ""));
                 });
 
                 Assert.AreEqual(1, luaManager.ActiveEngine.Snapshots.Count);

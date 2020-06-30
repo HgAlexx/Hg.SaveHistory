@@ -36,6 +36,18 @@ namespace Hg.SaveHistory.Forms
             Close();
         }
 
+        private void checkBoxDebug_CheckedChanged(object sender, EventArgs e)
+        {
+            if (checkBoxDebug.Checked)
+            {
+                Logger.Level = LogLevel.Debug;
+            }
+            else
+            {
+                Logger.Level = LogLevel.Information;
+            }
+        }
+
         private void FormDebugConsole_FormClosing(object sender, FormClosingEventArgs e)
         {
             Logger.OnLog -= OnLogEvent;

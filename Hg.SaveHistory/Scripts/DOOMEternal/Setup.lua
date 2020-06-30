@@ -1,8 +1,6 @@
 ﻿local engine, ns = ...
 
-Logger.Debug(engine.Name)
-Logger.Debug(engine.Title)
-Logger.Debug(engine.Description)
+Logger.Information("Engine.Name=",engine.Name,", Engine.Title=",engine.Title)
 
 -- Setup engine
 engine:AddProcessName("DOOMEternalx64vk")

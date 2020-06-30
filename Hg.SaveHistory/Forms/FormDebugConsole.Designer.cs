@@ -32,6 +32,7 @@
             this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.buttonClose = new System.Windows.Forms.Button();
             this.buttonClear = new System.Windows.Forms.Button();
+            this.checkBoxDebug = new System.Windows.Forms.CheckBox();
             this.SuspendLayout();
             // 
             // listViewLog
@@ -76,11 +77,24 @@
             this.buttonClear.UseVisualStyleBackColor = true;
             this.buttonClear.Click += new System.EventHandler(this.buttonClear_Click);
             // 
+            // checkBoxDebug
+            // 
+            this.checkBoxDebug.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.checkBoxDebug.AutoSize = true;
+            this.checkBoxDebug.Location = new System.Drawing.Point(93, 419);
+            this.checkBoxDebug.Name = "checkBoxDebug";
+            this.checkBoxDebug.Size = new System.Drawing.Size(115, 17);
+            this.checkBoxDebug.TabIndex = 7;
+            this.checkBoxDebug.Text = "Enable Debug Log";
+            this.checkBoxDebug.UseVisualStyleBackColor = true;
+            this.checkBoxDebug.CheckedChanged += new System.EventHandler(this.checkBoxDebug_CheckedChanged);
+            // 
             // FormDebugConsole
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
+            this.Controls.Add(this.checkBoxDebug);
             this.Controls.Add(this.buttonClear);
             this.Controls.Add(this.buttonClose);
             this.Controls.Add(this.listViewLog);
@@ -89,6 +103,7 @@
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FormDebugConsole_FormClosing);
             this.Shown += new System.EventHandler(this.FormDebugConsole_Shown);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -97,5 +112,6 @@
         private System.Windows.Forms.Button buttonClose;
         private System.Windows.Forms.Button buttonClear;
         private System.Windows.Forms.ColumnHeader columnHeader1;
+        private System.Windows.Forms.CheckBox checkBoxDebug;
     }
 }

@@ -209,9 +209,6 @@ local slotPath = ""
 local snapshotBackup = function(actionSouce, isDeath)
     Logger.Information("snapshotBackup: ", actionSouce, ", ", isDeath)
 
-    -- slotPath: source
-    -- snapshotsFolder: target
-
     if Directory.Exists(slotPath) then
         local gameDetailsFilePath = Path.Combine(slotPath, "game.details")
         local fileContent = File.ReadAllText(gameDetailsFilePath)
@@ -291,12 +288,11 @@ local snapshotBackup = function(actionSouce, isDeath)
                             if capture then
                                 Logger.Debug("snapshot: screenshot success")
                             else
-                                Logger.Debug("snapshot: screenshot failed")
+                                Logger.Warning("snapshot: screenshot failed")
                             end
                         end
                     end
                 end
-
 
                 Logger.Debug("snapshot: adding to list")
                 engine.Snapshots:Add(snapshot)
@@ -314,14 +310,14 @@ local snapshotBackup = function(actionSouce, isDeath)
             end
         else
             if snapshot.Status == EngineSnapshotStatus.Deleted then
-                Logger.Debug("snapshot: restored to active")
+                Logger.Information("snapshot: restored to active")
                 snapshot.Status = EngineSnapshotStatus.Active
                 -- it is up to the engine to set LastSnapshot to enable auto select feature
                 engine.LastSnapshot = snapshot
                 -- trigger UI refresh
                 engine:SnapshotsChanges()
             else
-                Logger.Debug("snapshot: already known")
+                Logger.Information("snapshot: already known")
             end
         end
 
@@ -333,7 +329,7 @@ end
 
 
 local snapshotRestore = function(actionSouce, snapshot)
-    Logger.Debug("snapshotRestore")
+    Logger.Information("snapshotRestore: ", actionSouce, ", ", snapshot)
 
     local sourcePath = Path.Combine(snapshotsFolder, snapshot.RelativePath)
     sourcePath = Path.Combine(sourcePath, "GAME-AUTOSAVE" .. (slotIndex - 1))
@@ -528,8 +524,8 @@ engine.OnClosing = function()
     return true
 end
 
-engine.OnSaved = function()
-    Logger.Debug("OnSaved")
+engine.OnClosed = function()
+    Logger.Debug("OnClosed")
 
     if watcher then
         watcher.OnEvent = nil
@@ -540,9 +536,8 @@ engine.OnSaved = function()
 
 end
 
-engine.OnActionSnapshotBackup = function(actionSource)
-    -- manual backup cannot be detected as death or not
-    return snapshotBackup(actionSource, false)
+engine.OnActionSnapshotBackup = function(actionSource, isDeath)
+    return snapshotBackup(actionSource, isDeath)
 end
 
 engine.OnActionSnapshotRestore = function(actionSource, snapshot)

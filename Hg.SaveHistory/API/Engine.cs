@@ -57,7 +57,7 @@ namespace Hg.SaveHistory.API
         ///     After the profile is saved and before the engine unload
         ///     Release final resources here
         /// </summary>
-        public LuaFunction OnSaved;
+        public LuaFunction OnClosed;
 
         public LuaFunction OnSetupSuggestProfileName = null;
 
@@ -105,7 +105,7 @@ namespace Hg.SaveHistory.API
                     Directory.CreateDirectory(SnapshotsFolder);
                 }
 
-                Logger.Debug(SnapshotsFolder);
+                Logger.Information("snapshotsFolder: ", SnapshotsFolder);
             }
 
             ScreenshotHelper = new ScreenshotHelper(this);
@@ -135,7 +135,8 @@ namespace Hg.SaveHistory.API
         {
             Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
-            if (OnActionSnapshotBackup.Call(actionSource, args).First() is bool b)
+            args = new object[] { actionSource }.Concat(args).ToArray();
+            if (OnActionSnapshotBackup.Call(args).First() is bool b)
             {
                 return b;
             }
@@ -147,7 +148,8 @@ namespace Hg.SaveHistory.API
         {
             Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
-            if (OnActionSnapshotRestore.Call(actionSource, snapshot, args).First() is bool b)
+            args = new object[] { actionSource, snapshot }.Concat(args).ToArray();
+            if (OnActionSnapshotRestore.Call(args).First() is bool b)
             {
                 return b;
             }
@@ -214,7 +216,7 @@ namespace Hg.SaveHistory.API
             OnInitialized = null;
             OnLoaded = null;
             OnOpened = null;
-            OnSaved = null;
+            OnClosed = null;
 
             SnapshotsFolder = null;
             LastSnapshot = null;

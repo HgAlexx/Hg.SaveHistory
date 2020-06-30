@@ -210,18 +210,17 @@ local snapshotBackup = function(actionSouce)
 
     if Directory.Exists(slotPath) then
         local gameDetailsFilePath = Path.Combine(slotPath, "game.details")
-        local gameDurationFilePath = Path.Combine(slotPath, "game_duration.dat")
 
         local savedAt = File.GetLastWriteTime(gameDetailsFilePath)
         local snapshot = snapshotsBySavedAt(savedAt)
 
         if snapshot == nil then
             local fileKey = fileDecryptBase .. "game.details"
-            -- TODO: convert this into lua function (with .NET call for crypto)
+            -- TODO: convert this into lua function (with .NET call for crypto, or pure lua)
             local fileContent = HgScriptSpecific.DOOMEternal_Decrypt(fileKey, gameDetailsFilePath)
 
             if fileContent == nil then
-                Logger.Debug("snapshotBackup: unable to decrypt game.details")
+                Logger.Error("snapshotBackup: unable to decrypt game.details")
                 return false
             end
 
@@ -241,7 +240,7 @@ local snapshotBackup = function(actionSouce)
                 if snapshot.CategoryId == 14 then
                     local skipFortress = engine:SettingByName("SkipFortress").Value
                     if skipFortress then
-                        Logger.Debug("snapshot: Fortress checkpoint, skipping")
+                        Logger.Debug("snapshot: Fortress checkpoint, skipping by user choice")
                         return true
                     end
                 end
@@ -301,7 +300,7 @@ local snapshotBackup = function(actionSouce)
                             if capture then
                                 Logger.Debug("snapshot: screenshot success")
                             else
-                                Logger.Debug("snapshot: screenshot failed")
+                                Logger.Warning("snapshot: screenshot failed")
                             end
                         end
                     end
@@ -324,14 +323,14 @@ local snapshotBackup = function(actionSouce)
             end
         else
             if snapshot.Status == EngineSnapshotStatus.Deleted then
-                Logger.Debug("snapshot: restored to active")
+                Logger.Information("snapshot: restored to active")
                 snapshot.Status = EngineSnapshotStatus.Active
                 -- it is up to the engine to set LastSnapshot to enable auto select feature
                 engine.LastSnapshot = snapshot
                 -- trigger UI refresh
                 engine:SnapshotsChanges()
             else
-                Logger.Debug("snapshot: already known")
+                Logger.Information("snapshot: already known")
             end
         end
 
@@ -343,7 +342,7 @@ end
 
 
 local snapshotRestore = function(actionSouce, snapshot)
-    Logger.Debug("snapshotRestore")
+    Logger.Information("snapshotRestore: ", actionSouce, ", ", snapshot)
 
     local sourcePath = Path.Combine(snapshotsFolder, snapshot.RelativePath)
     sourcePath = Path.Combine(sourcePath, "GAME-AUTOSAVE" .. (slotIndex - 1))
@@ -479,15 +478,12 @@ engine.OnInitialized = function()
     Logger.Debug("userIdentifier=" .. userIdentifier)
 
 
-
     if platform == 1 then
-        -- Steam: $"{Identifier}MANCUBUS{filename}"
         local steamId = HgSteamHelper.SteamId3ToSteamId64(userIdentifier)
         fileDecryptBase = steamId .. "MANCUBUS"
     end
 
     if platform == 2 then
-        -- Bethesda: $"{Identifier}PAINELEMENTAL{filename}"
         fileDecryptBase = userIdentifier .. "PAINELEMENTAL"
     end
     Logger.Debug("fileDecryptBase=" .. fileDecryptBase)
@@ -517,8 +513,8 @@ engine.OnClosing = function()
     return true
 end
 
-engine.OnSaved = function()
-    Logger.Debug("OnSaved")
+engine.OnClosed = function()
+    Logger.Debug("OnClosed")
 
     if watcher then
         watcher.OnEvent = nil
@@ -530,8 +526,7 @@ engine.OnSaved = function()
 end
 
 engine.OnActionSnapshotBackup = function(actionSource)
-    -- manual backup cannot be detected as death or not
-    return snapshotBackup(actionSource, false)
+    return snapshotBackup(actionSource)
 end
 
 engine.OnActionSnapshotRestore = function(actionSource, snapshot)

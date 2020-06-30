@@ -749,7 +749,7 @@ namespace Hg.SaveHistory.Forms
             if (_luaManager.ActiveEngine?.OnClosing?.Call().First() is bool b && b)
             {
                 SaveProfile();
-                _luaManager.ActiveEngine?.OnSaved?.Call();
+                _luaManager.ActiveEngine?.OnClosed?.Call();
             }
 
             foreach (ColumnHeader column in listViewSnapshot.Columns)
@@ -1453,8 +1453,6 @@ namespace Hg.SaveHistory.Forms
 
         private void OnKeyDown(object sender, KeyEventArgs e, HotKeyToAction hotKeyToAction)
         {
-            Logger.Debug("OnKeyDown: ", _hotKeysManager.GetCurrentStates() + ", " + e.KeyCode);
-
             if (_settingsManager == null || _luaManager == null || _activeProfileFile == null)
             {
                 return;
