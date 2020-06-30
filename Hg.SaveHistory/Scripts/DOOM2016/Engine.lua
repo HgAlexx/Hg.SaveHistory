@@ -47,51 +47,38 @@ local categoryToString = function(category)
     end
 end
 
-local snapshotGetCustomValue = function(snapshot, key)
-    if snapshot.CustomValues:ContainsKey(key) then
-        return snapshot.CustomValues[key]
-    end 
-    return nil
-end
+local snapshotsBySavedAt = function(savedAt)
+    Logger.Debug("snapshotsBySavedAt")
 
-local snapshotsContainsSavedAt = function(savedAt)
-    Logger.Debug("snapshotsContainsSavedAt")
-
-    local count = engine.Snapshots.Count;    
+    local count = engine.Snapshots.Count
     for i = 0, count-1 do
         local snapshot = engine.Snapshots[i]
-        
+
         if snapshot.SavedAt == savedAt then
-            return true
+            return snapshot
         end
     end
 
-    return false
-end
-
-local categories = {}
-local getCategoryById = function(id)
-    if categories[id] then
-        return categories[id]
-    end
     return nil
 end
 
+
 local getMapFullSafeName = function(snapshot)
-    local mapDesc = snapshotGetCustomValue(snapshot, "MapDesc").Value
+    local mapDesc = snapshot:CustomValueByKey("MapDesc").Value
     local level = snapshot.CategoryId
     local safeMap = tostring(level) .. " - " .. HgUtility.SafePath(mapDesc)
-    
+
     Logger.Debug("getMapFullSafeName: ", safeMap)
 
     return safeMap
 end
 
+local categories = {}
 local refreshCategories = function()
     Logger.Debug("refreshCategories")
 
-    local cat = getCategoryById(0)
-    if not cat then
+    local cat = nil
+    if not categories[0] then
         cat = EngineSnapshotCategory()
         cat.Id = 0
         cat.Name = "All"
@@ -101,19 +88,17 @@ local refreshCategories = function()
         categories[0] = cat
     end
 
-    local count = engine.Categories.Count;
-    
+    local count = engine.Categories.Count
+
     -- build category list from snapshots
     for i = 0, engine.Snapshots.Count-1 do
         local snapshot = engine.Snapshots[i]
-
-        local mapName = snapshotGetCustomValue(snapshot, "MapName").Value
-        local mapDesc = snapshotGetCustomValue(snapshot, "MapDesc").Value
+        local mapName = snapshot:CustomValueByKey("MapName").Value
+        local mapDesc = snapshot:CustomValueByKey("MapDesc").Value
         local level = mapsLevels[mapName] or 0
-        
-        cat = getCategoryById(level)
 
-        if level > 0 and not cat then
+        cat = nil
+        if level > 0 and not categories[level] then
             cat = EngineSnapshotCategory()
             cat.Id = level
             cat.Name = mapDesc or "unknown"
@@ -132,7 +117,7 @@ local refreshCategories = function()
 end
 
 local parseGameDetailFile = function(lines)
-    
+
     Logger.Debug("parseGameDetailFile")
 
     local snapshot = EngineSnapshot()
@@ -195,7 +180,7 @@ local parseGameDetailFile = function(lines)
 end
 
 local getSavedAtFromGameDetailFile = function(lines)
-    
+
     Logger.Debug("getSavedAtFromGameDetailFile")
 
     for i = 0, lines.Length-1 do
@@ -222,15 +207,15 @@ local slotIndex =  nil
 local slotPath = ""
 
 local snapshotBackup = function(actionSouce, isDeath)
-    Logger.Debug("snapshotBackup")
+    Logger.Information("snapshotBackup: ", actionSouce, ", ", isDeath)
 
     -- slotPath: source
     -- snapshotsFolder: target
 
     if Directory.Exists(slotPath) then
-        local gameDetailsFilePath = Path.Combine(slotPath, "game.details");
-        local fileContent = File.ReadAllText(gameDetailsFilePath);
-        
+        local gameDetailsFilePath = Path.Combine(slotPath, "game.details")
+        local fileContent = File.ReadAllText(gameDetailsFilePath)
+
         -- .NET version
         local lines = HgUtility.StringSplit(fileContent, "\n\r", StringSplitOptions.RemoveEmptyEntries)
 
@@ -238,20 +223,20 @@ local snapshotBackup = function(actionSouce, isDeath)
         -- local lines = ns.StringSplit(fileContent, "[^\r\n]+")
 
         local savedAt = getSavedAtFromGameDetailFile(lines)
-        
-        if not snapshotsContainsSavedAt(savedAt) then
-            
+        local snapshot = snapshotsBySavedAt(savedAt)
+
+        if snapshot == nil then
             Logger.Debug("snapshot parsing")
-            local snapshot = parseGameDetailFile(lines)
+            snapshot = parseGameDetailFile(lines)
             Logger.Debug("snapshot parsed")
 
             -- if needed, set snapshot.SavedAtToStringFormat
 
-            local custom = EngineSnapshotCustomValueString()            
+            local custom = EngineSnapshotCustomValueString()
             custom.Caption = "Death"
             custom.ShowInDetails = true
             custom.Value = ""
-            if isDeath then
+            if isDeath == true then
                 custom.Value = "🕱"
             end
             snapshot.CustomValues:Add("Death", custom)
@@ -259,13 +244,13 @@ local snapshotBackup = function(actionSouce, isDeath)
             -- get safe map name
             local targetPath = getMapFullSafeName(snapshot)
 
-            local saveAtSafe = savedAt:ToString("yyyy-MM-dd HH.mm.ss");
+            local saveAtSafe = savedAt:ToString("yyyy-MM-dd HH.mm.ss")
             targetPath = Path.Combine(targetPath, saveAtSafe)
 
             -- save relative path to snapshot
             snapshot.RelativePath = targetPath
 
-            -- "GAME-AUTOSAVE" + (_id - 1);
+            -- "GAME-AUTOSAVE" + (_id - 1)
             targetPath = Path.Combine(targetPath, "GAME-AUTOSAVE" .. (slotIndex - 1))
 
             -- full path
@@ -285,8 +270,8 @@ local snapshotBackup = function(actionSouce, isDeath)
 
             Logger.Debug("BackupHelper.CopyFiles: start")
             local copyFiles = BackupHelper.CopyFiles(
-                slotPath, 
-                targetPath, 
+                slotPath,
+                targetPath,
                 canCopy,
                 mustWait,
                 true,
@@ -298,7 +283,7 @@ local snapshotBackup = function(actionSouce, isDeath)
 
                 -- autobackup: screenshot
                 if actionSouce == ActionSource.AutoBackup then
-                    local screenshot = engine:GetSettingByName("Screenshot").Value
+                    local screenshot = engine:SettingByName("Screenshot").Value
                     if screenshot then
                         local bounds = engine.ScreenshotHelper:GetWindowBounds()
                         if bounds then
@@ -328,10 +313,19 @@ local snapshotBackup = function(actionSouce, isDeath)
                 return false
             end
         else
-            Logger.Debug("snapshot: already known")
+            if snapshot.Status == EngineSnapshotStatus.Deleted then
+                Logger.Debug("snapshot: restored to active")
+                snapshot.Status = EngineSnapshotStatus.Active
+                -- it is up to the engine to set LastSnapshot to enable auto select feature
+                engine.LastSnapshot = snapshot
+                -- trigger UI refresh
+                engine:SnapshotsChanges()
+            else
+                Logger.Debug("snapshot: already known")
+            end
         end
 
-        return true    
+        return true
     end
 
     return false
@@ -349,8 +343,8 @@ local snapshotRestore = function(actionSouce, snapshot)
 
     Logger.Debug("BackupHelper.CopyFiles: start")
     local copyFiles = BackupHelper.CopyFiles(
-        sourcePath, 
-        slotPath, 
+        sourcePath,
+        slotPath,
         nil,
         nil,
         true,
@@ -370,13 +364,12 @@ end
 
 local _checkpointStartTime = nil
 local _checkpointBuffer = ""
-local _isCheckPoint = false;
-local _isCheckPointAlt = false;
-local _isGameDuration = false;
-local _isCheckPointMapStart = false;
+local _isCheckPoint = false
+local _isCheckPointAlt = false
+local _isGameDuration = false
+local _isCheckPointMapStart = false
 
 local watcherOnEvent = function(eventType, event)
-    
     Logger.Debug("watcherOnEvent: event.Name = ", event.Name)
 
     if _checkpointStartTime ~= nil then
@@ -389,37 +382,37 @@ local watcherOnEvent = function(eventType, event)
             else
                 Logger.Debug("watcherOnEvent: Too much time since last event, _checkpointBuffer was ", _checkpointBuffer)
             end
-            
+
             -- Too much time since last event, reset states
-            _checkpointBuffer = "";
-            _checkpointStartTime = nil;
-            _isCheckPoint = false;
-            _isCheckPointAlt = false;
-            _isGameDuration = false;
-            _isCheckPointMapStart = false;
+            _checkpointBuffer = ""
+            _checkpointStartTime = nil
+            _isCheckPoint = false
+            _isCheckPointAlt = false
+            _isGameDuration = false
+            _isCheckPointMapStart = false
         end
     end
 
     if not _isGameDuration and event.Name == "game_duration.dat" then
         _isGameDuration = true
-        _checkpointBuffer = _checkpointBuffer .. "G";
+        _checkpointBuffer = _checkpointBuffer .. "G"
     end
 
     if not _isCheckPointMapStart and event.Name == "checkpoint_mapstart.dat" then
         _isCheckPointMapStart = true
-        _checkpointBuffer = _checkpointBuffer .. "M";
+        _checkpointBuffer = _checkpointBuffer .. "M"
     end
 
     -- Mostly in case of death
     if not _isCheckPointAlt and event.Name == "checkpoint_alt.dat" then
         _isCheckPointAlt = true
-        _checkpointBuffer = _checkpointBuffer .. "A";
+        _checkpointBuffer = _checkpointBuffer .. "A"
     end
 
     -- Proper checkpoint
     if not _isCheckPoint and event.Name == "checkpoint.dat" then
         _isCheckPoint = true
-        _checkpointBuffer = _checkpointBuffer .. "C";
+        _checkpointBuffer = _checkpointBuffer .. "C"
     end
 
     if _checkpointStartTime == nil and _checkpointBuffer ~= "" then
@@ -438,7 +431,7 @@ local watcherOnEvent = function(eventType, event)
         elseif ns.StringStartsWith(_checkpointBuffer, "CMGA") then
             Logger.Debug("watcherOnEvent: normal checkpoint")
             -- Normal checkpoint (usually)
-            
+
             -- backup
             local status = snapshotBackup(ActionSource.AutoBackup, false)
             engine:AutoBackupOccurred(status)
@@ -446,9 +439,9 @@ local watcherOnEvent = function(eventType, event)
         elseif _checkpointBuffer == "GA" then
             Logger.Debug("watcherOnEvent: death checkpoint")
             -- Death checkpoint (usually)
-            
+
             -- backup
-            local includeDeath = engine:GetSettingByName("IncludeDeath").Value
+            local includeDeath = engine:SettingByName("IncludeDeath").Value
             if includeDeath then
                 local status = snapshotBackup(ActionSource.AutoBackup, true)
                 engine:AutoBackupOccurred(status)
@@ -466,8 +459,8 @@ local watcherOnEvent = function(eventType, event)
 
 end
 
-engine.OnOpen = function()
-    Logger.Debug("OnOpen")
+engine.OnOpened = function()
+    Logger.Debug("OnOpened")
 
     for i = 0, engine.Snapshots.Count-1 do
         local snapshot = engine.Snapshots[i]
@@ -476,7 +469,7 @@ engine.OnOpen = function()
 
         local customValue = nil
 
-        customValue = snapshotGetCustomValue(snapshot, "Difficulty")
+        customValue = snapshot:CustomValueByKey("Difficulty")
         if customValue then
             -- set customValue.OnToString
             customValue.OnToString = difficultyToString
@@ -485,43 +478,66 @@ engine.OnOpen = function()
         -- if needed, handle other customValue
 
     end
+
+    refreshCategories()
 end
 
 local NotifyFilters_FileName = 1
 local NotifyFilters_DirectoryName = 2
 
-engine.OnInitialize = function()
-    Logger.Debug("OnInitialize")
+local watcher = nil
+
+engine.OnInitialized = function()
+    Logger.Debug("OnInitialized")
 
     --  Target backup folder
     snapshotsFolder = engine.SnapshotsFolder
     Logger.Debug("snapshotsFolder=" .. snapshotsFolder)
 
-    sourceFolder =  engine:GetSettingByName("SourceFolder").Value
+    sourceFolder =  engine:SettingByName("SourceFolder").Value
     Logger.Debug("sourceFolder=" .. sourceFolder)
 
-    slotIndex =  engine:GetSettingByName("SlotIndex").Value
+    slotIndex =  engine:SettingByName("SlotIndex").Value
     Logger.Debug("slotIndex=" .. slotIndex)
 
     -- full source path (where files are)
     slotPath = Path.Combine(sourceFolder, "GAME-AUTOSAVE" .. (slotIndex - 1))
     Logger.Debug("slotPath=" .. slotPath)
-    
-    local watcher = EngineWatcher()
+
+    watcher = EngineWatcher()
     watcher.Path = slotPath
     watcher.WatchParent = true
     watcher.Filter = "*"
     watcher.NotifyFilter = NotifyFilters_FileName
     watcher.WatchRenamed = true
     watcher.OnEvent = watcherOnEvent
-    
+
     engine:SetupWatcher(watcher)
-    
-    engine.Categories:Clear()
+end
 
-    refreshCategories()
+engine.OnLoaded = function()
+    Logger.Debug("OnLoaded")
 
+    engine:CategoriesChanges()
     engine:SnapshotsChanges()
+end
+
+engine.OnClosing = function()
+    Logger.Debug("OnClosing")
+
+    return true
+end
+
+engine.OnSaved = function()
+    Logger.Debug("OnSaved")
+
+    if watcher then
+        watcher.OnEvent = nil
+    end
+    watcher = nil
+
+    categories = nil
+
 end
 
 engine.OnActionSnapshotBackup = function(actionSource)

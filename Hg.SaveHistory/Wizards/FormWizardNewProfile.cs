@@ -29,16 +29,14 @@ namespace Hg.SaveHistory.Wizards
         {
             InitializeComponent();
 
-            var engineScriptManager1 = engineScriptManager;
-
             // Load official engines
-            foreach (var backupEngine in engineScriptManager1.BackupEngines.Where(backupEngine => backupEngine.Official))
+            foreach (var backupEngine in engineScriptManager.BackupEngines.Where(backupEngine => backupEngine.Official))
             {
                 comboBoxEngineOfficial.Items.Add(backupEngine);
             }
 
             // Load third party engines
-            foreach (var backupEngine in engineScriptManager1.BackupEngines.Where(backupEngine => !backupEngine.Official))
+            foreach (var backupEngine in engineScriptManager.BackupEngines.Where(backupEngine => !backupEngine.Official))
             {
                 comboBoxEngineOfficial.Items.Add(backupEngine);
             }
@@ -347,6 +345,8 @@ namespace Hg.SaveHistory.Wizards
 
             foreach (var setting in _luaManager.ActiveEngine.Settings.Where(s => s.Kind == EngineSettingKind.Setup).OrderBy(s => -s.Index))
             {
+                // TODO: missing settings types
+
                 if (setting is EngineSettingCombobox settingCombobox)
                 {
                     var control = new EngineSettingComboboxControl

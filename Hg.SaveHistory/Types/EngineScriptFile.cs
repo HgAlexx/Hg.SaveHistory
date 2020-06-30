@@ -38,6 +38,8 @@ namespace Hg.SaveHistory.Types
                     }
                 }
 
+                fileInfo = null;
+
                 return builder.ToString();
             }
 

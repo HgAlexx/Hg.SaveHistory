@@ -19,12 +19,12 @@ setting.Description = "Select the root folder where the game save files are loca
 setting.HelpTooltip = "This must be the folder containing the GAME-AUTOSAVEX folders"
 setting.Kind = EngineSettingKind.Setup
 setting.OnAutoDetect = function()
-	local s = '%USERPROFILE%\\Saved Games\\id Software\\DOOM\\base\\savegame.user'
+    local s = '%USERPROFILE%\\Saved Games\\id Software\\DOOM\\base\\savegame.user'
     local path = Environment.ExpandEnvironmentVariables(s)
-	Logger.Debug(path)
+    Logger.Debug(path)
 
     if (not Directory.Exists(path)) then
-        return ''
+        return ""
     end
 
     local directoryInfo = DirectoryInfo(path)
@@ -33,15 +33,20 @@ setting.OnAutoDetect = function()
     end
 
     local dirs = directoryInfo:GetDirectories()
-    
+
     for i = 0, dirs.Length-1 do
         directory = dirs[i]
         if (string.match(directory.Name, "^([%d]+)$")) then
-            return directory.FullName;
+            directoryInfo = nil
+            local fullname = directory.FullName
+            directory = nil
+            return fullname
         end
+        directory = nil
     end
 
-	return ''
+    directoryInfo = nil
+    return ""
 end
 engine:AddSetting(setting)
 
@@ -55,7 +60,7 @@ settingSlot.Kind = EngineSettingKind.Setup
 settingSlot.Values:Add(1, "Slot 1")
 settingSlot.Values:Add(2, "Slot 2")
 settingSlot.Values:Add(3, "Slot 3")
-settingSlot.Value = 1;
+settingSlot.Value = 1
 engine:AddSetting(settingSlot)
 
 

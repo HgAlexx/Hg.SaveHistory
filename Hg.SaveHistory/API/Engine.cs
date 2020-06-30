@@ -11,24 +11,53 @@ namespace Hg.SaveHistory.API
     {
         #region Fields & Properties
 
-        // Main Events
-        public LuaFunction OnActionSnapshotBackup = null;
-        public LuaFunction OnActionSnapshotRestore = null;
+        public LuaFunction OnActionSnapshotBackup;
+
+        public LuaFunction OnActionSnapshotRestore;
 
         public event EventHandlerAutoBackupOccurred OnAutoBackupOccurred;
 
         public event EventHandlerCategoriesChanged OnCategoriesChanges;
 
-        // Before the engine is unloaded
-        public LuaFunction OnClose = null;
+        /// <summary>
+        ///     Before the profile is saved to disk
+        ///     Must return true to allow saving
+        /// </summary>
+        /// <returns>Must return a boolean value</returns>
+        public LuaFunction OnClosing;
 
-        // After GUI initialized, Before loading snapshots/categories
-        public LuaFunction OnInitialize = null;
+        /// <summary>
+        ///     After profile and engine are fully loaded
+        ///     After engine events are set
+        ///     Before the watcher is set
+        /// </summary>
+        public LuaFunction OnInitialized;
+
+        /// <summary>
+        ///     After the watcher is set
+        ///     After profile, engine and GUI is fully loaded and initialized
+        ///     Last LoadProfile event
+        /// </summary>
+        public LuaFunction OnLoaded;
+
 
         public event MessageEventHandler OnMessage;
 
-        // After engine and settings loaded
-        public LuaFunction OnOpen = null;
+
+        /// <summary>
+        ///     First LoadProfile event
+        ///     After engine and profile loaded from file
+        ///     - At this point snapshots and settings are loaded in the Engine instance
+        ///     Before runtime settings are loaded into the GUI
+        ///     Before listview columns are initialized
+        /// </summary>
+        public LuaFunction OnOpened;
+
+        /// <summary>
+        ///     After the profile is saved and before the engine unload
+        ///     Release final resources here
+        /// </summary>
+        public LuaFunction OnSaved;
 
         public LuaFunction OnSetupSuggestProfileName = null;
 
@@ -55,7 +84,7 @@ namespace Hg.SaveHistory.API
 
         public List<EngineSnapshot> Snapshots { get; } = new List<EngineSnapshot>();
 
-        public string SnapshotsFolder { get; }
+        public string SnapshotsFolder { get; private set; }
 
         public string Title { get; }
 
@@ -104,7 +133,7 @@ namespace Hg.SaveHistory.API
         // Actions
         public bool ActionSnapshotBackup(ActionSource actionSource, params object[] args)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             if (OnActionSnapshotBackup.Call(actionSource, args).First() is bool b)
             {
@@ -116,7 +145,7 @@ namespace Hg.SaveHistory.API
 
         public bool ActionSnapshotRestore(ActionSource actionSource, EngineSnapshot snapshot, params object[] args)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             if (OnActionSnapshotRestore.Call(actionSource, snapshot, args).First() is bool b)
             {
@@ -170,12 +199,54 @@ namespace Hg.SaveHistory.API
 
         public void CategoriesChanges()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             OnCategoriesChanges?.Invoke();
         }
 
-        public EngineSetting GetSettingByName(string name)
+        [LuaHide]
+        public void Release()
+        {
+            OnActionSnapshotBackup = null;
+            OnActionSnapshotRestore = null;
+
+            OnClosing = null;
+            OnInitialized = null;
+            OnLoaded = null;
+            OnOpened = null;
+            OnSaved = null;
+
+            SnapshotsFolder = null;
+            LastSnapshot = null;
+
+            Watcher = null;
+
+            foreach (var category in Categories)
+            {
+                category.OnEquals = null;
+                category.OnToString = null;
+            }
+
+            Categories.Clear();
+
+            foreach (var snapshot in Snapshots)
+            {
+                foreach (var pair in snapshot.CustomValues)
+                {
+                    pair.Value.OnToString = null;
+                }
+
+                snapshot.OnEquals = null;
+            }
+
+            Snapshots.Clear();
+
+            SnapshotColumnsDefinition.Clear();
+
+            ProcessNames.Clear();
+        }
+
+        public EngineSetting SettingByName(string name)
         {
             return Settings.FirstOrDefault(setting => setting.Name == name);
         }
@@ -187,7 +258,7 @@ namespace Hg.SaveHistory.API
 
         public void SnapshotsChanges()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             OnSnapshotsChanges?.Invoke();
         }

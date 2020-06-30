@@ -14,16 +14,19 @@ namespace Hg.SaveHistory.Types
 
         // Name of engine script
         public string EngineScriptName;
+
         public string FilePath;
 
         // Display name of profile
         public string Name;
+
         public string RootFolder;
 
         public List<ProfileSetting> Settings = new List<ProfileSetting>();
 
         // Snapshots
         public List<EngineSnapshot> Snapshots = new List<EngineSnapshot>();
+
         public string SortKey;
 
         // Settings
@@ -45,6 +48,7 @@ namespace Hg.SaveHistory.Types
             if (File.Exists(path))
             {
                 var profile = FromJson(File.ReadAllText(path));
+
                 profile.FilePath = path;
                 profile.RootFolder = Path.GetDirectoryName(path);
 
@@ -52,6 +56,23 @@ namespace Hg.SaveHistory.Types
             }
 
             return null;
+        }
+
+        public void Release()
+        {
+            foreach (var snapshot in Snapshots)
+            {
+                foreach (var pair in snapshot.CustomValues)
+                {
+                    pair.Value.OnToString = null;
+                }
+
+                snapshot.OnEquals = null;
+            }
+
+            Snapshots.Clear();
+
+            Settings.Clear();
         }
 
         public static bool Save(ProfileFile profile)

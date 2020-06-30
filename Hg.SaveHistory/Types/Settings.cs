@@ -37,13 +37,14 @@ namespace Hg.SaveHistory.Types
         {
             HotKeyToActions = new List<HotKeyToAction>();
 
+            AutoBackupSoundNotification = false;
             AutoSelectLastSnapshot = true;
 
             HighlightSelectedSnapshot = true;
             HighlightSelectedSnapshotColor = Color.DeepSkyBlue;
 
             HotKeysActive = false;
-            HotKeysSound = true;
+            HotKeysSound = false;
 
             NotificationMode = MessageMode.Status;
 

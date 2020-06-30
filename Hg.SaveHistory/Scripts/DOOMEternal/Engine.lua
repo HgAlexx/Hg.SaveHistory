@@ -54,51 +54,38 @@ local categoryToString = function(category)
     end
 end
 
-local snapshotGetCustomValue = function(snapshot, key)
-    if snapshot.CustomValues:ContainsKey(key) then
-        return snapshot.CustomValues[key]
-    end 
-    return nil
-end
+local snapshotsBySavedAt = function(savedAt)
+    Logger.Debug("snapshotsBySavedAt")
 
-local snapshotsContainsSavedAt = function(savedAt)
-    Logger.Debug("snapshotsContainsSavedAt")
-
-    local count = engine.Snapshots.Count;    
+    local count = engine.Snapshots.Count
     for i = 0, count-1 do
         local snapshot = engine.Snapshots[i]
-        
+
         if snapshot.SavedAt == savedAt then
-            return true
+            return snapshot
         end
     end
 
-    return false
-end
-
-local categories = {}
-local getCategoryById = function(id)
-    if categories[id] then
-        return categories[id]
-    end
     return nil
 end
 
+
 local getMapFullSafeName = function(snapshot)
-    local mapDesc = snapshotGetCustomValue(snapshot, "MapDesc").Value
+    local mapDesc = snapshot:CustomValueByKey("MapDesc").Value
     local level = snapshot.CategoryId
     local safeMap = tostring(level) .. " - " .. HgUtility.SafePath(mapDesc)
-    
+
     Logger.Debug("getMapFullSafeName: ", safeMap)
 
     return safeMap
 end
 
+local categories = {}
 local refreshCategories = function()
     Logger.Debug("refreshCategories")
 
-    local cat = getCategoryById(0)
-    if not cat then
+    local cat = nil
+    if not categories[0] then
         cat = EngineSnapshotCategory()
         cat.Id = 0
         cat.Name = "All"
@@ -108,19 +95,18 @@ local refreshCategories = function()
         categories[0] = cat
     end
 
-    local count = engine.Categories.Count;
-    
+    local count = engine.Categories.Count
+
     -- build category list from snapshots
     for i = 0, engine.Snapshots.Count-1 do
         local snapshot = engine.Snapshots[i]
 
-        local mapName = snapshotGetCustomValue(snapshot, "MapName").Value
-        local mapDesc = snapshotGetCustomValue(snapshot, "MapDesc").Value
+        local mapName = snapshot:CustomValueByKey("MapName").Value
+        local mapDesc = snapshot:CustomValueByKey("MapDesc").Value
         local level = mapsLevels[mapName] or 0
-        
-        cat = getCategoryById(level)
 
-        if level > 0 and not cat then
+        cat = nil
+        if level > 0 and not categories[level] then
             cat = EngineSnapshotCategory()
             cat.Id = level
             cat.Name = mapDesc or "unknown"
@@ -139,7 +125,7 @@ local refreshCategories = function()
 end
 
 local parseGameDetailFile = function(lines, saveAt)
-    
+
     Logger.Debug("parseGameDetailFile")
 
     local snapshot = EngineSnapshot()
@@ -217,25 +203,22 @@ local userIdentifier = nil
 local fileDecryptBase = nil
 
 local snapshotBackup = function(actionSouce)
-    Logger.Debug("snapshotBackup")
+    Logger.Information("snapshotBackup: ", actionSouce)
 
     -- slotPath: source
     -- snapshotsFolder: target
 
     if Directory.Exists(slotPath) then
-        local gameDetailsFilePath = Path.Combine(slotPath, "game.details");
-        local gameDurationFilePath = Path.Combine(slotPath, "game_duration.dat");
-        
+        local gameDetailsFilePath = Path.Combine(slotPath, "game.details")
+        local gameDurationFilePath = Path.Combine(slotPath, "game_duration.dat")
+
         local savedAt = File.GetLastWriteTime(gameDetailsFilePath)
-        
-        if savedAt and not snapshotsContainsSavedAt(savedAt) then
+        local snapshot = snapshotsBySavedAt(savedAt)
 
---            local fileKey = fileDecryptBase .. "game_duration.dat"
---            local fileContent = HgScriptSpecific.DOOMEternal_Decrypt(fileKey, gameDurationFilePath);
-
+        if snapshot == nil then
             local fileKey = fileDecryptBase .. "game.details"
             -- TODO: convert this into lua function (with .NET call for crypto)
-            local fileContent = HgScriptSpecific.DOOMEternal_Decrypt(fileKey, gameDetailsFilePath);
+            local fileContent = HgScriptSpecific.DOOMEternal_Decrypt(fileKey, gameDetailsFilePath)
 
             if fileContent == nil then
                 Logger.Debug("snapshotBackup: unable to decrypt game.details")
@@ -249,22 +232,22 @@ local snapshotBackup = function(actionSouce)
             -- local lines = ns.StringSplit(fileContent, "[^\r\n]+")
 
             Logger.Debug("snapshot parsing")
-            local snapshot = parseGameDetailFile(lines, savedAt)
+            snapshot = parseGameDetailFile(lines, savedAt)
             Logger.Debug("snapshot parsed")
 
             -- if needed, set snapshot.SavedAtToStringFormat
 
             if actionSouce == ActionSource.AutoBackup then
                 if snapshot.CategoryId == 14 then
-                    local skipFortress = engine:GetSettingByName("SkipFortress").Value
+                    local skipFortress = engine:SettingByName("SkipFortress").Value
                     if skipFortress then
                         Logger.Debug("snapshot: Fortress checkpoint, skipping")
                         return true
                     end
                 end
 
-                local customDeath = snapshotGetCustomValue(snapshot, "Death").Value
-                local includeDeath = engine:GetSettingByName("IncludeDeath").Value
+                local customDeath = snapshot:CustomValueByKey("Death").Value
+                local includeDeath = engine:SettingByName("IncludeDeath").Value
                 if customDeath and not includeDeath then
                     Logger.Debug("snapshot: death checkpoint, skipping")
                     return true
@@ -274,13 +257,13 @@ local snapshotBackup = function(actionSouce)
             -- get safe map name
             local targetPath = getMapFullSafeName(snapshot)
 
-            local saveAtSafe = savedAt:ToString("yyyy-MM-dd HH.mm.ss");
+            local saveAtSafe = savedAt:ToString("yyyy-MM-dd HH.mm.ss")
             targetPath = Path.Combine(targetPath, saveAtSafe)
 
             -- save relative path to snapshot
             snapshot.RelativePath = targetPath
 
-            -- "GAME-AUTOSAVE" + (_id - 1);
+            -- "GAME-AUTOSAVE" + (_id - 1)
             targetPath = Path.Combine(targetPath, "GAME-AUTOSAVE" .. (slotIndex - 1))
 
             -- full path
@@ -297,8 +280,8 @@ local snapshotBackup = function(actionSouce)
 
             Logger.Debug("BackupHelper.CopyFiles: start")
             local copyFiles = BackupHelper.CopyFiles(
-                slotPath, 
-                targetPath, 
+                slotPath,
+                targetPath,
                 canCopy,
                 nil,
                 true,
@@ -310,7 +293,7 @@ local snapshotBackup = function(actionSouce)
 
                 -- autobackup: screenshot
                 if actionSouce == ActionSource.AutoBackup then
-                    local screenshot = engine:GetSettingByName("Screenshot").Value
+                    local screenshot = engine:SettingByName("Screenshot").Value
                     if screenshot then
                         local bounds = engine.ScreenshotHelper:GetWindowBounds()
                         if bounds then
@@ -340,7 +323,16 @@ local snapshotBackup = function(actionSouce)
                 return false
             end
         else
-            Logger.Debug("snapshot: already known")
+            if snapshot.Status == EngineSnapshotStatus.Deleted then
+                Logger.Debug("snapshot: restored to active")
+                snapshot.Status = EngineSnapshotStatus.Active
+                -- it is up to the engine to set LastSnapshot to enable auto select feature
+                engine.LastSnapshot = snapshot
+                -- trigger UI refresh
+                engine:SnapshotsChanges()
+            else
+                Logger.Debug("snapshot: already known")
+            end
         end
 
         return true
@@ -361,8 +353,8 @@ local snapshotRestore = function(actionSouce, snapshot)
 
     Logger.Debug("BackupHelper.CopyFiles: start")
     local copyFiles = BackupHelper.CopyFiles(
-        sourcePath, 
-        slotPath, 
+        sourcePath,
+        slotPath,
         nil,
         nil,
         true,
@@ -382,10 +374,9 @@ end
 
 local _checkpointStartTime = nil
 local _checkpointBuffer = ""
-local _isGameDuration = false;
+local _isGameDuration = false
 
 local watcherOnEvent = function(eventType, event)
-    
     Logger.Debug("watcherOnEvent: event.Name = ", event.Name)
 
     if _checkpointStartTime ~= nil then
@@ -394,17 +385,17 @@ local watcherOnEvent = function(eventType, event)
         -- 3 seconds might be too small for some computers, we'll see if we need to add this into a runtime setting
         if timeSpan.TotalSeconds >= 3 then
             Logger.Debug("watcherOnEvent: Too much time since last event, _checkpointBuffer was ", _checkpointBuffer)
-            
+
             -- Too much time since last event, reset states
-            _checkpointBuffer = "";
-            _checkpointStartTime = nil;
-            _isGameDuration = false;
+            _checkpointBuffer = ""
+            _checkpointStartTime = nil
+            _isGameDuration = false
         end
     end
 
     if not _isGameDuration and event.Name == "game_duration.dat" then
         _isGameDuration = true
-        _checkpointBuffer = _checkpointBuffer .. "G";
+        _checkpointBuffer = _checkpointBuffer .. "G"
     end
 
     if _checkpointStartTime == nil and _checkpointBuffer ~= "" then
@@ -430,8 +421,8 @@ local watcherOnEvent = function(eventType, event)
 
 end
 
-engine.OnOpen = function()
-    Logger.Debug("OnOpen")
+engine.OnOpened = function()
+    Logger.Debug("OnOpened")
 
     for i = 0, engine.Snapshots.Count-1 do
         local snapshot = engine.Snapshots[i]
@@ -440,13 +431,13 @@ engine.OnOpen = function()
 
         local customValue = nil
 
-        customValue = snapshotGetCustomValue(snapshot, "Difficulty")
+        customValue = snapshot:CustomValueByKey("Difficulty")
         if customValue then
             -- set customValue.OnToString
             customValue.OnToString = difficultyToString
         end
 
-        customValue = snapshotGetCustomValue(snapshot, "Death")
+        customValue = snapshot:CustomValueByKey("Death")
         if customValue then
             -- set customValue.OnToString
             customValue.OnToString = deathToString
@@ -455,50 +446,53 @@ engine.OnOpen = function()
         -- if needed, handle other customValue
 
     end
+
+    refreshCategories()
 end
 
 local NotifyFilters_FileName = 1
 local NotifyFilters_DirectoryName = 2
 
-engine.OnInitialize = function()
-    Logger.Debug("OnInitialize")
+local watcher = nil
 
-    platform =  engine:GetSettingByName("Platform").Value
+engine.OnInitialized = function()
+    Logger.Debug("OnInitialized")
+
+    platform =  engine:SettingByName("Platform").Value
     Logger.Debug("platform=" .. platform)
 
     --  Target backup folder
     snapshotsFolder = engine.SnapshotsFolder
     Logger.Debug("snapshotsFolder=" .. snapshotsFolder)
 
-    sourceFolder =  engine:GetSettingByName("SourceFolder").Value
+    sourceFolder =  engine:SettingByName("SourceFolder").Value
     Logger.Debug("sourceFolder=" .. sourceFolder)
 
-    slotIndex =  engine:GetSettingByName("SlotIndex").Value
+    slotIndex =  engine:SettingByName("SlotIndex").Value
     Logger.Debug("slotIndex=" .. slotIndex)
 
     -- full source path (where files are)
     slotPath = Path.Combine(sourceFolder, "GAME-AUTOSAVE" .. (slotIndex - 1))
     Logger.Debug("slotPath=" .. slotPath)
 
-    userIdentifier =  engine:GetSettingByName("UserIdentifier").Value
+    userIdentifier =  engine:SettingByName("UserIdentifier").Value
     Logger.Debug("userIdentifier=" .. userIdentifier)
 
 
 
     if platform == 1 then
-        -- Steam: $"{Identifier}MANCUBUS{filename}", fileData        
-        local steamId = HgSteamHelper.SteamId3ToSteamId64(userIdentifier)        
+        -- Steam: $"{Identifier}MANCUBUS{filename}"
+        local steamId = HgSteamHelper.SteamId3ToSteamId64(userIdentifier)
         fileDecryptBase = steamId .. "MANCUBUS"
     end
 
     if platform == 2 then
-        -- Bethesda: $"{Identifier}PAINELEMENTAL{filename}", fileData        
+        -- Bethesda: $"{Identifier}PAINELEMENTAL{filename}"
         fileDecryptBase = userIdentifier .. "PAINELEMENTAL"
     end
     Logger.Debug("fileDecryptBase=" .. fileDecryptBase)
-    
 
-    local watcher = EngineWatcher()
+    watcher = EngineWatcher()
     watcher.Path = slotPath
     watcher.WatchParent = true
     watcher.Filter = "*"
@@ -506,14 +500,33 @@ engine.OnInitialize = function()
     watcher.WatchRenamed = true
     watcher.WatchChanged = true
     watcher.OnEvent = watcherOnEvent
-    
+
     engine:SetupWatcher(watcher)
-    
-    engine.Categories:Clear()
+end
 
-    refreshCategories()
+engine.OnLoaded = function()
+    Logger.Debug("OnLoaded")
 
+    engine:CategoriesChanges()
     engine:SnapshotsChanges()
+end
+
+engine.OnClosing = function()
+    Logger.Debug("OnClosing")
+
+    return true
+end
+
+engine.OnSaved = function()
+    Logger.Debug("OnSaved")
+
+    if watcher then
+        watcher.OnEvent = nil
+    end
+    watcher = nil
+
+    categories = nil
+
 end
 
 engine.OnActionSnapshotBackup = function(actionSource)

@@ -23,13 +23,14 @@ namespace Hg.SaveHistory.Managers
 
         private readonly string _parentPath;
 
-        private readonly EngineWatcher _watcher;
-
         private AutoBackupStatus _autoBackupEnabled;
-        private bool _exiting;
-        private FileSystemWatcher _fileSystemWatcherMain;
 
+        private bool _exiting;
+
+        private FileSystemWatcher _fileSystemWatcherMain;
         private FileSystemWatcher _fileSystemWatcherParentFolder;
+
+        private EngineWatcher _watcher;
 
         public AutoBackupStatus AutoBackupStatus
         {
@@ -67,19 +68,28 @@ namespace Hg.SaveHistory.Managers
                 _parentName = null;
             }
 
+            AutoBackupStatus = AutoBackupStatus.Disabled;
+
             Logger.Debug("WatcherManager: _parentPath=", _parentPath);
             Logger.Debug("WatcherManager: _parentName=", _parentName);
         }
 
         public void Release()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             _exiting = true;
+
+            IsProcessRunning = null;
+
+            AutoBackupStatusChanged = null;
 
             if (_fileSystemWatcherParentFolder != null)
             {
                 _fileSystemWatcherParentFolder.EnableRaisingEvents = false;
+
+                _fileSystemWatcherParentFolder.Created -= FileSystemWatcherParentFolderOnCreated;
+                _fileSystemWatcherParentFolder.Deleted -= FileSystemWatcherParentFolderOnDeleted;
             }
 
             _fileSystemWatcherParentFolder = null;
@@ -87,11 +97,32 @@ namespace Hg.SaveHistory.Managers
             if (_fileSystemWatcherMain != null)
             {
                 _fileSystemWatcherMain.EnableRaisingEvents = false;
+
+                if (_watcher.WatchCreated)
+                {
+                    _fileSystemWatcherMain.Created -= FileSystemWatcherMainOnCreated;
+                }
+
+                if (_watcher.WatchChanged)
+                {
+                    _fileSystemWatcherMain.Changed -= FileSystemWatcherMainOnChanged;
+                }
+
+                if (_watcher.WatchDeleted)
+                {
+                    _fileSystemWatcherMain.Deleted -= FileSystemWatcherMainOnDeleted;
+                }
+
+                if (_watcher.WatchRenamed)
+                {
+                    _fileSystemWatcherMain.Renamed -= FileSystemWatcherMainOnRenamed;
+                }
             }
 
             _fileSystemWatcherMain = null;
-        }
 
+            _watcher = null;
+        }
 
         public AutoBackupStatus SetAutoBackup(bool enable)
         {
@@ -198,6 +229,26 @@ namespace Hg.SaveHistory.Managers
             }
         }
 
+        private void FileSystemWatcherMainOnChanged(object sender, FileSystemEventArgs args)
+        {
+            DoOnEvent(EngineWatcherEventType.Changed, args);
+        }
+
+        private void FileSystemWatcherMainOnCreated(object sender, FileSystemEventArgs args)
+        {
+            DoOnEvent(EngineWatcherEventType.Created, args);
+        }
+
+        private void FileSystemWatcherMainOnDeleted(object sender, FileSystemEventArgs args)
+        {
+            DoOnEvent(EngineWatcherEventType.Deleted, args);
+        }
+
+        private void FileSystemWatcherMainOnRenamed(object sender, RenamedEventArgs args)
+        {
+            DoOnEvent(EngineWatcherEventType.Renamed, args);
+        }
+
         private void FileSystemWatcherParentFolderOnCreated(object sender, FileSystemEventArgs e)
         {
             Logger.Debug("FileSystemWatcherParentFolderOnCreated");
@@ -251,22 +302,22 @@ namespace Hg.SaveHistory.Managers
 
             if (_watcher.WatchCreated)
             {
-                _fileSystemWatcherMain.Created += (sender, args) => { DoOnEvent(EngineWatcherEventType.Created, args); };
+                _fileSystemWatcherMain.Created += FileSystemWatcherMainOnCreated;
             }
 
             if (_watcher.WatchChanged)
             {
-                _fileSystemWatcherMain.Changed += (sender, args) => { DoOnEvent(EngineWatcherEventType.Changed, args); };
+                _fileSystemWatcherMain.Changed += FileSystemWatcherMainOnChanged;
             }
 
             if (_watcher.WatchDeleted)
             {
-                _fileSystemWatcherMain.Deleted += (sender, args) => { DoOnEvent(EngineWatcherEventType.Deleted, args); };
+                _fileSystemWatcherMain.Deleted += FileSystemWatcherMainOnDeleted;
             }
 
             if (_watcher.WatchRenamed)
             {
-                _fileSystemWatcherMain.Renamed += (sender, args) => { DoOnEvent(EngineWatcherEventType.Renamed, args); };
+                _fileSystemWatcherMain.Renamed += FileSystemWatcherMainOnRenamed;
             }
 
             Logger.Debug("MakeMainWatcher: _fileSystemWatcherMain created");

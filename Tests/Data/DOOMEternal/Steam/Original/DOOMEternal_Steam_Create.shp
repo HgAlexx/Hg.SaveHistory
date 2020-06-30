@@ -1,0 +1,53 @@
+{
+  "EngineScriptName": "DOOMEternal",
+  "FilePath": "%SOURCEFOLDER%\\DOOMEternal_Steam_Create.shp",
+  "Name": "DOOMEternal_Steam",
+  "RootFolder": null,
+  "Settings": [
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingInteger, Hg.SaveHistory",
+      "Value": 1,
+      "Kind": "Setup",
+      "Name": "Platform"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingString, Hg.SaveHistory",
+      "Value": "%SOURCEFOLDER%",
+      "Kind": "Setup",
+      "Name": "SourceFolder"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingInteger, Hg.SaveHistory",
+      "Value": 1,
+      "Kind": "Setup",
+      "Name": "SlotIndex"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingString, Hg.SaveHistory",
+      "Value": "13371337",
+      "Kind": "Hidden",
+      "Name": "UserIdentifier"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingBoolean, Hg.SaveHistory",
+      "Value": false,
+      "Kind": "Runtime",
+      "Name": "IncludeDeath"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingBoolean, Hg.SaveHistory",
+      "Value": false,
+      "Kind": "Runtime",
+      "Name": "Screenshot"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingBoolean, Hg.SaveHistory",
+      "Value": false,
+      "Kind": "Runtime",
+      "Name": "SkipFortress"
+    }
+  ],
+  "Snapshots": [],
+  "SortKey": null,
+  "SortOrder": 0
+}

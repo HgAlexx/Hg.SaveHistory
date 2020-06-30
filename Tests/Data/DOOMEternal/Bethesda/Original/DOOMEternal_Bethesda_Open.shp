@@ -1,0 +1,53 @@
+{
+  "EngineScriptName": "DOOMEternal",
+  "FilePath": "%SOURCEFOLDER%\\DOOMEternal_Bethesda_Open.shp",
+  "Name": "DOOMEternal_Bethesda",
+  "RootFolder": "%SOURCEFOLDER%",
+  "Settings": [
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingInteger, Hg.SaveHistory",
+      "Value": 2,
+      "Kind": "Setup",
+      "Name": "Platform"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingString, Hg.SaveHistory",
+      "Value": "%SOURCEFOLDER%",
+      "Kind": "Setup",
+      "Name": "SourceFolder"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingInteger, Hg.SaveHistory",
+      "Value": 1,
+      "Kind": "Setup",
+      "Name": "SlotIndex"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingString, Hg.SaveHistory",
+      "Value": "d8d67efe-5bae-453a-aad5-08a71028d4dd",
+      "Kind": "Hidden",
+      "Name": "UserIdentifier"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingBoolean, Hg.SaveHistory",
+      "Value": false,
+      "Kind": "Runtime",
+      "Name": "IncludeDeath"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingBoolean, Hg.SaveHistory",
+      "Value": false,
+      "Kind": "Runtime",
+      "Name": "Screenshot"
+    },
+    {
+      "$type": "Hg.SaveHistory.Types.ProfileSettingBoolean, Hg.SaveHistory",
+      "Value": false,
+      "Kind": "Runtime",
+      "Name": "SkipFortress"
+    }
+  ],
+  "Snapshots": [],
+  "SortKey": null,
+  "SortOrder": 0
+}

@@ -18,6 +18,7 @@ namespace Hg.SaveHistory.API
         public string NameSafe;
 
         public LuaFunction OnEquals = null;
+
         public LuaFunction OnToString = null;
 
         #endregion
@@ -36,7 +37,7 @@ namespace Hg.SaveHistory.API
 
         public override string ToString()
         {
-            if (OnToString != null && OnToString.Call(this).First() is string value)
+            if (OnToString != null && OnToString.Call(this).FirstOrDefault() is string value)
             {
                 return value;
             }

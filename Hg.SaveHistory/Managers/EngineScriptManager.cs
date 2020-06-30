@@ -16,6 +16,78 @@ namespace Hg.SaveHistory.Managers
 
         #region Members
 
+        public static EngineScript LoadEngineScript(DirectoryInfo dirInfo)
+        {
+            EngineScript engineScript = null;
+
+            foreach (FileInfo fileInfo in dirInfo.GetFiles("*.toc", SearchOption.TopDirectoryOnly))
+            {
+                string filename = Path.GetFileNameWithoutExtension(fileInfo.Name);
+                if (filename == dirInfo.Name)
+                {
+                    string fileRelativePath = Path.Combine(dirInfo.Name, fileInfo.Name);
+
+                    engineScript = new EngineScript {Name = filename};
+
+
+                    var engineScriptFile = new EngineScriptFile
+                    {
+                        FileName = fileRelativePath, FileFullName = fileInfo.FullName, IsToc = true
+                    };
+
+                    engineScript.Files.Add(engineScriptFile);
+
+                    List<string> tocContent = File.ReadAllLines(fileInfo.FullName).ToList();
+                    foreach (string line in tocContent)
+                    {
+                        string trimmedLine = line.Trim();
+                        if (trimmedLine.StartsWith("##"))
+                        {
+                            if (TocReadValue(trimmedLine, "## Title:", out var value))
+                            {
+                                engineScript.Title = value;
+                                continue;
+                            }
+
+                            if (TocReadValue(trimmedLine, "## Author:", out value))
+                            {
+                                engineScript.Author = value;
+                                continue;
+                            }
+
+                            if (TocReadValue(trimmedLine, "## Description:", out value))
+                            {
+                                if (!string.IsNullOrEmpty(engineScript.Description))
+                                {
+                                    engineScript.Description += Environment.NewLine;
+                                }
+
+                                engineScript.Description += value;
+                                continue;
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(trimmedLine) && !trimmedLine.StartsWith("##") && trimmedLine.EndsWith(".lua"))
+                        {
+                            fileRelativePath = Path.Combine(dirInfo.Name, trimmedLine);
+                            string fileFullPath = Path.Combine(dirInfo.FullName, trimmedLine);
+
+                            engineScriptFile = new EngineScriptFile
+                            {
+                                FileName = fileRelativePath, FileFullName = fileFullPath, IsToc = false
+                            };
+
+                            engineScript.Files.Add(engineScriptFile);
+                        }
+                    }
+
+                    break; // only one toc file per profile engine
+                }
+            }
+
+            return engineScript;
+        }
+
         public void ScanFolder(string path)
         {
             BackupEngines.Clear();
@@ -29,72 +101,7 @@ namespace Hg.SaveHistory.Managers
 
             foreach (DirectoryInfo dirInfo in directoryInfo.GetDirectories())
             {
-                EngineScript engineScript = null;
-
-                foreach (FileInfo fileInfo in dirInfo.GetFiles("*.toc", SearchOption.TopDirectoryOnly))
-                {
-                    string filename = Path.GetFileNameWithoutExtension(fileInfo.Name);
-                    if (filename == dirInfo.Name)
-                    {
-                        string fileRelativePath = Path.Combine(dirInfo.Name, fileInfo.Name);
-
-                        engineScript = new EngineScript {Name = filename};
-
-
-                        var engineScriptFile = new EngineScriptFile
-                        {
-                            FileName = fileRelativePath, FileFullName = fileInfo.FullName, IsToc = true
-                        };
-
-                        engineScript.Files.Add(engineScriptFile);
-
-                        List<string> tocContent = File.ReadAllLines(fileInfo.FullName).ToList();
-                        foreach (string line in tocContent)
-                        {
-                            string trimmedLine = line.Trim();
-                            if (trimmedLine.StartsWith("##"))
-                            {
-                                if (TocReadValue(trimmedLine, "## Title:", out var value))
-                                {
-                                    engineScript.Title = value;
-                                    continue;
-                                }
-
-                                if (TocReadValue(trimmedLine, "## Author:", out value))
-                                {
-                                    engineScript.Author = value;
-                                    continue;
-                                }
-
-                                if (TocReadValue(trimmedLine, "## Description:", out value))
-                                {
-                                    if (!string.IsNullOrEmpty(engineScript.Description))
-                                    {
-                                        engineScript.Description += Environment.NewLine;
-                                    }
-
-                                    engineScript.Description += value;
-                                    continue;
-                                }
-                            }
-
-                            if (!string.IsNullOrEmpty(trimmedLine) && !trimmedLine.StartsWith("##") && trimmedLine.EndsWith(".lua"))
-                            {
-                                fileRelativePath = Path.Combine(dirInfo.Name, trimmedLine);
-                                string fileFullPath = Path.Combine(dirInfo.FullName, trimmedLine);
-
-                                engineScriptFile = new EngineScriptFile
-                                {
-                                    FileName = fileRelativePath, FileFullName = fileFullPath, IsToc = false
-                                };
-
-                                engineScript.Files.Add(engineScriptFile);
-                            }
-                        }
-
-                        break; // only one toc file per profile engine
-                    }
-                }
+                var engineScript = LoadEngineScript(dirInfo);
 
                 if (engineScript != null && engineScript.IsValid())
                 {

@@ -18,7 +18,7 @@ settingPlatfom.HelpTooltip = ""
 settingPlatfom.Kind = EngineSettingKind.Setup
 settingPlatfom.Values:Add(1, "Steam")
 settingPlatfom.Values:Add(2, "Bethesda")
-settingPlatfom.Value = 1;
+settingPlatfom.Value = 1
 engine:AddSetting(settingPlatfom)
 
 
@@ -37,11 +37,11 @@ settingFolder.OnAutoDetect = function()
         local path = HgSteamHelper.SteamInstallPath()
 
         if path ~= nil then
-            path = Path.Combine(path, "userdata");
+            path = Path.Combine(path, "userdata")
             if (not Directory.Exists(path)) then
                 return "" -- steam userdata not found
             end
-            
+
             local directoryInfo = DirectoryInfo(path)
             if directoryInfo then
                 Logger.Debug("directoryInfo is ok")
@@ -52,7 +52,7 @@ settingFolder.OnAutoDetect = function()
             local dirs = directoryInfo:GetDirectories()
             for i = 0, dirs.Length-1 do
                 directory = dirs[i]
-                if (string.match(directory.Name, "^([%d]+)$")) then                    
+                if (string.match(directory.Name, "^([%d]+)$")) then
                     local finalPath = Path.Combine(directory.FullName, "782330", "remote")
                     if Directory.Exists(finalPath) then
                         return finalPath
@@ -69,7 +69,7 @@ settingFolder.OnAutoDetect = function()
 
 	    local varPath = '%USERPROFILE%\\Saved Games\\id Software\\DOOMEternal\\base\\savegame'
         local path = Environment.ExpandEnvironmentVariables(varPath)
-	    
+
         Logger.Debug(path)
 
         if (not Directory.Exists(path)) then
@@ -80,7 +80,7 @@ settingFolder.OnAutoDetect = function()
         if directoryInfo then
             Logger.Debug("directoryInfo is ok")
         end
-    
+
         -- \Saved Games\id Sofware\DOOMEternal\base\savegame\<guid>
 
         local dirs = directoryInfo:GetDirectories()
@@ -107,7 +107,7 @@ settingSlot.Kind = EngineSettingKind.Setup
 settingSlot.Values:Add(1, "Slot 1")
 settingSlot.Values:Add(2, "Slot 2")
 settingSlot.Values:Add(3, "Slot 3")
-settingSlot.Value = 1;
+settingSlot.Value = 1
 engine:AddSetting(settingSlot)
 
 local settingId = EngineSettingTextbox()
@@ -116,7 +116,7 @@ settingId.Caption = "UserIdentifier"
 settingId.Description = ""
 settingId.HelpTooltip = ""
 settingId.Kind = EngineSettingKind.Hidden
-settingId.Value = "";
+settingId.Value = ""
 engine:AddSetting(settingId)
 
 
@@ -154,11 +154,10 @@ engine.OnSetupValidate = function()
 
         Logger.Debug("platform=", platform)
         Logger.Debug("folder=", folder)
-        
-        if platform == 1 then -- steam            
-            -- \Steam\userdata\<steamid>\782330\remote
 
-            local match = string.match(folder, 'userdata\\([%d]+)\\782330')
+        if platform == 1 then -- steam
+            -- \Steam\userdata\<steamid>\782330\remote
+            local match = string.match(folder, "userdata\\([%d]+)\\782330")
             if match then
                 Logger.Debug("Identifier=", match)
                 settingId.Value = match
@@ -167,11 +166,11 @@ engine.OnSetupValidate = function()
 
         if platform == 2 then -- bethesda
             -- \Saved Games\id Sofware\DOOMEternal\base\savegame\<guid>
-            local match = string.match(folder, 'DOOMEternal\\base\\savegame\\([%d%-a-fA-F]+)')
+            local match = string.match(folder, "DOOMEternal\\base\\savegame\\([%d%-a-fA-F]+)")
             if match then
                 Logger.Debug("Identifier=", match)
                 settingId.Value = match
-            end            
+            end
         end
 
         if settingId.Value == "" then

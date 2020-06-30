@@ -58,9 +58,9 @@
             this.linkLabelItem.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.linkLabelItem.LinkBehavior = System.Windows.Forms.LinkBehavior.NeverUnderline;
             this.linkLabelItem.LinkColor = System.Drawing.Color.Black;
-            this.linkLabelItem.Location = new System.Drawing.Point(3, 1);
+            this.linkLabelItem.Location = new System.Drawing.Point(0, 0);
             this.linkLabelItem.Name = "linkLabelItem";
-            this.linkLabelItem.Size = new System.Drawing.Size(158, 16);
+            this.linkLabelItem.Size = new System.Drawing.Size(158, 18);
             this.linkLabelItem.TabIndex = 5;
             this.linkLabelItem.TabStop = true;
             this.linkLabelItem.Text = "profile_item";
@@ -89,9 +89,9 @@
             this.linkLabelPath.Cursor = System.Windows.Forms.Cursors.Hand;
             this.linkLabelPath.Font = new System.Drawing.Font("Microsoft Sans Serif", 8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.linkLabelPath.LinkColor = System.Drawing.Color.RoyalBlue;
-            this.linkLabelPath.Location = new System.Drawing.Point(2, 19);
+            this.linkLabelPath.Location = new System.Drawing.Point(0, 18);
             this.linkLabelPath.Name = "linkLabelPath";
-            this.linkLabelPath.Size = new System.Drawing.Size(159, 14);
+            this.linkLabelPath.Size = new System.Drawing.Size(159, 18);
             this.linkLabelPath.TabIndex = 6;
             this.linkLabelPath.TabStop = true;
             this.linkLabelPath.Text = "profile_item";

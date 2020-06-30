@@ -730,7 +730,7 @@ namespace Hg.SaveHistory.Forms
 
         private void CloseProfile()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             if (_activeProfileFile == null)
             {
@@ -744,28 +744,60 @@ namespace Hg.SaveHistory.Forms
 
             ReleaseWatcher();
 
-            if (_luaManager.ActiveEngine?.OnClose?.Call().First() is bool b && b)
+            _selectedSnapshot = null;
+
+            if (_luaManager.ActiveEngine?.OnClosing?.Call().First() is bool b && b)
             {
                 SaveProfile();
+                _luaManager.ActiveEngine?.OnSaved?.Call();
             }
 
-            listViewSnapshot.Items.Clear();
-            listViewArchived.Items.Clear();
-            listViewDeleted.Items.Clear();
+            foreach (ColumnHeader column in listViewSnapshot.Columns)
+            {
+                column.Tag = null;
+            }
+
+            foreach (ColumnHeader column in listViewArchived.Columns)
+            {
+                column.Tag = null;
+            }
+
+            foreach (ColumnHeader column in listViewDeleted.Columns)
+            {
+                column.Tag = null;
+            }
+
+            listViewSnapshot.Clear();
+            listViewArchived.Clear();
+            listViewDeleted.Clear();
 
             comboBoxCategories.Items.Clear();
 
+            foreach (Control control in flowLayoutPanelConfig.Controls)
+            {
+                if (control is CheckBox c)
+                {
+                    c.Tag = null;
+                }
+            }
+
             flowLayoutPanelConfig.Controls.Clear();
 
-            _activeProfileFile = null;
-
+            _luaManager.Release();
             _luaManager = null;
+
+            _activeProfileFile.Release();
+            _activeProfileFile = null;
 
             tabPageProfile.Text = "";
 
             ReleaseHotKeysHook();
 
             HideProfilePage();
+
+
+            GC.Collect();
+            GC.WaitForPendingFinalizers();
 
             Logger.Information("---------------------------------------------------------------------------------");
         }
@@ -949,7 +981,7 @@ namespace Hg.SaveHistory.Forms
 
         private void InitWatcher()
         {
-            if (_luaManager?.ActiveEngine == null)
+            if (_luaManager?.ActiveEngine?.Watcher == null)
             {
                 return;
             }
@@ -986,6 +1018,7 @@ namespace Hg.SaveHistory.Forms
                 else
                 {
                     Logger.Log("Open profile by Link click, already open: " + path, LogLevel.Debug);
+                    tabControlMain.SelectedTab = tabPageProfile;
                 }
             }
         }
@@ -1205,15 +1238,15 @@ namespace Hg.SaveHistory.Forms
 
         private bool LoadProfile(ProfileFile profileFile, EngineScript engineScript)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             _luaManager = new LuaManager();
             _luaManager.LoadEngineAndProfile(engineScript, profileFile);
 
+            _luaManager.ActiveEngine.OnOpened?.Call();
+
             _snapshotOrder = profileFile.SortOrder;
             _lastKey = profileFile.SortKey;
-
-            _luaManager.ActiveEngine.OnOpen?.Call();
 
             // Load configuration controls
             foreach (var setting in _luaManager.ActiveEngine.Settings.Where(s => s.Kind == EngineSettingKind.Runtime).OrderBy(s => s.Index))
@@ -1230,9 +1263,17 @@ namespace Hg.SaveHistory.Forms
 
                 if (setting is EngineSettingCheckbox settingCheckbox)
                 {
-                    var checkBox = new CheckBox {AutoSize = false, Text = settingCheckbox.Caption, Checked = settingCheckbox.Value};
+                    var checkBox = new CheckBox
+                        {AutoSize = false, Text = settingCheckbox.Caption, Checked = settingCheckbox.Value, Tag = settingCheckbox};
 
-                    checkBox.CheckedChanged += (sender, args) => { settingCheckbox.Value = checkBox.Checked; };
+                    checkBox.CheckedChanged += (sender, args) =>
+                    {
+                        if (checkBox.Tag is EngineSettingCheckbox sc)
+                        {
+                            sc.Value = checkBox.Checked;
+                            sc = null;
+                        }
+                    };
 
                     toolTipHelp.SetToolTip(checkBox, settingCheckbox.HelpTooltip);
                     flowLayoutPanelConfig.Controls.Add(checkBox);
@@ -1263,7 +1304,6 @@ namespace Hg.SaveHistory.Forms
             listViewSnapshot.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
             listViewArchived.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
             listViewDeleted.AutoResizeColumns(ColumnHeaderAutoResizeStyle.HeaderSize);
-
 
             _luaManager.ActiveEngine.OnCategoriesChanges += () =>
             {
@@ -1306,8 +1346,8 @@ namespace Hg.SaveHistory.Forms
                 }
             };
 
-            _luaManager.ActiveEngine.OnInitialize?.Call();
 
+            _luaManager.ActiveEngine.OnInitialized?.Call();
 
             return true;
         }
@@ -1390,7 +1430,7 @@ namespace Hg.SaveHistory.Forms
 
         private void NewProfileDialog()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             // Create new profile
             FormWizardNewProfile form = new FormWizardNewProfile(_engineScriptManager);
@@ -1573,7 +1613,7 @@ namespace Hg.SaveHistory.Forms
         private void OpenProfile(string path)
         {
             Logger.Information("---------------------------------------------------------------------------------");
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             Cursor.Current = Cursors.WaitCursor;
 
@@ -1605,6 +1645,8 @@ namespace Hg.SaveHistory.Forms
                             InitHotKeys();
 
                             InitWatcher();
+
+                            _luaManager.ActiveEngine.OnLoaded?.Call();
                         }
                         else
                         {
@@ -1629,7 +1671,7 @@ namespace Hg.SaveHistory.Forms
 
         private void OpenProfileDialog()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             if (openFileDialogProfile.ShowDialog(this) == DialogResult.OK)
             {
@@ -1666,7 +1708,7 @@ namespace Hg.SaveHistory.Forms
 
         private void RefreshCategories()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             if (_luaManager == null)
             {
@@ -1723,7 +1765,7 @@ namespace Hg.SaveHistory.Forms
 
         private void RefreshPinnedProfiles()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             panelPinnedList.Controls.Clear();
             foreach (string path in _settingsManager.PinnedProfiles.OrderByDescending(s => s))
@@ -1761,7 +1803,7 @@ namespace Hg.SaveHistory.Forms
 
         private void RefreshRecentProfiles()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             panelRecentList.Controls.Clear();
             foreach (string path in _settingsManager.RecentProfiles.OrderByDescending(s => s))
@@ -1809,6 +1851,8 @@ namespace Hg.SaveHistory.Forms
 
         private void RefreshSnapshotLists()
         {
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+
             if (_luaManager == null)
             {
                 return;
@@ -1940,16 +1984,13 @@ namespace Hg.SaveHistory.Forms
 
         private void ReleaseWatcher()
         {
-            if (_watcherManager != null)
-            {
-                _watcherManager.Release();
-                _watcherManager = null;
-            }
+            _watcherManager?.Release();
+            _watcherManager = null;
         }
 
         private void SaveProfile()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             if (_luaManager != null && _activeProfileFile != null)
             {
@@ -2299,7 +2340,7 @@ namespace Hg.SaveHistory.Forms
 
         private bool SnapshotNuke(EngineSnapshot snapshot)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             try
             {
@@ -2418,7 +2459,7 @@ namespace Hg.SaveHistory.Forms
 
         private bool UnzipSnapshot(EngineSnapshot snapshot)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             if (!snapshot.Compressed)
             {
@@ -2473,7 +2514,7 @@ namespace Hg.SaveHistory.Forms
 
         private bool ZipSnapshot(EngineSnapshot snapshot)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             if (snapshot.Compressed)
             {

@@ -12,8 +12,7 @@ namespace Hg.SaveHistory.API
 
         public int CategoryId = -1;
 
-        public Dictionary<string, EngineSnapshotCustomValueBase> CustomValues =
-            new Dictionary<string, EngineSnapshotCustomValueBase>();
+        public Dictionary<string, EngineSnapshotCustomValueBase> CustomValues = new Dictionary<string, EngineSnapshotCustomValueBase>();
 
         public string Notes;
 
@@ -23,7 +22,6 @@ namespace Hg.SaveHistory.API
 
         public string SavedAtToStringFormat = "yyyy-MM-dd HH:mm:ss";
         public EngineSnapshotStatus Status = EngineSnapshotStatus.Active;
-        private string _screenshotFilename;
 
         [LuaHide] public bool Compressed { get; set; }
 
@@ -45,6 +43,16 @@ namespace Hg.SaveHistory.API
             }
 
             return other != null && SavedAt == other.SavedAt;
+        }
+
+        public EngineSnapshotCustomValueBase CustomValueByKey(string key)
+        {
+            if (CustomValues.ContainsKey(key))
+            {
+                return CustomValues[key];
+            }
+
+            return null;
         }
 
         #endregion

@@ -37,6 +37,11 @@ namespace Hg.SaveHistory.API
             Path = null;
         }
 
+        ~EngineWatcher()
+        {
+            OnEvent = null;
+        }
+
         #endregion
     }
 }

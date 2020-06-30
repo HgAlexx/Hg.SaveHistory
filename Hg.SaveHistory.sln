@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hg.SaveHistory", "Hg.SaveHi
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hash", "Hash\Hash.csproj", "{897B9F8F-3DC4-4787-A850-DEFD678F691C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests", "Tests\Tests.csproj", "{B8FCD930-CBF4-4330-A06A-0ED5C6DE090E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,6 +26,10 @@ Global
 		{897B9F8F-3DC4-4787-A850-DEFD678F691C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{897B9F8F-3DC4-4787-A850-DEFD678F691C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{897B9F8F-3DC4-4787-A850-DEFD678F691C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8FCD930-CBF4-4330-A06A-0ED5C6DE090E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8FCD930-CBF4-4330-A06A-0ED5C6DE090E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8FCD930-CBF4-4330-A06A-0ED5C6DE090E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8FCD930-CBF4-4330-A06A-0ED5C6DE090E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

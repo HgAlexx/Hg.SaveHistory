@@ -3,7 +3,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using Hg.SaveHistory.Utilities;
 using NLua;
 
 namespace Hg.SaveHistory.API
@@ -15,7 +14,7 @@ namespace Hg.SaveHistory.API
         public static bool CopyFiles(string sourcePath, string targetPath, LuaFunction canCopy, LuaFunction mustWait, bool overrideIfExists,
             bool withBackup)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             Logger.Debug("sourcePath: ", sourcePath);
             Logger.Debug("targetPath: ", targetPath);
@@ -46,9 +45,7 @@ namespace Hg.SaveHistory.API
                         {
                             if (mustWait.Call(fileInfo.Name).First() is bool b && b)
                             {
-                                Utilities.Logger.Log(
-                                    "CopyFiles: mustWait returned true for file " + fileInfo.Name + ", wait a bit",
-                                    LogLevel.Debug);
+                                Utilities.Logger.Debug("CopyFiles: mustWait returned true for file ", fileInfo.Name, ", wait a bit");
                                 needToWait = true;
                                 break;
                             }
@@ -86,7 +83,7 @@ namespace Hg.SaveHistory.API
                     }
                     catch (Exception exception)
                     {
-                        Utilities.Logger.Log("CopyFiles, withBackup failed: " + exception.Message, LogLevel.Error);
+                        Utilities.Logger.Error("CopyFiles, withBackup failed: ", exception.Message);
                         Utilities.Logger.LogException(exception);
                     }
                 }
@@ -117,7 +114,7 @@ namespace Hg.SaveHistory.API
                 }
                 catch (Exception ex)
                 {
-                    Utilities.Logger.Log("CopyFiles, files copy failed: " + ex.Message, LogLevel.Error);
+                    Utilities.Logger.Error("CopyFiles, files copy failed: ", ex.Message);
                     Utilities.Logger.LogException(ex);
 
                     if (withBackup && canRestore)
@@ -152,7 +149,7 @@ namespace Hg.SaveHistory.API
             }
             catch (Exception exception)
             {
-                Utilities.Logger.Log("CopyFiles: " + exception.Message, LogLevel.Error);
+                Utilities.Logger.Error("CopyFiles: ", exception.Message);
                 Utilities.Logger.LogException(exception);
             }
 

@@ -17,7 +17,7 @@ namespace Hg.SaveHistory.Managers
     {
         #region Fields & Properties
 
-        private readonly Lua _lua;
+        private Lua _lua;
 
         public Engine ActiveEngine { get; private set; }
 
@@ -78,10 +78,19 @@ namespace Hg.SaveHistory.Managers
             return true;
         }
 
+        public void Release()
+        {
+            ActiveEngine?.Release();
+            ActiveEngine = null;
+
+            _lua.Dispose();
+            _lua = null;
+        }
+
         public void SaveSettings(ProfileFile profileFile)
         {
             profileFile.Settings.Clear();
-            foreach (var setting in ActiveEngine.Settings.OrderBy(s => s.Index))
+            foreach (var setting in ActiveEngine.Settings)
             {
                 if (setting is EngineSettingCheckbox engineSettingCheckbox)
                 {

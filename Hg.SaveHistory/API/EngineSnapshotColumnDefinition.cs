@@ -1,6 +1,4 @@
-﻿using NLua;
-
-namespace Hg.SaveHistory.API
+﻿namespace Hg.SaveHistory.API
 {
     public class EngineSnapshotColumnDefinition
     {
@@ -9,8 +7,6 @@ namespace Hg.SaveHistory.API
         public string HeaderText;
         public string Key;
         public int Order;
-
-        public LuaFunction Sort;
 
         #endregion
     }

@@ -13,11 +13,10 @@ namespace Hg.SaveHistory.API
         #region Members
 
         /// <summary>
-        /// Decrypt a file from DOOM Eternal Saves
-        /// 
-        /// Function taken from https://github.com/GoobyCorp/DOOMSaveManager/blob/master/Crypto.cs
-        /// Thank you for the reverse engineering of the save file encryption.
-        /// TODO: convert to native .NET when possible and remove dependency
+        ///     Decrypt a file from DOOM Eternal Saves
+        ///     Function taken from https://github.com/GoobyCorp/DOOMSaveManager/blob/master/Crypto.cs
+        ///     Thank you for the reverse engineering of the save file encryption.
+        ///     TODO: convert to native .NET when possible and remove dependency
         /// </summary>
         /// <param name="fileKey">decryption key</param>
         /// <param name="filePath">full path to file</param>

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Hg.SaveHistory.Forms;
 using Hg.SaveHistory.Types;
 
@@ -117,25 +118,59 @@ namespace Hg.SaveHistory.Utilities
             }
         }
 
-        public static void LogException(Exception exception)
+        public static void LogException(Exception exception,
+            [CallerMemberName] string memberName = "",
+            [CallerFilePath] string sourceFilePath = "",
+            [CallerLineNumber] int sourceLineNumber = 0)
         {
             switch (ExceptionMode)
             {
                 case LogMode.Debug:
-                    LogExceptionDebug(exception);
+                    LogExceptionDebug(exception, memberName, sourceFilePath, sourceLineNumber);
                     break;
                 case LogMode.Release:
-                    LogExceptionDebug(exception);
+                    LogExceptionDebug(exception, memberName, sourceFilePath, sourceLineNumber);
                     LogExceptionDialog(exception);
                     break;
             }
         }
 
-        private static void LogExceptionDebug(Exception exception)
+        private static void LogExceptionDebug(Exception exception, string memberName = "", string sourceFilePath = "",
+            int sourceLineNumber = 0)
         {
             System.Diagnostics.Debug.WriteLine("");
+            if (!string.IsNullOrEmpty(sourceFilePath))
+            {
+                System.Diagnostics.Debug.WriteLine("File: " + sourceFilePath);
+            }
+
+            if (!string.IsNullOrEmpty(memberName))
+            {
+                System.Diagnostics.Debug.WriteLine("Function: " + memberName);
+            }
+
+            if (sourceLineNumber > 0)
+            {
+                System.Diagnostics.Debug.WriteLine("Line: " + sourceLineNumber);
+            }
+
             System.Diagnostics.Debug.WriteLine(exception.ToString(), "Exception");
             System.Diagnostics.Debug.WriteLine("");
+
+            if (!string.IsNullOrEmpty(sourceFilePath))
+            {
+                Log("File: " + sourceFilePath, LogLevel.Error);
+            }
+
+            if (!string.IsNullOrEmpty(memberName))
+            {
+                Log("Function: " + memberName, LogLevel.Error);
+            }
+
+            if (sourceLineNumber > 0)
+            {
+                Log("Line: " + sourceLineNumber, LogLevel.Error);
+            }
 
             Log(exception.ToString(), LogLevel.Error);
 

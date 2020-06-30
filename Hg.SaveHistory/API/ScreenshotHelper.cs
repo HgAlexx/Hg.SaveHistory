@@ -31,7 +31,7 @@ namespace Hg.SaveHistory.API
 
         public bool Capture(Rectangle captureBounds, EngineSnapshot snapshot)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             try
             {
