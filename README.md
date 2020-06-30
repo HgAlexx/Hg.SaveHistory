@@ -2,6 +2,20 @@
 
 This tool helps generate snapshots of game save files, or any files for that matter.
 
+
+---
+
+### WARNING: Beta version 0.5.0
+
+SaveHistory is currently in Open Beta, if you encounter any issue please report them.
+
+You'll find a log file named Hg.SaveHistory.log inside the application folder.
+
+Thank you!
+
+---
+
+
 ## Features
 
 - Global Hot keys
@@ -24,7 +38,7 @@ This tool helps generate snapshots of game save files, or any files for that mat
 
 ### Third Party Engines
 
-- None yet.
+- None yet
 
 
 ## Installation
@@ -34,6 +48,7 @@ Just unzip and run executable!
 (or you can download the source code, examine and compile it yourself)
 
 ## Setup
+
 ### Global settings
 
 On first run, the app will ask where you want to save the app settings, either:
@@ -100,7 +115,14 @@ To unpin a profile, click the trash can icon.
 
 1. Sometimes the Archive/Active/Nuke action fails
 
-This can happens if the target folder is currently open in a windows explorer (even if not selected)
+This can happens if the target folder is currently open in a windows explorer (even if not selected) or if you don't have write persmission to the destination.
+
+This may be the case if steam is installed inside "Program Files". You can either move you're steam installation folder or launch SaveHistory as administrator.
+
+
+## TODO:
+
+- Write guide and API documentation for the creation of third party engines
 
 
 
@@ -110,11 +132,11 @@ This tool is the second iteration of the same idea. It is based on Hg.DoomHistor
 
 Now the tool support a script system, using lua, which allow to add support for any game and any application!
 
-Beta testers:
+Alpha testers:
 
 - [RedW4rr10r](https://www.twitch.tv/redw4rr10r): The first bug slayer
 
-- [x_ByteMe_x](https://www.twitch.tv/x_byteme_x): The suggestions slayer
+- [x_ByteMe_x](https://www.twitch.tv/x_byteme_x): The suggestion slayer
 
 - [IAmAllstin](https://www.twitch.tv/iamallstin): The origin slayer
 
@@ -133,6 +155,6 @@ The first beta tester was [RedW4rr10r](https://www.twitch.tv/redw4rr10r) who fou
 
 # Version History
 
-## v1.0
+## v0.5.0
 
-- \* First public release
+- \* First public beta release
