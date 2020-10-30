@@ -33,7 +33,7 @@ Thank you!
 ### Official Engines
 
 - DOOM 2016
-- DOOM Eternal
+- DOOM Eternal, with DLC1
 
 
 ### Third Party Engines
