@@ -183,7 +183,7 @@ function sandbox.protect(chunk, chunkname, options)
     local threadengine = coroutine.create(engineloader)
     local threadresults = {coroutine.resume(threadengine, ...)}
     local threadstatus = table.remove(threadresults, 1)
-    
+
     cleanup()
 
     if not threadstatus then
@@ -196,7 +196,7 @@ function sandbox.protect(chunk, chunkname, options)
             else
                 for k, v in pairs(threadresults) do
                     message = message .. tostring(k) .. "=" .. tostring(v) .. string.char(10)
-                end 
+                end
             end
         else
             message = tostring(threadresults) .. string.char(10)

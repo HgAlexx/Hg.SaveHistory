@@ -69,6 +69,7 @@
             this.checkForUpdateToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.aboutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolTipHelp = new System.Windows.Forms.ToolTip(this.components);
+            this.pictureBoxScreenshot = new System.Windows.Forms.PictureBox();
             this.openFileDialogProfile = new System.Windows.Forms.OpenFileDialog();
             this.panelMain = new System.Windows.Forms.Panel();
             this.tabControlMain = new System.Windows.Forms.TabControl();
@@ -125,9 +126,9 @@
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.flowLayoutPanelConfig = new System.Windows.Forms.FlowLayoutPanel();
             this.imageListMessageType = new System.Windows.Forms.ImageList(this.components);
-            this.pictureBoxScreenshot = new System.Windows.Forms.PictureBox();
             this.statusStrip1.SuspendLayout();
             this.menuStrip.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxScreenshot)).BeginInit();
             this.panelMain.SuspendLayout();
             this.tabControlMain.SuspendLayout();
             this.tabPageHome.SuspendLayout();
@@ -162,7 +163,6 @@
             this.groupBox2.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxScreenshot)).BeginInit();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -449,13 +449,14 @@
             // checkForUpdateToolStripMenuItem
             // 
             this.checkForUpdateToolStripMenuItem.Name = "checkForUpdateToolStripMenuItem";
-            this.checkForUpdateToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.checkForUpdateToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.checkForUpdateToolStripMenuItem.Text = "Check for update";
+            this.checkForUpdateToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdateToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -466,6 +467,19 @@
             this.toolTipHelp.ReshowDelay = 10;
             this.toolTipHelp.ToolTipIcon = System.Windows.Forms.ToolTipIcon.Info;
             this.toolTipHelp.ToolTipTitle = "Help";
+            // 
+            // pictureBoxScreenshot
+            // 
+            this.pictureBoxScreenshot.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this.pictureBoxScreenshot.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.pictureBoxScreenshot.Location = new System.Drawing.Point(3, 3);
+            this.pictureBoxScreenshot.Name = "pictureBoxScreenshot";
+            this.pictureBoxScreenshot.Size = new System.Drawing.Size(357, 268);
+            this.pictureBoxScreenshot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.pictureBoxScreenshot.TabIndex = 1;
+            this.pictureBoxScreenshot.TabStop = false;
+            this.toolTipHelp.SetToolTip(this.pictureBoxScreenshot, "Double click to open");
+            this.pictureBoxScreenshot.DoubleClick += new System.EventHandler(this.pictureBoxScreenshot_DoubleClick);
             // 
             // openFileDialogProfile
             // 
@@ -1078,6 +1092,7 @@
             this.buttonActionAuto.Text = "Start AutoBackup";
             this.buttonActionAuto.UseVisualStyleBackColor = true;
             this.buttonActionAuto.Click += new System.EventHandler(this.buttonActionAuto_Click);
+            this.buttonActionAuto.Paint += new System.Windows.Forms.PaintEventHandler(this.buttonActionAuto_Paint);
             // 
             // groupBox1
             // 
@@ -1108,19 +1123,6 @@
             this.imageListMessageType.Images.SetKeyName(2, "messagebox-question.png");
             this.imageListMessageType.Images.SetKeyName(3, "messagebox-exclamation.png");
             // 
-            // pictureBoxScreenshot
-            // 
-            this.pictureBoxScreenshot.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this.pictureBoxScreenshot.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.pictureBoxScreenshot.Location = new System.Drawing.Point(3, 3);
-            this.pictureBoxScreenshot.Name = "pictureBoxScreenshot";
-            this.pictureBoxScreenshot.Size = new System.Drawing.Size(357, 268);
-            this.pictureBoxScreenshot.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
-            this.pictureBoxScreenshot.TabIndex = 1;
-            this.pictureBoxScreenshot.TabStop = false;
-            this.toolTipHelp.SetToolTip(this.pictureBoxScreenshot, "Double click to open");
-            this.pictureBoxScreenshot.DoubleClick += new System.EventHandler(this.pictureBoxScreenshot_DoubleClick);
-            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1136,10 +1138,12 @@
             this.Text = "Hg.SaveHistory";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FormMain_FormClosed);
             this.Load += new System.EventHandler(this.FormMain_Load);
+            this.Paint += new System.Windows.Forms.PaintEventHandler(this.FormMain_Paint);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.menuStrip.ResumeLayout(false);
             this.menuStrip.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxScreenshot)).EndInit();
             this.panelMain.ResumeLayout(false);
             this.tabControlMain.ResumeLayout(false);
             this.tabPageHome.ResumeLayout(false);
@@ -1175,7 +1179,6 @@
             this.groupBox2.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
-            ((System.ComponentModel.ISupportInitialize)(this.pictureBoxScreenshot)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 

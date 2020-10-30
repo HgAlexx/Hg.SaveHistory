@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Security.Cryptography;
 using System.Text;
+using Hg.SaveHistory.API;
 
 namespace Hg.SaveHistory.Types
 {
@@ -21,29 +22,12 @@ namespace Hg.SaveHistory.Types
 
         private string HashFile()
         {
-            if (File.Exists(FileFullName))
-            {
-                FileInfo fileInfo = new FileInfo(FileFullName);
+            string hash = HgUtility.HashFile(FileFullName);
 
-                SHA256 sha256 = SHA256.Create();
-                StringBuilder builder = new StringBuilder();
-                using (FileStream fileStream = fileInfo.Open(FileMode.Open))
-                {
-                    fileStream.Position = 0;
-                    byte[] hashValue = sha256.ComputeHash(fileStream);
+            if (string.IsNullOrEmpty(hash))
+                return "";
 
-                    foreach (var t in hashValue)
-                    {
-                        builder.Append(t.ToString("x2"));
-                    }
-                }
-
-                fileInfo = null;
-
-                return builder.ToString();
-            }
-
-            return "";
+            return hash;
         }
 
         #endregion

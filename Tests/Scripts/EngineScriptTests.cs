@@ -28,9 +28,15 @@ namespace Tests.Scripts
         [OneTimeTearDown]
         public void TearDown()
         {
-            string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Data");
+            // Delete all scripts data folders
+            string[] paths = new[] {@"DOOM2016", @"DOOMEternal"};
 
-            Directory.Delete(path, true);
+            foreach (var p in paths)
+            {
+                string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Data", p);
+
+                Directory.Delete(path, true);
+            }
         }
 
 

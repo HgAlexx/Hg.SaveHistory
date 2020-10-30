@@ -5,6 +5,7 @@ using System.Drawing;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
@@ -15,6 +16,7 @@ using Hg.SaveHistory.Managers;
 using Hg.SaveHistory.Types;
 using Hg.SaveHistory.Utilities;
 using Hg.SaveHistory.Wizards;
+using Newtonsoft.Json.Linq;
 using Logger = Hg.SaveHistory.Utilities.Logger;
 
 namespace Hg.SaveHistory.Forms
@@ -711,6 +713,90 @@ namespace Hg.SaveHistory.Forms
         private void buttonOpenProject_Click(object sender, EventArgs e)
         {
             OpenProfileDialog();
+        }
+
+        private void checkForUpdateToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            string responseString = null;
+            string versionFormatted = $"{_version.Major}.{_version.Minor}.{_version.Build}";
+            try
+            {
+                string url = "https://api.github.com/repos/HgAlexx/Hg.SaveHistory/releases/latest";
+                if (_version.Major < 1)
+                {
+                    url = "https://api.github.com/repos/HgAlexx/Hg.SaveHistory/releases";
+                }
+
+                HttpWebRequest request = (HttpWebRequest) WebRequest.Create(url);
+                request.UserAgent = $"Hg.SaveHistory/{versionFormatted} ({Environment.OSVersion}) By: HgAlexx";
+
+                HttpWebResponse response = (HttpWebResponse) request.GetResponse();
+                if (response.StatusCode == HttpStatusCode.OK)
+                {
+                    Stream stream = response.GetResponseStream();
+                    if (stream != null)
+                    {
+                        responseString = new StreamReader(stream).ReadToEnd();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex.Message);
+            }
+
+            if (!string.IsNullOrEmpty(responseString))
+            {
+                Version maxVersion = _version;
+                try
+                {
+                    var json = JArray.Parse(responseString);
+
+                    foreach (var obj in json)
+                    {
+                        string value = obj.Value<string>("tag_name");
+
+                        value = value.Substring(1); // strip "v" prefix
+
+                        if (value.Contains("_")) // strip "_beta" suffix
+                        {
+                            value = value.Substring(0, value.IndexOf("_", StringComparison.Ordinal));
+                        }
+
+                        var v = new Version(value);
+                        if (v > _version)
+                        {
+                            if (v > maxVersion)
+                            {
+                                maxVersion = v;
+                            }
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error(ex.Message);
+                }
+
+                if (maxVersion > _version)
+                {
+                    if (Message("A new version is available, do you want to open the release page?",
+                        "New version available!", MessageType.Question, MessageMode.MessageBox) == DialogResult.Yes)
+                    {
+                        Process.Start("https://github.com/HgAlexx/Hg.SaveHistory/releases");
+                    }
+                }
+                else
+                {
+                    Message(@"No new version found", @"You are up-to-date", MessageType.Information,
+                        MessageMode.MessageBox);
+                }
+            }
+            else
+            {
+                Message(@"Unable to check for a new version, please try again later", @"Hmm :(",
+                    MessageType.Information, MessageMode.MessageBox);
+            }
         }
 
         private void clearSettingsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2018,6 +2104,7 @@ namespace Hg.SaveHistory.Forms
                     case AutoBackupStatus.Enabled:
                         buttonActionAuto.Text = "Stop AutoBackup";
                         toolStripAutoBackup.Text = "AutoBackup: Enabled";
+
                         SetToolStripHotKeyStyle(toolStripAutoBackup, IconChar.CheckCircle, Color.LimeGreen);
                         Message("Auto backup enabled", "", MessageType.Information, MessageMode.Status);
                         break;
@@ -2576,5 +2663,118 @@ namespace Hg.SaveHistory.Forms
         }
 
         #endregion
+
+        private void buttonActionAuto_Paint(object sender, PaintEventArgs e)
+        {
+            Button btn = (Button)sender;
+
+            Color color = Color.Gray;
+            int border = 0;
+
+            if (_autoBackupEnabled)
+            {
+                switch (_watcherManager.AutoBackupStatus)
+                {
+                    case AutoBackupStatus.Disabled:
+                        color = Color.Gray;
+                        border = 0;
+                        break;
+                    case AutoBackupStatus.Enabled:
+                        color = Color.LimeGreen;
+                        border = 5;
+                        break;
+                    case AutoBackupStatus.Waiting:
+                        color = Color.Orange;
+                        border = 5;
+                        break;
+                }
+            }
+            else
+            {
+                switch (_watcherManager.AutoBackupStatus)
+                {
+                    case AutoBackupStatus.Disabled:
+                        color = Color.Gray;
+                        border = 0;
+                        break;
+                    case AutoBackupStatus.Enabled:
+                        color = Color.LimeGreen;
+                        border = 5;
+                        break;
+                    case AutoBackupStatus.Waiting:
+                        color = Color.Orange;
+                        border = 5;
+                        break;
+                }
+            }
+
+            ControlPaint.DrawBorder(e.Graphics, btn.ClientRectangle,
+                color, border, ButtonBorderStyle.Solid,
+                color, border, ButtonBorderStyle.Solid,
+                color, border, ButtonBorderStyle.Solid,
+                color, border, ButtonBorderStyle.Solid
+            );
+        }
+
+        private void FormMain_Paint(object sender, PaintEventArgs e)
+        {
+            if (_watcherManager == null)
+                return;
+
+            Color color = Color.Gray;
+            int border = 0;
+
+            if (_autoBackupEnabled)
+            {
+                switch (_watcherManager.AutoBackupStatus)
+                {
+                    case AutoBackupStatus.Disabled:
+                        color = Color.Gray;
+                        border = 0;
+                        break;
+                    case AutoBackupStatus.Enabled:
+                        color = Color.LimeGreen;
+                        border = 5;
+                        break;
+                    case AutoBackupStatus.Waiting:
+                        color = Color.Orange;
+                        border = 5;
+                        break;
+                }
+            }
+            else
+            {
+                switch (_watcherManager.AutoBackupStatus)
+                {
+                    case AutoBackupStatus.Disabled:
+                        color = Color.Gray;
+                        border = 0;
+                        break;
+                    case AutoBackupStatus.Enabled:
+                        color = Color.LimeGreen;
+                        border = 5;
+                        break;
+                    case AutoBackupStatus.Waiting:
+                        color = Color.Orange;
+                        border = 5;
+                        break;
+                }
+            }
+
+            ControlPaint.DrawBorder(e.Graphics, ClientRectangle,
+                color, border, ButtonBorderStyle.Outset,
+                color, border, ButtonBorderStyle.Outset,
+                color, border, ButtonBorderStyle.Outset,
+                color, border, ButtonBorderStyle.Outset
+            );
+
+        }
+
+        private void debugToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+
+
+
+        }
     }
 }

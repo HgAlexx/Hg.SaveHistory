@@ -15,7 +15,11 @@ local mapsLevels = {
     ["game/sp/e3m2_hell_b/e3m2_hell_b"] = 11,
     ["game/sp/e3m3_maykr/e3m3_maykr"] = 12,
     ["game/sp/e3m4_boss/e3m4_boss"] = 13,
-    ["game/hub/hub"] = 14
+    ["game/hub/hub"] = 14,
+    ["game/dlc/e4m1_rig/e4m1_rig"] = 1,
+    ["game/dlc/e4m2_rig/e4m2_swap"] = 2,
+    ["game/dlc/e4m3_rig/e4m3_mcity"] = 3,
+    ["game/dlc/hub/hub"] = 99
 }
 
 -- difficulties
@@ -25,6 +29,16 @@ local difficultyValues = {
     "Ultra-Violence",
     "Nightmare",
     "Ultra-Nightmare"
+}
+
+-- slot folder name
+local slotFolderNames = {
+    "GAME-AUTOSAVE0",
+    "GAME-AUTOSAVE1",
+    "GAME-AUTOSAVE2",
+    "DLC1-AUTOSAVE3",
+    "DLC1-AUTOSAVE4",
+    "DLC1-AUTOSAVE5"
 }
 
 local difficultyToString = function(diff)
@@ -237,7 +251,16 @@ local snapshotBackup = function(actionSouce)
             -- if needed, set snapshot.SavedAtToStringFormat
 
             if actionSouce == ActionSource.AutoBackup then
+                -- base game
                 if snapshot.CategoryId == 14 then
+                    local skipFortress = engine:SettingByName("SkipFortress").Value
+                    if skipFortress then
+                        Logger.Debug("snapshot: Fortress checkpoint, skipping by user choice")
+                        return true
+                    end
+                end
+                -- DLC game
+                if snapshot.CategoryId == 99 then
                     local skipFortress = engine:SettingByName("SkipFortress").Value
                     if skipFortress then
                         Logger.Debug("snapshot: Fortress checkpoint, skipping by user choice")
@@ -262,8 +285,8 @@ local snapshotBackup = function(actionSouce)
             -- save relative path to snapshot
             snapshot.RelativePath = targetPath
 
-            -- "GAME-AUTOSAVE" + (_id - 1)
-            targetPath = Path.Combine(targetPath, "GAME-AUTOSAVE" .. (slotIndex - 1))
+            local slotFolderName = slotFolderNames[slotIndex]
+            targetPath = Path.Combine(targetPath, slotFolderName)
 
             -- full path
             targetPath = Path.Combine(snapshotsFolder, targetPath)
@@ -345,7 +368,8 @@ local snapshotRestore = function(actionSouce, snapshot)
     Logger.Information("snapshotRestore: ", actionSouce, ", ", snapshot)
 
     local sourcePath = Path.Combine(snapshotsFolder, snapshot.RelativePath)
-    sourcePath = Path.Combine(sourcePath, "GAME-AUTOSAVE" .. (slotIndex - 1))
+    local slotFolderName = slotFolderNames[slotIndex]
+    sourcePath = Path.Combine(sourcePath, slotFolderName)
 
     Logger.Debug("sourcePath=" .. sourcePath)
     Logger.Debug("targetPath=" .. slotPath)
@@ -471,12 +495,12 @@ engine.OnInitialized = function()
     Logger.Debug("slotIndex=" .. slotIndex)
 
     -- full source path (where files are)
-    slotPath = Path.Combine(sourceFolder, "GAME-AUTOSAVE" .. (slotIndex - 1))
+    local slotFolderName = slotFolderNames[slotIndex]
+    slotPath = Path.Combine(sourceFolder, slotFolderName)
     Logger.Debug("slotPath=" .. slotPath)
 
     userIdentifier =  engine:SettingByName("UserIdentifier").Value
     Logger.Debug("userIdentifier=" .. userIdentifier)
-
 
     if platform == 1 then
         local steamId = HgSteamHelper.SteamId3ToSteamId64(userIdentifier)
@@ -486,6 +510,7 @@ engine.OnInitialized = function()
     if platform == 2 then
         fileDecryptBase = userIdentifier .. "PAINELEMENTAL"
     end
+
     Logger.Debug("fileDecryptBase=" .. fileDecryptBase)
 
     watcher = EngineWatcher()

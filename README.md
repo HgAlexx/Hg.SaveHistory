@@ -155,6 +155,12 @@ The first beta tester was [RedW4rr10r](https://www.twitch.tv/redw4rr10r) who fou
 
 # Version History
 
+## v0.6.0
+
+- \* Add DLC support (new maps)
+- \* Add more visual feedback for autobackup status
+- \* Few other fixes and improvements here and there
+
 ## v0.5.0
 
 - \* First public beta release

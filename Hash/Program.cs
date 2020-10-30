@@ -56,7 +56,7 @@ REPLACE_HASHES
                     string fileName = Path.Combine(directoryInfo.Name, fileInfo.Name);
                     try
                     {
-                        var fileStream = fileInfo.Open(FileMode.Open);
+                        var fileStream = fileInfo.Open(FileMode.Open, FileAccess.Read);
                         fileStream.Position = 0;
                         var hashValue = sha256.ComputeHash(fileStream);
                         var builder = new StringBuilder();

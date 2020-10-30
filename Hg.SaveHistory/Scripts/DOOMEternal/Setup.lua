@@ -105,6 +105,9 @@ settingSlot.Kind = EngineSettingKind.Setup
 settingSlot.Values:Add(1, "Slot 1")
 settingSlot.Values:Add(2, "Slot 2")
 settingSlot.Values:Add(3, "Slot 3")
+settingSlot.Values:Add(4, "DLC1 - Slot 1")
+settingSlot.Values:Add(5, "DLC1 - Slot 2")
+settingSlot.Values:Add(6, "DLC1 - Slot 3")
 settingSlot.Value = 1
 engine:AddSetting(settingSlot)
 
@@ -189,6 +192,15 @@ engine.OnSetupSuggestProfileName = function()
     end
     if settingSlot.Value == 3 then
         return "DOOM Eternal - Slot 3"
+    end
+    if settingSlot.Value == 4 then
+        return "DOOM Eternal DLC1 - Slot 1"
+    end
+    if settingSlot.Value == 5 then
+        return "DOOM Eternal DLC1 - Slot 2"
+    end
+    if settingSlot.Value == 6 then
+        return "DOOM Eternal DLC1 - Slot 3"
     end
     return "DOOM Eternal"
 end

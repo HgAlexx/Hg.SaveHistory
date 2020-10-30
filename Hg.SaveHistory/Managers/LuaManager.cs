@@ -185,7 +185,7 @@ namespace Hg.SaveHistory.Managers
 
             foreach (string value in values)
             {
-                env += value + " = " + value + ", ";
+                env += $"{value} = {value}, ";
             }
 
             env += "nil }";
@@ -307,7 +307,7 @@ namespace Hg.SaveHistory.Managers
             _lua["_sandbox_"] = _lua.DoString(Resources.Lua_Sandbox).First();
 
             // setup environment
-            _lua.DoString(@"_sandbox_.init({env = " + AllowedGlobals() + "})");
+            _lua.DoString(@"_sandbox_.init({quota = false, env = " + AllowedGlobals() + "})");
 
             // unbind import function
             _lua.DoString(@"import = function (...) end");
