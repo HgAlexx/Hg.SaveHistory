@@ -5,7 +5,7 @@ This tool helps generate snapshots of game save files, or any files for that mat
 
 ---
 
-### WARNING: Beta version 0.5.0
+### WARNING: Beta version 0.6.0
 
 SaveHistory is currently in Open Beta, if you encounter any issue please report them.
 
