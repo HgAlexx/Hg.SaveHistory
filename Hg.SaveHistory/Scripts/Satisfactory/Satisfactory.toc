@@ -1,0 +1,7 @@
+## Title: Satisfactory
+## Description: This engine helps keep backup of saves and autosaves for the game Satisfactory.
+## Author: HgAlexx
+
+Utility.lua
+Setup.lua
+Engine.lua

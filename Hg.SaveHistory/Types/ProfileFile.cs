@@ -27,10 +27,10 @@ namespace Hg.SaveHistory.Types
         // Snapshots
         public List<EngineSnapshot> Snapshots = new List<EngineSnapshot>();
 
-        public string SortKey;
+        public string SortKey = "SavedAt";
 
         // Settings
-        public SortOrder SortOrder;
+        public SortOrder SortOrder = SortOrder.Ascending;
 
         #endregion
 

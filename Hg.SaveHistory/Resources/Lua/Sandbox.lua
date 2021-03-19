@@ -127,7 +127,7 @@ local function cleanup()
 end
 
 local shared_env
-local shared_quato = false
+local shared_quota = false
 
 -- Public interface: sandbox.init
 function sandbox.init(options)
@@ -135,7 +135,7 @@ function sandbox.init(options)
   options = options or {}
 
   if options.quota ~= false then
-    shared_quato = options.quota or 500000
+    shared_quota = options.quota or 500000
   end
 
   shared_env = merge(options.env or {}, BASE_ENV)
@@ -161,7 +161,7 @@ function sandbox.protect(chunk, chunkname, options)
       env = merge(options.env or {}, BASE_ENV)
       env._G = env._G or env
   else
-    quota = shared_quato
+    quota = shared_quota
     env = shared_env
   end
 

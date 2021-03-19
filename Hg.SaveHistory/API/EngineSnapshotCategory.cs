@@ -4,7 +4,7 @@ using NLua;
 
 namespace Hg.SaveHistory.API
 {
-    public class EngineSnapshotCategory : IEquatable<EngineSnapshotCategory>
+    public class EngineSnapshotCategory : IEquatable<EngineSnapshotCategory>, IComparable<EngineSnapshotCategory>
     {
         #region Fields & Properties
 
@@ -24,6 +24,11 @@ namespace Hg.SaveHistory.API
         #endregion
 
         #region Members
+
+        public int CompareTo(EngineSnapshotCategory other)
+        {
+            return string.Compare(Name, other.Name, StringComparison.Ordinal);
+        }
 
         public bool Equals(EngineSnapshotCategory other)
         {

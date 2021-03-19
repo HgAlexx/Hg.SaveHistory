@@ -48,6 +48,6 @@
     }
   ],
   "Snapshots": [],
-  "SortKey": null,
-  "SortOrder": 0
+  "SortKey": "SavedAt",
+  "SortOrder": 1
 }

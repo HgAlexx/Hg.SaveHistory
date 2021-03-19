@@ -20,6 +20,12 @@ namespace Hg.SaveHistory.API
         public event EventHandlerCategoriesChanged OnCategoriesChanges;
 
         /// <summary>
+        ///     After the profile is saved and before the engine unload
+        ///     Release final resources here
+        /// </summary>
+        public LuaFunction OnClosed;
+
+        /// <summary>
         ///     Before the profile is saved to disk
         ///     Must return true to allow saving
         /// </summary>
@@ -52,12 +58,6 @@ namespace Hg.SaveHistory.API
         ///     Before listview columns are initialized
         /// </summary>
         public LuaFunction OnOpened;
-
-        /// <summary>
-        ///     After the profile is saved and before the engine unload
-        ///     Release final resources here
-        /// </summary>
-        public LuaFunction OnClosed;
 
         public LuaFunction OnSetupSuggestProfileName = null;
 
@@ -135,7 +135,7 @@ namespace Hg.SaveHistory.API
         {
             Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
-            args = new object[] { actionSource }.Concat(args).ToArray();
+            args = new object[] {actionSource}.Concat(args).ToArray();
             if (OnActionSnapshotBackup.Call(args).First() is bool b)
             {
                 return b;
@@ -148,7 +148,7 @@ namespace Hg.SaveHistory.API
         {
             Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
-            args = new object[] { actionSource, snapshot }.Concat(args).ToArray();
+            args = new object[] {actionSource, snapshot}.Concat(args).ToArray();
             if (OnActionSnapshotRestore.Call(args).First() is bool b)
             {
                 return b;

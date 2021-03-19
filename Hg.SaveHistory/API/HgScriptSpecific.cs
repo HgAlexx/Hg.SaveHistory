@@ -10,6 +10,23 @@ namespace Hg.SaveHistory.API
 {
     public static class HgScriptSpecific
     {
+        #region Types
+
+        public class SatisfactoryHeaderData
+        {
+            #region Fields & Properties
+
+            public int BuildVersion;
+            public TimeSpan PlayedTime;
+            public DateTime SavedAt;
+            public int SaveVersion;
+            public string SessionName;
+
+            #endregion
+        }
+
+        #endregion
+
         #region Members
 
         /// <summary>
@@ -56,6 +73,94 @@ namespace Hg.SaveHistory.API
             }
 
             return plaintext;
+        }
+
+        /// <summary>
+        ///     Parse save file
+        ///     https://satisfactory.gamepedia.com/Save_files
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns>SatisfactoryHeaderData</returns>
+        public static SatisfactoryHeaderData Satisfactory_GetHeaderData(string filePath)
+        {
+            try
+            {
+                using (var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    using (var binaryReader = new BinaryReader(fileStream))
+                    {
+                        SatisfactoryHeaderData data = new SatisfactoryHeaderData();
+
+                        // same variable to read binary value
+                        int int32Byte;
+                        long int64Byte;
+                        string value;
+
+                        // header version
+                        int32Byte = binaryReader.ReadInt32();
+                        // unused
+
+                        // save version
+                        int32Byte = binaryReader.ReadInt32();
+                        data.SaveVersion = int32Byte;
+
+                        // build version
+                        int32Byte = binaryReader.ReadInt32();
+                        data.BuildVersion = int32Byte;
+
+                        string ReadString()
+                        {
+                            // get string size
+                            int byteCount = binaryReader.ReadInt32();
+                            if (byteCount == 0)
+                            {
+                                return "";
+                            }
+
+                            // ASCII string
+                            if (byteCount > 0)
+                            {
+                                value = new string(binaryReader.ReadChars(byteCount));
+                            }
+                            else
+                            {
+                                // UTF16 string
+                                byte[] bytes = binaryReader.ReadBytes(2 * -byteCount);
+                                value = Encoding.Unicode.GetString(bytes);
+                            }
+
+                            return value.TrimEnd('\0');
+                        }
+
+                        // map name: size + data
+                        value = ReadString();
+                        // unused
+
+                        // map options: size + data
+                        value = ReadString();
+                        // unused
+
+                        // session name: size + data
+                        value = ReadString();
+                        data.SessionName = value;
+
+                        // played time
+                        int32Byte = binaryReader.ReadInt32();
+                        data.PlayedTime = new TimeSpan(0, 0, int32Byte); // as seconds
+
+                        // saved at
+                        int64Byte = binaryReader.ReadInt64();
+                        data.SavedAt = new DateTime(int64Byte, DateTimeKind.Utc).ToLocalTime(); // as ticks
+
+                        return data;
+                    }
+                }
+            }
+            catch (Exception exception)
+            {
+                Logger.Error(exception.Message);
+                return null;
+            }
         }
 
         #endregion

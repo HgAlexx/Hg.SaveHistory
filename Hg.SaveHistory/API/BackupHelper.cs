@@ -11,6 +11,107 @@ namespace Hg.SaveHistory.API
     {
         #region Members
 
+        public static bool CopyFile(string sourceFullName, string targetFullName, bool overrideIfExists, bool withBackup)
+        {
+            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+
+            Logger.Debug("sourcePath: ", sourceFullName);
+            Logger.Debug("targetPath: ", targetFullName);
+            Logger.Debug("overrideIfExists: ", overrideIfExists);
+            Logger.Debug("withBackup: ", withBackup);
+
+            try
+            {
+                if (!File.Exists(sourceFullName))
+                {
+                    return false;
+                }
+
+                string targetDirectory = Path.GetDirectoryName(targetFullName);
+                if (targetDirectory == null)
+                {
+                    return false;
+                }
+
+                Directory.CreateDirectory(targetDirectory);
+
+                bool canRestore = false;
+                if (withBackup)
+                {
+                    try
+                    {
+                        string name = targetFullName + ".hg.bak";
+                        if (File.Exists(targetFullName))
+                        {
+                            File.Move(targetFullName, name);
+
+                            Thread.Sleep(100);
+
+                            canRestore = true;
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        Utilities.Logger.Error("CopyFile, withBackup failed: ", exception.Message);
+                        Utilities.Logger.LogException(exception);
+                    }
+                }
+
+                try
+                {
+                    File.Copy(sourceFullName, targetFullName, overrideIfExists);
+
+                    Thread.Sleep(100);
+
+                    if (withBackup)
+                    {
+                        string name = targetFullName + ".hg.bak";
+                        if (File.Exists(name))
+                        {
+                            File.Delete(name);
+                            canRestore = false;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Utilities.Logger.Error("CopyFile, files copy failed: ", ex.Message);
+                    Utilities.Logger.LogException(ex);
+
+                    if (withBackup && canRestore)
+                    {
+                        // Clean up
+                        if (File.Exists(targetFullName))
+                        {
+                            File.Delete(targetFullName);
+                        }
+
+                        Thread.Sleep(100);
+
+                        // Restore backup
+                        string name = targetFullName + ".hg.bak";
+                        if (File.Exists(name))
+                        {
+                            File.Move(name, targetFullName);
+                            canRestore = false;
+                        }
+                    }
+
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception exception)
+            {
+                Utilities.Logger.Error("CopyFile: ", exception.Message);
+                Utilities.Logger.LogException(exception);
+            }
+
+            return false;
+        }
+
+
         public static bool CopyFiles(string sourcePath, string targetPath, LuaFunction canCopy, LuaFunction mustWait, bool overrideIfExists,
             bool withBackup)
         {

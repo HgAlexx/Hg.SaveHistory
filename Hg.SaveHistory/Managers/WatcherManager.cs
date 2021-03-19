@@ -291,13 +291,14 @@ namespace Hg.SaveHistory.Managers
         {
             Logger.Debug("MakeMainWatcher");
 
+            // NotifyFilters notifyFilters = (NotifyFilters) _watcher.NotifyFilter;
+
             // Create new
             _fileSystemWatcherMain = new FileSystemWatcher
             {
                 Path = _watcher.Path,
                 Filter = _watcher.Filter,
                 EnableRaisingEvents = false,
-                NotifyFilter = (NotifyFilters) _watcher.NotifyFilter
             };
 
             if (_watcher.WatchCreated)
@@ -308,6 +309,7 @@ namespace Hg.SaveHistory.Managers
             if (_watcher.WatchChanged)
             {
                 _fileSystemWatcherMain.Changed += FileSystemWatcherMainOnChanged;
+                //notifyFilters = notifyFilters | NotifyFilters.LastWrite;
             }
 
             if (_watcher.WatchDeleted)
@@ -319,6 +321,8 @@ namespace Hg.SaveHistory.Managers
             {
                 _fileSystemWatcherMain.Renamed += FileSystemWatcherMainOnRenamed;
             }
+
+            //_fileSystemWatcherMain.NotifyFilter = notifyFilters;
 
             Logger.Debug("MakeMainWatcher: _fileSystemWatcherMain created");
         }

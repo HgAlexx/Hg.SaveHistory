@@ -1,8 +1,8 @@
 {
-  "EngineScriptName": "DOOM2016",
-  "FilePath": "%SOURCEFOLDER%\\DOOM2016_Create.shp",
-  "Name": "DOOM2016",
-  "RootFolder": null,
+  "EngineScriptName": "Satisfactory",
+  "FilePath": "%SOURCEFOLDER%\\Satisfactory_Open.shp",
+  "Name": "Satisfactory",
+  "RootFolder": "%SOURCEFOLDER%",
   "Settings": [
     {
       "$type": "Hg.SaveHistory.Types.ProfileSettingString, Hg.SaveHistory",
@@ -11,20 +11,14 @@
       "Name": "SourceFolder"
     },
     {
-      "$type": "Hg.SaveHistory.Types.ProfileSettingInteger, Hg.SaveHistory",
-      "Value": 1,
-      "Kind": "Setup",
-      "Name": "SlotIndex"
-    },
-    {
       "$type": "Hg.SaveHistory.Types.ProfileSettingBoolean, Hg.SaveHistory",
-      "Value": false,
+      "Value": true,
       "Kind": "Runtime",
-      "Name": "IncludeDeath"
+      "Name": "IncludeAutosave"
     },
     {
       "$type": "Hg.SaveHistory.Types.ProfileSettingBoolean, Hg.SaveHistory",
-      "Value": false,
+      "Value": true,
       "Kind": "Runtime",
       "Name": "Screenshot"
     }

@@ -38,15 +38,16 @@ namespace Hg.SaveHistory.Forms
 
         private Comparison<EngineSnapshot> _comparer;
 
+
         private FormDebugConsole _debugConsole;
 
         private HotKeysManager _hotKeysManager;
-        private string _lastKey;
 
         private LuaManager _luaManager;
 
         private EngineSnapshot _selectedSnapshot;
-        private SortOrder _snapshotOrder = SortOrder.Ascending;
+        private string _sortKey;
+        private SortOrder _sortOrder = SortOrder.Ascending;
 
         private WatcherManager _watcherManager;
 
@@ -210,6 +211,11 @@ namespace Hg.SaveHistory.Forms
                 if (_luaManager.ActiveEngine.ProcessNames.Contains(process.ProcessName))
                 {
                     processPtr = process.MainWindowHandle;
+                    if (processPtr == IntPtr.Zero)
+                    {
+                        processPtr = process.Handle;
+                    }
+
                     break;
                 }
             }
@@ -343,14 +349,22 @@ namespace Hg.SaveHistory.Forms
 
             if (tabControlSaves.SelectedTab == tabPageActiveSaves)
             {
-                if (_luaManager.ActiveEngine.ActionSnapshotBackup(actionSource))
+                try
                 {
-                    Message("The backup has been successful", "Backup Successful", MessageType.Information, MessageMode.User);
-                    return true;
-                }
+                    Cursor.Current = Cursors.WaitCursor;
+                    if (_luaManager.ActiveEngine.ActionSnapshotBackup(actionSource))
+                    {
+                        Message("The backup has been successful", "Backup Successful", MessageType.Information, MessageMode.User);
+                        return true;
+                    }
 
-                Message("The backup failed :(", "Hmm :(", MessageType.Error, MessageMode.User);
-                return false;
+                    Message("The backup failed :(", "Hmm :(", MessageType.Error, MessageMode.User);
+                    return false;
+                }
+                finally
+                {
+                    Cursor.Current = Cursors.Default;
+                }
             }
 
             return false;
@@ -585,6 +599,58 @@ namespace Hg.SaveHistory.Forms
             ActionSwitchAutoBackup();
         }
 
+        private void buttonActionAuto_Paint(object sender, PaintEventArgs e)
+        {
+            Button btn = (Button) sender;
+
+            Color color = Color.Gray;
+            int border = 0;
+
+            if (_autoBackupEnabled)
+            {
+                switch (_watcherManager.AutoBackupStatus)
+                {
+                    case AutoBackupStatus.Disabled:
+                        color = Color.Gray;
+                        border = 0;
+                        break;
+                    case AutoBackupStatus.Enabled:
+                        color = Color.LimeGreen;
+                        border = 5;
+                        break;
+                    case AutoBackupStatus.Waiting:
+                        color = Color.Orange;
+                        border = 5;
+                        break;
+                }
+            }
+            else
+            {
+                switch (_watcherManager.AutoBackupStatus)
+                {
+                    case AutoBackupStatus.Disabled:
+                        color = Color.Gray;
+                        border = 0;
+                        break;
+                    case AutoBackupStatus.Enabled:
+                        color = Color.LimeGreen;
+                        border = 5;
+                        break;
+                    case AutoBackupStatus.Waiting:
+                        color = Color.Orange;
+                        border = 5;
+                        break;
+                }
+            }
+
+            ControlPaint.DrawBorder(e.Graphics, btn.ClientRectangle,
+                color, border, ButtonBorderStyle.Solid,
+                color, border, ButtonBorderStyle.Solid,
+                color, border, ButtonBorderStyle.Solid,
+                color, border, ButtonBorderStyle.Solid
+            );
+        }
+
         private void buttonActionBackup_Click(object sender, EventArgs e)
         {
             ActionSnapshotBackup(ActionSource.Button);
@@ -729,6 +795,7 @@ namespace Hg.SaveHistory.Forms
 
                 HttpWebRequest request = (HttpWebRequest) WebRequest.Create(url);
                 request.UserAgent = $"Hg.SaveHistory/{versionFormatted} ({Environment.OSVersion}) By: HgAlexx";
+
 
                 HttpWebResponse response = (HttpWebResponse) request.GetResponse();
                 if (response.StatusCode == HttpStatusCode.OK)
@@ -975,19 +1042,21 @@ namespace Hg.SaveHistory.Forms
             _settingsManager.SaveSettings();
         }
 
+        private void FormMain_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            CloseProfile();
+        }
+
         private void FormMain_Load(object sender, EventArgs e)
         {
             string versionFormatted = $"v{_version.Major}.{_version.Minor}.{_version.Build}";
             Text += @" " + versionFormatted;
+#if DEBUG
             if (_version.Major == 0)
             {
-#if DEBUG
-                Text += @" - Alpha";
-#endif
-#if !DEBUG
-                Text += @" - Beta";
-#endif
+                Text += @" - Development";
             }
+#endif
 
             _settingsManager.DetectAndLoadFile();
 
@@ -999,6 +1068,61 @@ namespace Hg.SaveHistory.Forms
                 debugConsoleToolStripMenuItem_Click(null, null);
             }
 #endif
+        }
+
+        private void FormMain_Paint(object sender, PaintEventArgs e)
+        {
+            if (_watcherManager == null)
+            {
+                return;
+            }
+
+            Color color = Color.Gray;
+            int border = 0;
+
+            if (_autoBackupEnabled)
+            {
+                switch (_watcherManager.AutoBackupStatus)
+                {
+                    case AutoBackupStatus.Disabled:
+                        color = Color.Gray;
+                        border = 0;
+                        break;
+                    case AutoBackupStatus.Enabled:
+                        color = Color.LimeGreen;
+                        border = 5;
+                        break;
+                    case AutoBackupStatus.Waiting:
+                        color = Color.Orange;
+                        border = 5;
+                        break;
+                }
+            }
+            else
+            {
+                switch (_watcherManager.AutoBackupStatus)
+                {
+                    case AutoBackupStatus.Disabled:
+                        color = Color.Gray;
+                        border = 0;
+                        break;
+                    case AutoBackupStatus.Enabled:
+                        color = Color.LimeGreen;
+                        border = 5;
+                        break;
+                    case AutoBackupStatus.Waiting:
+                        color = Color.Orange;
+                        border = 5;
+                        break;
+                }
+            }
+
+            ControlPaint.DrawBorder(e.Graphics, ClientRectangle,
+                color, border, ButtonBorderStyle.Outset,
+                color, border, ButtonBorderStyle.Outset,
+                color, border, ButtonBorderStyle.Outset,
+                color, border, ButtonBorderStyle.Outset
+            );
         }
 
         private EngineSnapshot GetSelectedActiveSnapshot()
@@ -1113,7 +1237,8 @@ namespace Hg.SaveHistory.Forms
         {
             if (listViewArchived.Columns[e.Column].Tag is EngineSnapshotColumnDefinition column)
             {
-                SetComparer(column.Key);
+                UpdateSortOrder(column.Key);
+                SetComparer();
                 SortSnapshots();
                 RefreshSnapshotLists();
             }
@@ -1166,7 +1291,8 @@ namespace Hg.SaveHistory.Forms
         {
             if (listViewDeleted.Columns[e.Column].Tag is EngineSnapshotColumnDefinition column)
             {
-                SetComparer(column.Key);
+                UpdateSortOrder(column.Key);
+                SetComparer();
                 SortSnapshots();
                 RefreshSnapshotLists();
             }
@@ -1248,7 +1374,8 @@ namespace Hg.SaveHistory.Forms
         {
             if (listViewSnapshot.Columns[e.Column].Tag is EngineSnapshotColumnDefinition column)
             {
-                SetComparer(column.Key);
+                UpdateSortOrder(column.Key);
+                SetComparer();
                 SortSnapshots();
                 RefreshSnapshotLists();
             }
@@ -1331,8 +1458,10 @@ namespace Hg.SaveHistory.Forms
 
             _luaManager.ActiveEngine.OnOpened?.Call();
 
-            _snapshotOrder = profileFile.SortOrder;
-            _lastKey = profileFile.SortKey;
+            _sortOrder = profileFile.SortOrder;
+            _sortKey = profileFile.SortKey;
+
+            SetComparer();
 
             // Load configuration controls
             foreach (var setting in _luaManager.ActiveEngine.Settings.Where(s => s.Kind == EngineSettingKind.Runtime).OrderBy(s => s.Index))
@@ -1405,6 +1534,8 @@ namespace Hg.SaveHistory.Forms
 
             _luaManager.ActiveEngine.OnSnapshotsChanges += () =>
             {
+                SortSnapshots();
+
                 if (InvokeRequired)
                 {
                     Invoke(new Action(RefreshSnapshotLists));
@@ -2078,8 +2209,8 @@ namespace Hg.SaveHistory.Forms
 
             if (_luaManager != null && _activeProfileFile != null)
             {
-                _activeProfileFile.SortOrder = _snapshotOrder;
-                _activeProfileFile.SortKey = _lastKey;
+                _activeProfileFile.SortOrder = _sortOrder;
+                _activeProfileFile.SortKey = _sortKey;
 
                 _luaManager.SaveSnapshots(_activeProfileFile);
                 _luaManager.SaveSettings(_activeProfileFile);
@@ -2150,28 +2281,11 @@ namespace Hg.SaveHistory.Forms
             button.TextImageRelation = TextImageRelation.ImageBeforeText;
         }
 
-        private void SetComparer(string key)
+        private void SetComparer()
         {
-            if (_lastKey != key)
-            {
-                _lastKey = key;
-                _snapshotOrder = SortOrder.Ascending;
-            }
-            else
-            {
-                if (_snapshotOrder == SortOrder.Ascending)
-                {
-                    _snapshotOrder = SortOrder.Descending;
-                }
-                else
-                {
-                    _snapshotOrder = SortOrder.Ascending;
-                }
-            }
+            Logger.Information(MethodBase.GetCurrentMethod().Name, " ", _sortKey, " ", _sortOrder);
 
-            Logger.Information(MethodBase.GetCurrentMethod().Name, " ", _lastKey, " ", _snapshotOrder);
-
-            switch (key)
+            switch (_sortKey)
             {
                 case "SavedAt":
                     _comparer = (s1, s2) =>
@@ -2191,7 +2305,7 @@ namespace Hg.SaveHistory.Forms
                             return 1;
                         }
 
-                        if (_snapshotOrder == SortOrder.Ascending)
+                        if (_sortOrder == SortOrder.Ascending)
                         {
                             return DateTime.Compare(s1.SavedAt, s2.SavedAt);
                         }
@@ -2217,7 +2331,7 @@ namespace Hg.SaveHistory.Forms
                             return 1;
                         }
 
-                        if (_snapshotOrder == SortOrder.Ascending)
+                        if (_sortOrder == SortOrder.Ascending)
                         {
                             return string.CompareOrdinal(s1.Notes ?? "", s2.Notes ?? "");
                         }
@@ -2243,10 +2357,10 @@ namespace Hg.SaveHistory.Forms
                             return 1;
                         }
 
-                        EngineSnapshotCustomValueBase c1 = s1.CustomValues[key];
-                        EngineSnapshotCustomValueBase c2 = s2.CustomValues[key];
+                        EngineSnapshotCustomValueBase c1 = s1.CustomValues[_sortKey];
+                        EngineSnapshotCustomValueBase c2 = s2.CustomValues[_sortKey];
 
-                        if (_snapshotOrder == SortOrder.Ascending)
+                        if (_sortOrder == SortOrder.Ascending)
                         {
                             return c1.CompareTo(c2);
                         }
@@ -2597,6 +2711,26 @@ namespace Hg.SaveHistory.Forms
             return true;
         }
 
+        private void UpdateSortOrder(string key)
+        {
+            if (_sortKey != key)
+            {
+                _sortKey = key;
+                _sortOrder = SortOrder.Ascending;
+            }
+            else
+            {
+                if (_sortOrder == SortOrder.Ascending)
+                {
+                    _sortOrder = SortOrder.Descending;
+                }
+                else
+                {
+                    _sortOrder = SortOrder.Ascending;
+                }
+            }
+        }
+
         private bool ZipSnapshot(EngineSnapshot snapshot)
         {
             Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
@@ -2663,118 +2797,5 @@ namespace Hg.SaveHistory.Forms
         }
 
         #endregion
-
-        private void buttonActionAuto_Paint(object sender, PaintEventArgs e)
-        {
-            Button btn = (Button)sender;
-
-            Color color = Color.Gray;
-            int border = 0;
-
-            if (_autoBackupEnabled)
-            {
-                switch (_watcherManager.AutoBackupStatus)
-                {
-                    case AutoBackupStatus.Disabled:
-                        color = Color.Gray;
-                        border = 0;
-                        break;
-                    case AutoBackupStatus.Enabled:
-                        color = Color.LimeGreen;
-                        border = 5;
-                        break;
-                    case AutoBackupStatus.Waiting:
-                        color = Color.Orange;
-                        border = 5;
-                        break;
-                }
-            }
-            else
-            {
-                switch (_watcherManager.AutoBackupStatus)
-                {
-                    case AutoBackupStatus.Disabled:
-                        color = Color.Gray;
-                        border = 0;
-                        break;
-                    case AutoBackupStatus.Enabled:
-                        color = Color.LimeGreen;
-                        border = 5;
-                        break;
-                    case AutoBackupStatus.Waiting:
-                        color = Color.Orange;
-                        border = 5;
-                        break;
-                }
-            }
-
-            ControlPaint.DrawBorder(e.Graphics, btn.ClientRectangle,
-                color, border, ButtonBorderStyle.Solid,
-                color, border, ButtonBorderStyle.Solid,
-                color, border, ButtonBorderStyle.Solid,
-                color, border, ButtonBorderStyle.Solid
-            );
-        }
-
-        private void FormMain_Paint(object sender, PaintEventArgs e)
-        {
-            if (_watcherManager == null)
-                return;
-
-            Color color = Color.Gray;
-            int border = 0;
-
-            if (_autoBackupEnabled)
-            {
-                switch (_watcherManager.AutoBackupStatus)
-                {
-                    case AutoBackupStatus.Disabled:
-                        color = Color.Gray;
-                        border = 0;
-                        break;
-                    case AutoBackupStatus.Enabled:
-                        color = Color.LimeGreen;
-                        border = 5;
-                        break;
-                    case AutoBackupStatus.Waiting:
-                        color = Color.Orange;
-                        border = 5;
-                        break;
-                }
-            }
-            else
-            {
-                switch (_watcherManager.AutoBackupStatus)
-                {
-                    case AutoBackupStatus.Disabled:
-                        color = Color.Gray;
-                        border = 0;
-                        break;
-                    case AutoBackupStatus.Enabled:
-                        color = Color.LimeGreen;
-                        border = 5;
-                        break;
-                    case AutoBackupStatus.Waiting:
-                        color = Color.Orange;
-                        border = 5;
-                        break;
-                }
-            }
-
-            ControlPaint.DrawBorder(e.Graphics, ClientRectangle,
-                color, border, ButtonBorderStyle.Outset,
-                color, border, ButtonBorderStyle.Outset,
-                color, border, ButtonBorderStyle.Outset,
-                color, border, ButtonBorderStyle.Outset
-            );
-
-        }
-
-        private void debugToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-
-
-
-        }
     }
 }

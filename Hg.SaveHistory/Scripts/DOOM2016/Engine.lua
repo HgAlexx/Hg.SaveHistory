@@ -478,9 +478,6 @@ engine.OnOpened = function()
     refreshCategories()
 end
 
-local NotifyFilters_FileName = 1
-local NotifyFilters_DirectoryName = 2
-
 local watcher = nil
 
 engine.OnInitialized = function()
@@ -504,7 +501,6 @@ engine.OnInitialized = function()
     watcher.Path = slotPath
     watcher.WatchParent = true
     watcher.Filter = "*"
-    watcher.NotifyFilter = NotifyFilters_FileName
     watcher.WatchRenamed = true
     watcher.OnEvent = watcherOnEvent
 

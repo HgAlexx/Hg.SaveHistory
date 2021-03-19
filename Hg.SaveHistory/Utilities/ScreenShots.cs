@@ -250,8 +250,22 @@ namespace Hg.SaveHistory.Utilities
             return (value & WS_CAPTION) == WS_CAPTION;
         }
 
+        public static bool? IsWindowFocused(IntPtr processPtr)
+        {
+            IntPtr handle = GetForegroundWindow();
+            if (handle == IntPtr.Zero)
+            {
+                return false;
+            }
+
+            return handle == processPtr;
+        }
+
         [DllImport("user32.dll")]
         private static extern IntPtr GetClientRect(IntPtr hWnd, ref Rect rect);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetForegroundWindow();
 
         [DllImport("user32.dll")]
         private static extern int GetSystemMetrics(SystemMetric smIndex);

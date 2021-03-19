@@ -105,9 +105,12 @@ settingSlot.Kind = EngineSettingKind.Setup
 settingSlot.Values:Add(1, "Slot 1")
 settingSlot.Values:Add(2, "Slot 2")
 settingSlot.Values:Add(3, "Slot 3")
-settingSlot.Values:Add(4, "DLC1 - Slot 1")
-settingSlot.Values:Add(5, "DLC1 - Slot 2")
-settingSlot.Values:Add(6, "DLC1 - Slot 3")
+settingSlot.Values:Add(4, "The Ancient Gods Part 1 - Slot 1")
+settingSlot.Values:Add(5, "The Ancient Gods Part 1 - Slot 2")
+settingSlot.Values:Add(6, "The Ancient Gods Part 1 - Slot 3")
+settingSlot.Values:Add(7, "The Ancient Gods Part 2 - Slot 1")
+settingSlot.Values:Add(8, "The Ancient Gods Part 2 - Slot 2")
+settingSlot.Values:Add(9, "The Ancient Gods Part 2 - Slot 3")
 settingSlot.Value = 1
 engine:AddSetting(settingSlot)
 
@@ -194,13 +197,22 @@ engine.OnSetupSuggestProfileName = function()
         return "DOOM Eternal - Slot 3"
     end
     if settingSlot.Value == 4 then
-        return "DOOM Eternal DLC1 - Slot 1"
+        return "DOOM Eternal - The Ancient Gods Part 1 - Slot 1"
     end
     if settingSlot.Value == 5 then
-        return "DOOM Eternal DLC1 - Slot 2"
+        return "DOOM Eternal - The Ancient Gods Part 1 - Slot 2"
     end
     if settingSlot.Value == 6 then
-        return "DOOM Eternal DLC1 - Slot 3"
+        return "DOOM Eternal - The Ancient Gods Part 1 - Slot 3"
+    end
+    if settingSlot.Value == 7 then
+        return "DOOM Eternal - The Ancient Gods Part 2 - Slot 1"
+    end
+    if settingSlot.Value == 8 then
+        return "DOOM Eternal - The Ancient Gods Part 2 - Slot 2"
+    end
+    if settingSlot.Value == 9 then
+        return "DOOM Eternal - The Ancient Gods Part 2 - Slot 3"
     end
     return "DOOM Eternal"
 end

@@ -16,9 +16,16 @@ local mapsLevels = {
     ["game/sp/e3m3_maykr/e3m3_maykr"] = 12,
     ["game/sp/e3m4_boss/e3m4_boss"] = 13,
     ["game/hub/hub"] = 14,
+
     ["game/dlc/e4m1_rig/e4m1_rig"] = 1,
-    ["game/dlc/e4m2_rig/e4m2_swap"] = 2,
-    ["game/dlc/e4m3_rig/e4m3_mcity"] = 3,
+    ["game/dlc/e4m2_swap/e4m2_swap"] = 2,
+    ["game/dlc/e4m3_mcity/e4m3_mcity"] = 3,
+
+    ["game/dlc2/e5m1_spear/e5m1_spear"] = 1,
+    ["game/dlc2/e5m2_earth/e5m2_earth"] = 2,
+    ["game/dlc2/e5m3_hell/e5m3_hell"] = 3,
+    ["game/dlc2/e5m4_boss/e5m4_boss"] = 4,
+
     ["game/dlc/hub/hub"] = 99
 }
 
@@ -38,7 +45,10 @@ local slotFolderNames = {
     "GAME-AUTOSAVE2",
     "DLC1-AUTOSAVE3",
     "DLC1-AUTOSAVE4",
-    "DLC1-AUTOSAVE5"
+    "DLC1-AUTOSAVE5",
+    "DLC2-AUTOSAVE6",
+    "DLC2-AUTOSAVE7",
+    "DLC2-AUTOSAVE8"
 }
 
 local difficultyToString = function(diff)
@@ -473,9 +483,6 @@ engine.OnOpened = function()
     refreshCategories()
 end
 
-local NotifyFilters_FileName = 1
-local NotifyFilters_DirectoryName = 2
-
 local watcher = nil
 
 engine.OnInitialized = function()
@@ -517,9 +524,7 @@ engine.OnInitialized = function()
     watcher.Path = slotPath
     watcher.WatchParent = true
     watcher.Filter = "*"
-    watcher.NotifyFilter = NotifyFilters_FileName
     watcher.WatchRenamed = true
-    watcher.WatchChanged = true
     watcher.OnEvent = watcherOnEvent
 
     engine:SetupWatcher(watcher)

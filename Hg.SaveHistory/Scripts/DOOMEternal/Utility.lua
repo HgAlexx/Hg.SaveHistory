@@ -10,5 +10,9 @@ ns.StringEndsWith = function(str, ending)
 end
 
 ns.StringSplit = function(str, pattern)
-    return str:gmatch(pattern)
+    local result = {}
+    for each in str:gmatch(pattern) do
+        table.insert(result, each)
+    end
+    return result
 end

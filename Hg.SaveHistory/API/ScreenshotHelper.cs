@@ -35,6 +35,13 @@ namespace Hg.SaveHistory.API
 
             try
             {
+                bool? focused = IsWindowFocused();
+                if (focused is null || focused == false)
+                {
+                    Logger.Warning("Screenshot.Capture: The window is not focused.");
+                    return false;
+                }
+
                 snapshot.HasScreenshot = false;
 
                 Bitmap bitmap = new Bitmap(captureBounds.Width, captureBounds.Height);
@@ -116,6 +123,17 @@ namespace Hg.SaveHistory.API
             return ScreenShots.HasTitlebar(processPtr);
         }
 
+        public bool? IsWindowFocused()
+        {
+            IntPtr processPtr = GetProcessPtr();
+            if (processPtr == IntPtr.Zero)
+            {
+                return null;
+            }
+
+            return ScreenShots.IsWindowFocused(processPtr);
+        }
+
         public int TitleBarHeight()
         {
             return ScreenShots.GetTitleBarHeight();
@@ -135,6 +153,11 @@ namespace Hg.SaveHistory.API
                 if (_engine.ProcessNames.Contains(process.ProcessName))
                 {
                     processPtr = process.MainWindowHandle;
+                    if (processPtr == IntPtr.Zero)
+                    {
+                        processPtr = process.Handle;
+                    }
+
                     break;
                 }
             }

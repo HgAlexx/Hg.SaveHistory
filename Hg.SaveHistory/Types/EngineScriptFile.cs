@@ -1,7 +1,4 @@
-﻿using System.IO;
-using System.Security.Cryptography;
-using System.Text;
-using Hg.SaveHistory.API;
+﻿using Hg.SaveHistory.API;
 
 namespace Hg.SaveHistory.Types
 {
@@ -25,7 +22,9 @@ namespace Hg.SaveHistory.Types
             string hash = HgUtility.HashFile(FileFullName);
 
             if (string.IsNullOrEmpty(hash))
+            {
                 return "";
+            }
 
             return hash;
         }
