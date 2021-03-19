@@ -5,9 +5,7 @@ This tool helps generate snapshots of game save files, or any files for that mat
 
 ---
 
-### WARNING: Beta version 0.6.0
-
-SaveHistory is currently in Open Beta, if you encounter any issue please report them.
+If you encounter any issue please report them!
 
 You'll find a log file named Hg.SaveHistory.log inside the application folder.
 
@@ -33,7 +31,8 @@ Thank you!
 ### Official Engines
 
 - DOOM 2016
-- DOOM Eternal, with DLC1
+- DOOM Eternal, with DLC1 and DLC2
+- Satisfactory
 
 
 ### Third Party Engines
@@ -154,6 +153,15 @@ The first beta tester was [RedW4rr10r](https://www.twitch.tv/redw4rr10r) who fou
 
 
 # Version History
+
+## v0.7.0
+
+- \* Add support for Satisfactory and DOOM Eternal DLC2
+- \* Add wait cursor on manual backup
+- \* Fix snapshots sorting
+- \* Screenshot only if the process window is focused
+- \* Tests: refactor to support Satisfactory cases
+- \* Typo
 
 ## v0.6.0
 
