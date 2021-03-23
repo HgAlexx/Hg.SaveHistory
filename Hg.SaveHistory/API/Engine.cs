@@ -49,7 +49,6 @@ namespace Hg.SaveHistory.API
 
         public event MessageEventHandler OnMessage;
 
-
         /// <summary>
         ///     First LoadProfile event
         ///     After engine and profile loaded from file
@@ -64,6 +63,13 @@ namespace Hg.SaveHistory.API
         public LuaFunction OnSetupValidate = null;
 
         public event EventHandlerSnapshotsChanged OnSnapshotsChanges;
+
+        /// <summary>
+        ///     Return the content of the README
+        ///     Provides help on how to use the engine
+        /// </summary>
+        /// <returns>Must return a string value</returns>
+        public LuaFunction ReadMe;
 
         public List<EngineSnapshotCategory> Categories { get; } = new List<EngineSnapshotCategory>();
 
@@ -87,7 +93,6 @@ namespace Hg.SaveHistory.API
         public string SnapshotsFolder { get; private set; }
 
         public string Title { get; }
-
 
         [LuaHide] public EngineWatcher Watcher { get; set; }
 

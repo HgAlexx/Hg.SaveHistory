@@ -26,17 +26,20 @@ Thank you!
 - Events Sound notifications
 - Attach notes to snapshots
 
+
 ## Supported Games and Applications
 
 ### Official Engines
 
+#### Games
 - DOOM 2016
 - DOOM Eternal, with DLC1 and DLC2
 - Satisfactory
 
+#### Applications
+- None yet
 
 ### Third Party Engines
-
 - None yet
 
 
@@ -64,9 +67,10 @@ On first run, the app will ask where you want to save the app settings, either:
 Start by creating a backup profile using the built-in wizard.
 
 1. Choose a engine
-2. Setup the profile: each engine require its own settings
+2. Setup the profile: each engine requires its own settings
 3. Choose a name and a location to save the profile
-4. You are done!
+4. Be sure to read the engine README if one is provided!
+5. You are done!
 
 
 ### Open an existing backup profile
@@ -116,7 +120,7 @@ To unpin a profile, click the trash can icon.
 
 This can happens if the target folder is currently open in a windows explorer (even if not selected) or if you don't have write persmission to the destination.
 
-This may be the case if steam is installed inside "Program Files". You can either move you're steam installation folder or launch SaveHistory as administrator.
+This may be the case if steam is installed inside "Program Files". You can either move your steam installation folder or launch SaveHistory as administrator.
 
 
 ## TODO:
@@ -153,6 +157,13 @@ The first beta tester was [RedW4rr10r](https://www.twitch.tv/redw4rr10r) who fou
 
 
 # Version History
+
+## v0.7.1
+
+- \+ Add README feature
+- \+ Add README content for all 3 engines
+- \* Update NuGet packages
+- \* Small fixes
 
 ## v0.7.0
 

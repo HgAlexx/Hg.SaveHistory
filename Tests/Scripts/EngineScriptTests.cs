@@ -176,6 +176,15 @@ namespace Tests.Scripts
                 });
             }
 
+            if (luaManager.ActiveEngine.ReadMe != null)
+            {
+                Assert.DoesNotThrow(() =>
+                {
+                    string s = luaManager.ActiveEngine.ReadMe.Call().First() as string;
+                    Assert.IsFalse(string.IsNullOrEmpty(s));
+                });
+            }
+
             var profileFile = new ProfileFile {EngineScriptName = engineScript.Name, Name = dataSet.ProfileName};
 
             luaManager.SaveSnapshots(profileFile);

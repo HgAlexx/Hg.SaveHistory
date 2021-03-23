@@ -124,6 +124,8 @@
             this.buttonActionAuto = new System.Windows.Forms.Button();
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.flowLayoutPanelConfig = new System.Windows.Forms.FlowLayoutPanel();
+            this.tabPageUsage = new System.Windows.Forms.TabPage();
+            this.richTextBoxUsage = new System.Windows.Forms.RichTextBox();
             this.imageListMessageType = new System.Windows.Forms.ImageList(this.components);
             this.statusStrip1.SuspendLayout();
             this.menuStrip.SuspendLayout();
@@ -162,6 +164,7 @@
             this.groupBox2.SuspendLayout();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            this.tabPageUsage.SuspendLayout();
             this.SuspendLayout();
             // 
             // statusStrip1
@@ -233,33 +236,33 @@
             // newProfileToolStripMenuItem
             // 
             this.newProfileToolStripMenuItem.Name = "newProfileToolStripMenuItem";
-            this.newProfileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.newProfileToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.newProfileToolStripMenuItem.Text = "New Profile";
             this.newProfileToolStripMenuItem.Click += new System.EventHandler(this.newProfileToolStripMenuItem_Click);
             // 
             // openProfileToolStripMenuItem
             // 
             this.openProfileToolStripMenuItem.Name = "openProfileToolStripMenuItem";
-            this.openProfileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.openProfileToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.openProfileToolStripMenuItem.Text = "Open Profile";
             this.openProfileToolStripMenuItem.Click += new System.EventHandler(this.openProfileToolStripMenuItem_Click);
             // 
             // closeProfileToolStripMenuItem
             // 
             this.closeProfileToolStripMenuItem.Name = "closeProfileToolStripMenuItem";
-            this.closeProfileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.closeProfileToolStripMenuItem.Size = new System.Drawing.Size(140, 22);
             this.closeProfileToolStripMenuItem.Text = "Close Profile";
             this.closeProfileToolStripMenuItem.Click += new System.EventHandler(this.closeProfileToolStripMenuItem_Click);
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(137, 6);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(140, 22);
             this.toolStripMenuItem2.Text = "Exit";
             this.toolStripMenuItem2.Click += new System.EventHandler(this.toolStripMenuItem2_Click);
             // 
@@ -283,7 +286,7 @@
             this.soundToolStripMenuItem,
             this.setKeysToolStripMenuItem});
             this.hotKeysToolStripMenuItem.Name = "hotKeysToolStripMenuItem";
-            this.hotKeysToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.hotKeysToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.hotKeysToolStripMenuItem.Text = "Hot keys";
             // 
             // activeToolStripMenuItem
@@ -313,7 +316,7 @@
             this.messageBoxToolStripMenuItem,
             this.statusBarToolStripMenuItem});
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(176, 22);
             this.toolStripMenuItem3.Text = "Notification mode";
             // 
             // messageBoxToolStripMenuItem
@@ -337,7 +340,7 @@
             this.giflowSizeToolStripMenuItem,
             this.pnghugeSizeToolStripMenuItem});
             this.screenshotsQualityToolStripMenuItem.Name = "screenshotsQualityToolStripMenuItem";
-            this.screenshotsQualityToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.screenshotsQualityToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.screenshotsQualityToolStripMenuItem.Text = "Screenshots quality";
             // 
             // jpgmediumToolStripMenuItem
@@ -367,7 +370,7 @@
             this.toolStripSeparator3,
             this.highlightColorToolStripMenuItem});
             this.snapshotToolStripMenuItem.Name = "snapshotToolStripMenuItem";
-            this.snapshotToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.snapshotToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.snapshotToolStripMenuItem.Text = "Snapshot";
             // 
             // soundNotificationToolStripMenuItem
@@ -406,12 +409,12 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(173, 6);
             // 
             // clearSettingsToolStripMenuItem
             // 
             this.clearSettingsToolStripMenuItem.Name = "clearSettingsToolStripMenuItem";
-            this.clearSettingsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clearSettingsToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.clearSettingsToolStripMenuItem.Text = "Clear settings";
             this.clearSettingsToolStripMenuItem.Click += new System.EventHandler(this.clearSettingsToolStripMenuItem_Click);
             // 
@@ -442,14 +445,14 @@
             // checkForUpdateToolStripMenuItem
             // 
             this.checkForUpdateToolStripMenuItem.Name = "checkForUpdateToolStripMenuItem";
-            this.checkForUpdateToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.checkForUpdateToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.checkForUpdateToolStripMenuItem.Text = "Check for update";
             this.checkForUpdateToolStripMenuItem.Click += new System.EventHandler(this.checkForUpdateToolStripMenuItem_Click);
             // 
             // aboutToolStripMenuItem
             // 
             this.aboutToolStripMenuItem.Name = "aboutToolStripMenuItem";
-            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.aboutToolStripMenuItem.Size = new System.Drawing.Size(165, 22);
             this.aboutToolStripMenuItem.Text = "About";
             this.aboutToolStripMenuItem.Click += new System.EventHandler(this.aboutToolStripMenuItem_Click);
             // 
@@ -493,6 +496,7 @@
             // 
             this.tabControlMain.Controls.Add(this.tabPageHome);
             this.tabControlMain.Controls.Add(this.tabPageProfile);
+            this.tabControlMain.Controls.Add(this.tabPageUsage);
             this.tabControlMain.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControlMain.Location = new System.Drawing.Point(0, 0);
             this.tabControlMain.Name = "tabControlMain";
@@ -1107,6 +1111,28 @@
             this.flowLayoutPanelConfig.Size = new System.Drawing.Size(781, 37);
             this.flowLayoutPanelConfig.TabIndex = 0;
             // 
+            // tabPageUsage
+            // 
+            this.tabPageUsage.Controls.Add(this.richTextBoxUsage);
+            this.tabPageUsage.Location = new System.Drawing.Point(4, 22);
+            this.tabPageUsage.Name = "tabPageUsage";
+            this.tabPageUsage.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPageUsage.Size = new System.Drawing.Size(803, 512);
+            this.tabPageUsage.TabIndex = 2;
+            this.tabPageUsage.Text = "Engine: README";
+            this.tabPageUsage.UseVisualStyleBackColor = true;
+            // 
+            // richTextBoxUsage
+            // 
+            this.richTextBoxUsage.BackColor = System.Drawing.SystemColors.Window;
+            this.richTextBoxUsage.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBoxUsage.Location = new System.Drawing.Point(3, 3);
+            this.richTextBoxUsage.Name = "richTextBoxUsage";
+            this.richTextBoxUsage.ReadOnly = true;
+            this.richTextBoxUsage.Size = new System.Drawing.Size(797, 506);
+            this.richTextBoxUsage.TabIndex = 0;
+            this.richTextBoxUsage.Text = "";
+            // 
             // imageListMessageType
             // 
             this.imageListMessageType.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("imageListMessageType.ImageStream")));
@@ -1173,6 +1199,7 @@
             this.groupBox2.ResumeLayout(false);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.groupBox1.ResumeLayout(false);
+            this.tabPageUsage.ResumeLayout(false);
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -1274,6 +1301,8 @@
         private System.Windows.Forms.ColumnHeader columnHeader3;
         private System.Windows.Forms.ColumnHeader columnHeader4;
         public System.Windows.Forms.PictureBox pictureBoxScreenshot;
+        private System.Windows.Forms.TabPage tabPageUsage;
+        private System.Windows.Forms.RichTextBox richTextBoxUsage;
     }
 }
 

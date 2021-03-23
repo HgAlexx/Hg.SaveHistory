@@ -317,7 +317,17 @@ namespace Hg.SaveHistory.Wizards
                 }
             }
 
-            textBoxSummary.Text = sb.ToString();
+            if (_luaManager.ActiveEngine.ReadMe?.Call().First() is string content)
+            {
+                sb.AppendLine();
+                sb.AppendLine("-= README =-");
+                foreach (string line in content.Split('\n'))
+                {
+                    sb.AppendLine(line);
+                }
+            }
+
+            richTextBoxSummary.Text = sb.ToString();
 
             if (_luaManager.ActiveEngine.OnSetupSuggestProfileName != null)
             {

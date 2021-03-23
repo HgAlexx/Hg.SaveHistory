@@ -1,6 +1,7 @@
 {
   "EngineScriptName": "DOOMEternal",
   "FilePath": "%SOURCEFOLDER%\\DOOMEternal_Steam_Create.shp",
+  "FirstTimeRun": true,
   "Name": "DOOMEternal_Steam",
   "RootFolder": null,
   "Settings": [

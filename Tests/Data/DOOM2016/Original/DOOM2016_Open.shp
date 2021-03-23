@@ -1,6 +1,7 @@
 {
   "EngineScriptName": "DOOM2016",
   "FilePath": "%SOURCEFOLDER%\\DOOM2016_Open.shp",
+  "FirstTimeRun": true,
   "Name": "DOOM2016",
   "RootFolder": "%SOURCEFOLDER%",
   "Settings": [
@@ -30,6 +31,6 @@
     }
   ],
   "Snapshots": [],
-  "SortKey": null,
+  "SortKey": "SavedAt",
   "SortOrder": 0
 }

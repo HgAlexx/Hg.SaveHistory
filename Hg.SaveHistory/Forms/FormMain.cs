@@ -162,6 +162,7 @@ namespace Hg.SaveHistory.Forms
             ApplyStyle();
 
             HideProfilePage();
+            HideReadMePage();
         }
 
         public void CategorySelectNext()
@@ -947,12 +948,12 @@ namespace Hg.SaveHistory.Forms
             ReleaseHotKeysHook();
 
             HideProfilePage();
-
+            HideReadMePage();
 
             GC.Collect();
             GC.WaitForPendingFinalizers();
 
-            Logger.Information("---------------------------------------------------------------------------------");
+            Logger.Information("---------------------------------Close---------------------------------");
         }
 
         private void closeProfileToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1142,6 +1143,15 @@ namespace Hg.SaveHistory.Forms
         private void HideProfilePage()
         {
             tabControlMain.Controls.Remove(tabPageProfile);
+        }
+
+        private void HideReadMePage()
+        {
+            richTextBoxUsage.Text = "";
+            if (tabControlMain.Controls.Contains(tabPageUsage))
+            {
+                tabControlMain.Controls.Remove(tabPageUsage);
+            }
         }
 
         private void highlightColorToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1827,7 +1837,7 @@ namespace Hg.SaveHistory.Forms
 
         private void OpenProfile(string path)
         {
-            Logger.Information("---------------------------------------------------------------------------------");
+            Logger.Information("---------------------------------Open---------------------------------");
             Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
 
             Cursor.Current = Cursors.WaitCursor;
@@ -1852,8 +1862,21 @@ namespace Hg.SaveHistory.Forms
                             tabPageProfile.Text = @"Profile: " + profileFile.Name;
                             ShowProfilePage();
 
-                            tabControlMain.SelectedTab = tabPageProfile;
-                            tabControlSaves_Selected(null, null);
+                            if (_luaManager.ActiveEngine.ReadMe?.Call().First() is string usageContent)
+                            {
+                                ShowReadMePage(usageContent);
+                            }
+
+                            if (_activeProfileFile.FirstTimeRun && tabControlMain.Controls.Contains(tabPageUsage))
+                            {
+                                tabControlMain.SelectedTab = tabPageUsage;
+                                _activeProfileFile.FirstTimeRun = false;
+                            }
+                            else
+                            {
+                                tabControlMain.SelectedTab = tabPageProfile;
+                                tabControlSaves_Selected(null, null);
+                            }
 
                             CreateHotKeysHook();
 
@@ -2276,7 +2299,7 @@ namespace Hg.SaveHistory.Forms
 
         private void SetButtonStyle(Button button, IconChar iconChar, Color color)
         {
-            button.Image = iconChar.ToBitmap(32, color);
+            button.Image = iconChar.ToBitmap(color, 32);
             button.ImageAlign = ContentAlignment.MiddleRight;
             button.TextImageRelation = TextImageRelation.ImageBeforeText;
         }
@@ -2284,6 +2307,11 @@ namespace Hg.SaveHistory.Forms
         private void SetComparer()
         {
             Logger.Information(MethodBase.GetCurrentMethod().Name, " ", _sortKey, " ", _sortOrder);
+
+            if (_sortKey == null)
+            {
+                _sortKey = "SavedAt";
+            }
 
             switch (_sortKey)
             {
@@ -2340,6 +2368,7 @@ namespace Hg.SaveHistory.Forms
                     };
                     break;
                 default:
+
                     _comparer = (s1, s2) =>
                     {
                         if (s1 == null && s2 == null)
@@ -2357,16 +2386,45 @@ namespace Hg.SaveHistory.Forms
                             return 1;
                         }
 
-                        EngineSnapshotCustomValueBase c1 = s1.CustomValues[_sortKey];
-                        EngineSnapshotCustomValueBase c2 = s2.CustomValues[_sortKey];
+                        EngineSnapshotCustomValueBase c1 = null;
+                        if (s1.CustomValues.ContainsKey(_sortKey))
+                        {
+                            c1 = s1.CustomValues[_sortKey];
+                        }
+
+                        EngineSnapshotCustomValueBase c2 = null;
+                        if (s2.CustomValues.ContainsKey(_sortKey))
+                        {
+                            c2 = s2.CustomValues[_sortKey];
+                        }
+
+                        if (c1 == null && c2 == null)
+                        {
+                            return 0;
+                        }
+
+                        int result;
+                        if (c1 == null)
+                        {
+                            result = -1;
+                        }
+                        else if (c2 == null)
+                        {
+                            result = 1;
+                        }
+                        else
+                        {
+                            result = c1.CompareTo(c2);
+                        }
 
                         if (_sortOrder == SortOrder.Ascending)
                         {
-                            return c1.CompareTo(c2);
+                            return result;
                         }
 
-                        return c2.CompareTo(c1);
+                        return -result;
                     };
+
                     break;
             }
         }
@@ -2391,7 +2449,7 @@ namespace Hg.SaveHistory.Forms
 
         private void SetPictureBoxStyle(PictureBox pictureBox, IconChar iconChar, Color color)
         {
-            pictureBox.Image = iconChar.ToBitmap(32, color);
+            pictureBox.Image = iconChar.ToBitmap(color, 32);
             pictureBox.SizeMode = PictureBoxSizeMode.CenterImage;
         }
 
@@ -2520,21 +2578,39 @@ namespace Hg.SaveHistory.Forms
 
         private void SetToolStripHotKeyStyle(ToolStripStatusLabel toolStripStatusLabel, IconChar iconChar, Color color)
         {
-            toolStripStatusLabel.Image = iconChar.ToBitmap(20, color);
+            toolStripStatusLabel.Image = iconChar.ToBitmap(color, 20);
             toolStripStatusLabel.ImageAlign = ContentAlignment.BottomLeft;
             toolStripStatusLabel.TextImageRelation = TextImageRelation.TextBeforeImage;
         }
 
         private void SetToolStripStatusStyle(ToolStripStatusLabel toolStripStatusLabel, IconChar iconChar, Color color)
         {
-            toolStripStatusLabel.Image = iconChar.ToBitmap(20, color);
+            toolStripStatusLabel.Image = iconChar.ToBitmap(color, 20);
             toolStripStatusLabel.ImageAlign = ContentAlignment.BottomLeft;
             toolStripStatusLabel.TextImageRelation = TextImageRelation.ImageBeforeText;
         }
 
         private void ShowProfilePage()
         {
-            tabControlMain.Controls.Add(tabPageProfile);
+            if (!tabControlMain.Controls.Contains(tabPageProfile))
+            {
+                tabControlMain.Controls.Add(tabPageProfile);
+            }
+        }
+
+        private void ShowReadMePage(string content)
+        {
+            richTextBoxUsage.Text = "";
+            if (!string.IsNullOrEmpty(content))
+            {
+                if (!tabControlMain.Controls.Contains(tabPageUsage))
+                {
+                    tabControlMain.Controls.Add(tabPageUsage);
+                }
+
+                // plain text for now
+                richTextBoxUsage.Text = content;
+            }
         }
 
         private bool SnapshotNuke(EngineSnapshot snapshot)

@@ -1,6 +1,7 @@
 {
   "EngineScriptName": "DOOMEternal",
   "FilePath": "%SOURCEFOLDER%\\DOOMEternal_Steam_Open.shp",
+  "FirstTimeRun": true,
   "Name": "DOOMEternal_Steam",
   "RootFolder": "%SOURCEFOLDER%",
   "Settings": [
@@ -48,6 +49,6 @@
     }
   ],
   "Snapshots": [],
-  "SortKey": null,
+  "SortKey": "SavedAt",
   "SortOrder": 0
 }

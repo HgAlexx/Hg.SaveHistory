@@ -47,7 +47,7 @@ namespace Hg.SaveHistory.Wizards
             this.panelSetup = new System.Windows.Forms.Panel();
             this.wizardPageSave = new AeroWizard.WizardPage();
             this.panelSave = new System.Windows.Forms.Panel();
-            this.textBoxSummary = new System.Windows.Forms.TextBox();
+            this.richTextBoxSummary = new System.Windows.Forms.RichTextBox();
             this.groupBoxInfo = new System.Windows.Forms.GroupBox();
             this.buttonSaveBrowse = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
@@ -246,7 +246,7 @@ namespace Hg.SaveHistory.Wizards
             // 
             // panelSave
             // 
-            this.panelSave.Controls.Add(this.textBoxSummary);
+            this.panelSave.Controls.Add(this.richTextBoxSummary);
             this.panelSave.Controls.Add(this.groupBoxInfo);
             this.panelSave.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panelSave.Location = new System.Drawing.Point(0, 0);
@@ -254,16 +254,16 @@ namespace Hg.SaveHistory.Wizards
             this.panelSave.Size = new System.Drawing.Size(546, 316);
             this.panelSave.TabIndex = 1;
             // 
-            // textBoxSummary
+            // richTextBoxSummary
             // 
-            this.textBoxSummary.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.textBoxSummary.Enabled = false;
-            this.textBoxSummary.Location = new System.Drawing.Point(0, 0);
-            this.textBoxSummary.Multiline = true;
-            this.textBoxSummary.Name = "textBoxSummary";
-            this.textBoxSummary.ReadOnly = true;
-            this.textBoxSummary.Size = new System.Drawing.Size(546, 201);
-            this.textBoxSummary.TabIndex = 4;
+            this.richTextBoxSummary.BackColor = System.Drawing.SystemColors.Window;
+            this.richTextBoxSummary.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.richTextBoxSummary.Location = new System.Drawing.Point(0, 0);
+            this.richTextBoxSummary.Name = "richTextBoxSummary";
+            this.richTextBoxSummary.ReadOnly = true;
+            this.richTextBoxSummary.Size = new System.Drawing.Size(546, 201);
+            this.richTextBoxSummary.TabIndex = 4;
+            this.richTextBoxSummary.Text = "";
             // 
             // groupBoxInfo
             // 
@@ -360,7 +360,6 @@ namespace Hg.SaveHistory.Wizards
             this.wizardPageSetup.ResumeLayout(false);
             this.wizardPageSave.ResumeLayout(false);
             this.panelSave.ResumeLayout(false);
-            this.panelSave.PerformLayout();
             this.groupBoxInfo.ResumeLayout(false);
             this.groupBoxInfo.PerformLayout();
             this.ResumeLayout(false);
@@ -387,12 +386,12 @@ namespace Hg.SaveHistory.Wizards
         private TextBox textBoxName;
         private Label label1;
         private Panel panelSave;
-        private TextBox textBoxSummary;
         private SaveFileDialog saveFileDialog;
         private Button buttonSaveBrowse;
         private Label label2;
         private TextBox textBoxSaveFolder;
         private FolderBrowserDialog folderBrowserDialog;
         public ToolTip toolTipHelp;
+        private RichTextBox richTextBoxSummary;
     }
 }

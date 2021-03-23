@@ -464,3 +464,26 @@ end
 engine.OnActionSnapshotRestore = function(actionSource, snapshot)
     return snapshotRestore(actionSource, snapshot)
 end
+
+engine.ReadMe = function()
+    local content =
+[[Satisfactory
+
+Manual backup:
+This will backup all available save files in the save folder.
+If a save file has already been backed-up, it is ignored.
+Note that the first manual backup may take some time if you have a lot of save files.
+
+Automatic backup:
+When active, everytime a save file changes, either from autosave or from manual save, a backup will be made.
+Autosave backup will be marked as such.
+
+Manual restore:
+This will copy the selected snapshot file into your save folder with the following naming scheme: "SessionName_yyyyMMdd-HHmmss".
+You will need to re-open the "Load" menu and select the correct session to see the restored save which should be at the top.
+
+
+Enjoy!]]
+
+    return content;
+end

@@ -1,6 +1,7 @@
 {
   "EngineScriptName": "DOOMEternal",
   "FilePath": "%SOURCEFOLDER%\\DOOMEternal_Bethesda_Open.shp",
+  "FirstTimeRun": true,
   "Name": "DOOMEternal_Bethesda",
   "RootFolder": "%SOURCEFOLDER%",
   "Settings": [
@@ -48,6 +49,6 @@
     }
   ],
   "Snapshots": [],
-  "SortKey": null,
+  "SortKey": "SavedAt",
   "SortOrder": 0
 }

@@ -562,3 +562,28 @@ end
 engine.OnActionSnapshotRestore = function(actionSource, snapshot)
     return snapshotRestore(actionSource, snapshot)
 end
+
+engine.ReadMe = function()
+    local content =
+[[DOOM Enternal
+
+Manual backup:
+This will backup the current save files of the selected slot.
+If the save files have already been backed-up, nothing happens.
+
+Automatic backup:
+This will backup the current save files of the selected slot everytime a in-game checkpoint is reached.
+Death checkpoints can be distinguished from progression checkpoints and backed-up or not.
+
+Manual restore:
+Restore the selected snapshot and override the current save files for the selected slot.
+Unfortunately, you must restart DOOM Eternal to see the restored save.
+
+Screenshot:
+Screenshot will only work if the game uses OpenGL or run windowed.
+
+
+Enjoy!]]
+
+    return content;
+end
