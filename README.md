@@ -139,7 +139,7 @@ Alpha testers:
 
 - [RedW4rr10r](https://www.twitch.tv/redw4rr10r): The first bug slayer
 
-- [x_ByteMe_x](https://www.twitch.tv/x_byteme_x): The suggestion slayer
+- [ByteMe](https://www.twitch.tv/byteme): The suggestion slayer
 
 - [IAmAllstin](https://www.twitch.tv/iamallstin): The origin slayer
 
@@ -153,7 +153,7 @@ Since I was also planning to do Doom on Ultra-Nightmare, I was going to need a w
 
 The first beta tester was [RedW4rr10r](https://www.twitch.tv/redw4rr10r) who found the first bug and made good improvements suggestions.
 
-[x_ByteMe_x](https://www.twitch.tv/x_byteme_x) who also made good improvements suggestions (global hot keys).
+[ByteMe](https://www.twitch.tv/byteme) who also made good improvements suggestions (global hot keys).
 
 
 # Version History
