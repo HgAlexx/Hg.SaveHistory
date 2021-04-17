@@ -158,6 +158,13 @@ The first beta tester was [RedW4rr10r](https://www.twitch.tv/redw4rr10r) who fou
 
 # Version History
 
+## v0.7.2
+
+- \* Remember window size and location
+- \* Window now snap to edge of screen
+- \* Small improvement on Satisfactory script
+- \* Code clean up
+
 ## v0.7.1
 
 - \+ Add README feature
