@@ -11,6 +11,7 @@ namespace Hg.SaveHistory.Types
 
         public bool AutoBackupSoundNotification { get; set; }
 
+
         public bool AutoSelectLastSnapshot { get; set; }
 
         public bool HighlightSelectedSnapshot { get; set; }
@@ -22,12 +23,17 @@ namespace Hg.SaveHistory.Types
         public bool HotKeysSound { get; set; }
 
         public List<HotKeyToAction> HotKeyToActions { get; set; }
+        public Point? Location { get; set; }
 
         public List<string> PinnedProfiles { get; set; }
 
         public List<string> RecentProfiles { get; set; }
 
+        public bool SaveSizeAndPosition { get; set; }
+
         public ScreenshotQuality ScreenshotQuality { get; set; }
+        public Size? Size { get; set; }
+        public bool SnapToScreenEdges { get; set; }
 
         #endregion
 
@@ -36,6 +42,8 @@ namespace Hg.SaveHistory.Types
         public Settings()
         {
             HotKeyToActions = new List<HotKeyToAction>();
+            Location = null;
+            Size = null;
 
             AutoBackupSoundNotification = false;
             AutoSelectLastSnapshot = true;
@@ -49,6 +57,9 @@ namespace Hg.SaveHistory.Types
             NotificationMode = MessageMode.Status;
 
             ScreenshotQuality = ScreenshotQuality.Png;
+
+            SaveSizeAndPosition = true;
+            SnapToScreenEdges = true;
 
             RecentProfiles = new List<string>();
             PinnedProfiles = new List<string>();

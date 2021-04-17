@@ -44,7 +44,9 @@ namespace Hg.SaveHistory.Types
                 JsonConvert.DeserializeObject<ProfileFile>(content, new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Auto});
 
             if (profileFile != null && string.IsNullOrEmpty(profileFile.SortKey))
+            {
                 profileFile.SortKey = "SavedAt";
+            }
 
             return profileFile;
         }

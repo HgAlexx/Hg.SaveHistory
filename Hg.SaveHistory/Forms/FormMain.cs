@@ -36,12 +36,17 @@ namespace Hg.SaveHistory.Forms
 
         private bool _autoBackupEnabled;
 
+
+        private int _borderOffset;
+
         private Comparison<EngineSnapshot> _comparer;
 
 
         private FormDebugConsole _debugConsole;
 
         private HotKeysManager _hotKeysManager;
+
+        private bool _loading;
 
         private LuaManager _luaManager;
 
@@ -114,6 +119,16 @@ namespace Hg.SaveHistory.Forms
             {
                 messageBoxToolStripMenuItem.Checked = _settingsManager.NotificationMode == MessageMode.MessageBox;
                 statusBarToolStripMenuItem.Checked = _settingsManager.NotificationMode == MessageMode.Status;
+            };
+
+            _settingsManager.SaveSizeAndPositionChanged += () =>
+            {
+                saveSizeAndPositionToolStripMenuItem.Checked = _settingsManager.SaveSizeAndPosition;
+            };
+
+            _settingsManager.SnapToScreenEdgesChanged += () =>
+            {
+                snapToScreenEdgesToolStripMenuItem.Checked = _settingsManager.SnapToScreenEdges;
             };
 
             _settingsManager.ScreenshotQualityChanged += () =>
@@ -222,6 +237,13 @@ namespace Hg.SaveHistory.Forms
             }
 
             return processPtr;
+        }
+
+        public bool IsOnScreen(Form form)
+        {
+            Rectangle rect = new Rectangle(form.Left, form.Top, form.Width, form.Height);
+
+            return Screen.AllScreens.Select(screen => screen.Bounds).Aggregate(Rectangle.Union).Contains(rect);
         }
 
 
@@ -607,40 +629,43 @@ namespace Hg.SaveHistory.Forms
             Color color = Color.Gray;
             int border = 0;
 
-            if (_autoBackupEnabled)
+            if (_watcherManager != null)
             {
-                switch (_watcherManager.AutoBackupStatus)
+                if (_autoBackupEnabled)
                 {
-                    case AutoBackupStatus.Disabled:
-                        color = Color.Gray;
-                        border = 0;
-                        break;
-                    case AutoBackupStatus.Enabled:
-                        color = Color.LimeGreen;
-                        border = 5;
-                        break;
-                    case AutoBackupStatus.Waiting:
-                        color = Color.Orange;
-                        border = 5;
-                        break;
+                    switch (_watcherManager.AutoBackupStatus)
+                    {
+                        case AutoBackupStatus.Disabled:
+                            color = Color.Gray;
+                            border = 0;
+                            break;
+                        case AutoBackupStatus.Enabled:
+                            color = Color.LimeGreen;
+                            border = 5;
+                            break;
+                        case AutoBackupStatus.Waiting:
+                            color = Color.Orange;
+                            border = 5;
+                            break;
+                    }
                 }
-            }
-            else
-            {
-                switch (_watcherManager.AutoBackupStatus)
+                else
                 {
-                    case AutoBackupStatus.Disabled:
-                        color = Color.Gray;
-                        border = 0;
-                        break;
-                    case AutoBackupStatus.Enabled:
-                        color = Color.LimeGreen;
-                        border = 5;
-                        break;
-                    case AutoBackupStatus.Waiting:
-                        color = Color.Orange;
-                        border = 5;
-                        break;
+                    switch (_watcherManager.AutoBackupStatus)
+                    {
+                        case AutoBackupStatus.Disabled:
+                            color = Color.Gray;
+                            border = 0;
+                            break;
+                        case AutoBackupStatus.Enabled:
+                            color = Color.LimeGreen;
+                            border = 5;
+                            break;
+                        case AutoBackupStatus.Waiting:
+                            color = Color.Orange;
+                            border = 5;
+                            break;
+                    }
                 }
             }
 
@@ -966,6 +991,13 @@ namespace Hg.SaveHistory.Forms
             RefreshSnapshotLists();
         }
 
+        private bool ComputeSnapDelta(int pos, int edge)
+        {
+            int delta = Math.Abs(pos - edge);
+
+            return delta > 0 && delta <= 10;
+        }
+
         private void contextMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             contextMenu.Hide();
@@ -1050,16 +1082,48 @@ namespace Hg.SaveHistory.Forms
 
         private void FormMain_Load(object sender, EventArgs e)
         {
+            _loading = true;
+
             string versionFormatted = $"v{_version.Major}.{_version.Minor}.{_version.Build}";
             Text += @" " + versionFormatted;
 #if DEBUG
-            if (_version.Major == 0)
-            {
-                Text += @" - Development";
-            }
+            Text += @" - Development";
 #endif
 
             _settingsManager.DetectAndLoadFile();
+
+            // Get default size and location
+            Point defaultLocation = Location;
+            Size defaultSize = Size;
+
+            // Get location offset
+            Location = new Point(0, 0);
+            Point p = PointToScreen(new Point(0, 0));
+            _borderOffset = p.X;
+
+            Location = defaultLocation;
+
+            if (_settingsManager.SaveSizeAndPosition)
+            {
+                // Restore location from settings
+                if (_settingsManager.Location != null)
+                {
+                    Location = (Point) _settingsManager.Location;
+                }
+
+                // Restore size from settings
+                if (_settingsManager.Size != null)
+                {
+                    Size = (Size) _settingsManager.Size;
+                }
+            }
+
+            if (!IsOnScreen(this))
+            {
+                // Reset size and location to default if window if out of screen
+                Location = defaultLocation;
+                Size = defaultSize;
+            }
 
             SoundManager.PreLoad();
 
@@ -1069,61 +1133,73 @@ namespace Hg.SaveHistory.Forms
                 debugConsoleToolStripMenuItem_Click(null, null);
             }
 #endif
+
+            _loading = false;
         }
 
-        private void FormMain_Paint(object sender, PaintEventArgs e)
+        private void FormMain_ResizeBegin(object sender, EventArgs e)
         {
-            if (_watcherManager == null)
-            {
-                return;
-            }
+            tabControlMain?.SelectedTab?.SuspendLayout();
+        }
 
-            Color color = Color.Gray;
-            int border = 0;
 
-            if (_autoBackupEnabled)
+        private void FormMain_ResizeEnd(object sender, EventArgs e)
+        {
+            try
             {
-                switch (_watcherManager.AutoBackupStatus)
+                if (_loading)
                 {
-                    case AutoBackupStatus.Disabled:
-                        color = Color.Gray;
-                        border = 0;
-                        break;
-                    case AutoBackupStatus.Enabled:
-                        color = Color.LimeGreen;
-                        border = 5;
-                        break;
-                    case AutoBackupStatus.Waiting:
-                        color = Color.Orange;
-                        border = 5;
-                        break;
+                    return;
+                }
+
+                if (_settingsManager == null)
+                {
+                    return;
+                }
+
+                if (_settingsManager.SnapToScreenEdges)
+                {
+                    // Get working area of screen containing most of the form
+                    var workingArea = Screen.GetWorkingArea(this);
+
+                    if (ComputeSnapDelta(Left + _borderOffset, workingArea.Left))
+                    {
+                        Left = workingArea.Left - _borderOffset;
+                    }
+
+                    if (ComputeSnapDelta(Top, workingArea.Top))
+                    {
+                        Top = workingArea.Top;
+                    }
+
+                    if (ComputeSnapDelta(Right - _borderOffset, workingArea.Right))
+                    {
+                        Left = workingArea.Right - Width + _borderOffset;
+                    }
+
+                    if (ComputeSnapDelta(Bottom - _borderOffset, workingArea.Bottom))
+                    {
+                        Top = workingArea.Bottom - Height + _borderOffset;
+                    }
+                }
+
+                if (_settingsManager.SaveSizeAndPosition)
+                {
+                    if (_settingsManager.Location != Location)
+                    {
+                        _settingsManager.Location = Location;
+                    }
+
+                    if (_settingsManager.Size != Size)
+                    {
+                        _settingsManager.Size = Size;
+                    }
                 }
             }
-            else
+            finally
             {
-                switch (_watcherManager.AutoBackupStatus)
-                {
-                    case AutoBackupStatus.Disabled:
-                        color = Color.Gray;
-                        border = 0;
-                        break;
-                    case AutoBackupStatus.Enabled:
-                        color = Color.LimeGreen;
-                        border = 5;
-                        break;
-                    case AutoBackupStatus.Waiting:
-                        color = Color.Orange;
-                        border = 5;
-                        break;
-                }
+                tabControlMain?.SelectedTab?.ResumeLayout();
             }
-
-            ControlPaint.DrawBorder(e.Graphics, ClientRectangle,
-                color, border, ButtonBorderStyle.Outset,
-                color, border, ButtonBorderStyle.Outset,
-                color, border, ButtonBorderStyle.Outset,
-                color, border, ButtonBorderStyle.Outset
-            );
         }
 
         private EngineSnapshot GetSelectedActiveSnapshot()
@@ -2110,6 +2186,33 @@ namespace Hg.SaveHistory.Forms
             {
                 RefreshSnapshotsListView(listViewDeleted, EngineSnapshotStatus.Deleted);
             }
+
+            int active = 0;
+            int archived = 0;
+            int deleted = 0;
+
+            var category = comboBoxCategories.SelectedItem as EngineSnapshotCategory;
+
+            foreach (var snapshot in _activeProfileFile.Snapshots.Where(snapshot =>
+                category == null || category.Id == 0 || snapshot.CategoryId == category.Id))
+            {
+                switch (snapshot.Status)
+                {
+                    case EngineSnapshotStatus.Active:
+                        active++;
+                        break;
+                    case EngineSnapshotStatus.Archived:
+                        archived++;
+                        break;
+                    case EngineSnapshotStatus.Deleted:
+                        deleted++;
+                        break;
+                }
+            }
+
+            tabPageActiveSaves.Text = $@"Active ({active})";
+            tabPageArchivedSaves.Text = $@"Archived ({archived})";
+            tabPageDeletedSaves.Text = $@"Deleted ({deleted})";
         }
 
         private void RefreshSnapshotsListView(ListView listView, EngineSnapshotStatus status)
@@ -2157,7 +2260,6 @@ namespace Hg.SaveHistory.Forms
                                     {
                                         value = snapshot.CustomValues[columnDefinition.Key].ToString();
                                     }
-
                                     break;
                             }
 
@@ -2173,7 +2275,6 @@ namespace Hg.SaveHistory.Forms
                         }
 
                         listViewItem.Tag = snapshot;
-
 
                         if (snapshot.Status == status)
                         {
@@ -2240,6 +2341,12 @@ namespace Hg.SaveHistory.Forms
 
                 ProfileFile.Save(_activeProfileFile);
             }
+        }
+
+        private void saveSizeAndPositionToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.SaveSizeAndPosition = !_settingsManager.SaveSizeAndPosition;
+            saveSizeAndPositionToolStripMenuItem.Checked = _settingsManager.SaveSizeAndPosition;
         }
 
         private void SetAutoBackupMessage()
@@ -2656,6 +2763,12 @@ namespace Hg.SaveHistory.Forms
 
                 return false;
             }
+        }
+
+        private void snapToScreenEdgesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.SnapToScreenEdges = !_settingsManager.SnapToScreenEdges;
+            saveSizeAndPositionToolStripMenuItem.Checked = _settingsManager.SnapToScreenEdges;
         }
 
         private void SortSnapshots()

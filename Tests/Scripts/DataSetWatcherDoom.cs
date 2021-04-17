@@ -5,6 +5,8 @@ namespace Tests.Scripts
 {
     public class DataSetWatcherDoom
     {
+        #region Fields & Properties
+
         public List<string> Files;
         public string SnapshotDeath { get; set; }
         public string SnapshotDifficulty { get; set; }
@@ -12,5 +14,7 @@ namespace Tests.Scripts
         public string SnapshotMapName { get; set; }
         public string SnapshotPlayedTime { get; set; }
         public DateTime SnapshotSaveAt { get; set; }
+
+        #endregion
     }
 }

@@ -4,10 +4,10 @@ using NUnit.Framework;
 
 namespace Tests.API
 {
-    [TestFixture()]
+    [TestFixture]
     public class HgConverterTests
     {
-        [Test()]
+        [Test]
         public void DateTimeToUnixTest()
         {
             ulong value = 1578960000;
@@ -16,7 +16,7 @@ namespace Tests.API
             Assert.AreEqual(output, value);
         }
 
-        [Test()]
+        [Test]
         public void StringToGuidTest()
         {
             string input = Guid.NewGuid().ToString();
@@ -24,7 +24,7 @@ namespace Tests.API
             Assert.AreEqual(input, output.ToString());
         }
 
-        [Test()]
+        [Test]
         public void UnixToDateTimeTest()
         {
             DateTime value = new DateTime(2020, 1, 14, 0, 0, 0, DateTimeKind.Utc);

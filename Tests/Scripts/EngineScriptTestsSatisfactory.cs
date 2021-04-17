@@ -6,7 +6,9 @@ using System.Threading;
 using Hg.SaveHistory.API;
 using Hg.SaveHistory.Managers;
 using Hg.SaveHistory.Types;
+using Hg.SaveHistory.Utilities;
 using NUnit.Framework;
+using Logger = Hg.SaveHistory.Utilities.Logger;
 
 namespace Tests.Scripts
 {
@@ -16,8 +18,28 @@ namespace Tests.Scripts
     [TestFixture]
     public class EngineScriptTestsSatisfactory : EngineScriptTests
     {
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            Logger.Level = LogLevel.None;
+        }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            // Delete all scripts data folders
+            string[] paths = {@"Satisfactory"};
+
+            foreach (var p in paths)
+            {
+                string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Data", p);
+
+                Directory.Delete(path, true);
+            }
+        }
+
         /// <summary>
-        /// Remove bits after milliseconds
+        ///     Remove bits after milliseconds
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>
@@ -55,7 +77,8 @@ namespace Tests.Scripts
                 Directory.CreateDirectory(dataSetSatisfactory.SourceFolder);
             }
 
-            string profilePathOrigin = Path.Combine(dataSetSatisfactory.DataRoot, @"Original", dataSetSatisfactory.ProfileName + "_Open.shp");
+            string profilePathOrigin =
+                Path.Combine(dataSetSatisfactory.DataRoot, @"Original", dataSetSatisfactory.ProfileName + "_Open.shp");
             string profilePathSimulation = Path.Combine(dataSetSatisfactory.SourceFolder, dataSetSatisfactory.ProfileName + "_Open.shp");
 
             File.Copy(profilePathOrigin, profilePathSimulation);
@@ -110,7 +133,7 @@ namespace Tests.Scripts
 
                 Assert.DoesNotThrow(() =>
                 {
-                    luaManager.ActiveEngine.ActionSnapshotBackup(ActionSource.HotKey, (files.Value.SnapshotAutosave != ""));
+                    luaManager.ActiveEngine.ActionSnapshotBackup(ActionSource.HotKey, files.Value.SnapshotAutosave != "");
                 });
 
                 Assert.AreEqual(1, luaManager.ActiveEngine.Snapshots.Count);
@@ -161,7 +184,8 @@ namespace Tests.Scripts
                 Directory.CreateDirectory(dataSetSatisfactory.SourceFolder);
             }
 
-            string profilePathOrigin = Path.Combine(dataSetSatisfactory.DataRoot, @"Original", dataSetSatisfactory.ProfileName + "_Open.shp");
+            string profilePathOrigin =
+                Path.Combine(dataSetSatisfactory.DataRoot, @"Original", dataSetSatisfactory.ProfileName + "_Open.shp");
             string profilePathSimulation = Path.Combine(dataSetSatisfactory.SourceFolder, dataSetSatisfactory.ProfileName + "_Open.shp");
 
             File.Copy(profilePathOrigin, profilePathSimulation);

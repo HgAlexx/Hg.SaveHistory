@@ -318,10 +318,9 @@ local snapshotRestore = function(actionSouce, snapshot)
     local safeSessionName = getSafeSessionName(snapshot)
     sourcePath = Path.Combine(sourcePath, safeSessionName .. ".sav")
 
-    local saveAtSafe = snapshot.SavedAt:ToString("yyyy-MM-dd HH.mm.ss")
     local now = DateTime.Now
     local nowSafe = now:ToString("yyyyMMdd-HHmmss")
-    local filename = safeSessionName .. "_" .. nowSafe .. ".sav"
+    local filename = safeSessionName .. "_" .. nowSafe .. "_RESTORED.sav"
     local gameSavePath = Path.Combine(sourceFolder, filename)
 
     Logger.Debug("sourcePath=" .. sourcePath)
@@ -479,8 +478,8 @@ When active, everytime a save file changes, either from autosave or from manual 
 Autosave backup will be marked as such.
 
 Manual restore:
-This will copy the selected snapshot file into your save folder with the following naming scheme: "SessionName_yyyyMMdd-HHmmss".
-You will need to re-open the "Load" menu and select the correct session to see the restored save which should be at the top.
+This will copy the selected snapshot file into your save folder with the following naming scheme "SessionName_yyyyMMdd-HHmmss_RESTORED" where yyyyMMdd-HHmmss is the date and time of restoration.
+You will need to re-open the "Load" menu and select the correct session to see the restored save.
 
 
 Enjoy!]]

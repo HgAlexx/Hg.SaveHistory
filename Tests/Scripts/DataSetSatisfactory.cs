@@ -7,13 +7,17 @@ namespace Tests.Scripts
 {
     public class DataSetWatcherSatisfactory
     {
+        #region Fields & Properties
+
         public List<string> Files;
         public string SnapshotAutosave { get; set; }
-        public string SnapshotSaveVersion { get; set; }
         public string SnapshotBuildVersion { get; set; }
-        public string SnapshotSessionName { get; set; }
         public string SnapshotPlayedTime { get; set; }
         public DateTime SnapshotSaveAt { get; set; }
+        public string SnapshotSaveVersion { get; set; }
+        public string SnapshotSessionName { get; set; }
+
+        #endregion
     }
 
     public class DataSetSatisfactory : DataSet
@@ -50,7 +54,7 @@ namespace Tests.Scripts
                 Watchers = new Dictionary<int, DataSetWatcherSatisfactory>()
             };
 
-            var watcher = new DataSetWatcherSatisfactory()
+            var watcher = new DataSetWatcherSatisfactory
             {
                 // 2021-03-18 18.24.16
                 SnapshotSaveAt = new DateTime(2021, 03, 18, 18, 24, 16),
@@ -67,7 +71,7 @@ namespace Tests.Scripts
             };
             set.Watchers.Add(1, watcher);
 
-            watcher = new DataSetWatcherSatisfactory()
+            watcher = new DataSetWatcherSatisfactory
             {
                 // 2021-03-18 18.25.01
                 SnapshotSaveAt = new DateTime(2021, 03, 18, 18, 25, 01),

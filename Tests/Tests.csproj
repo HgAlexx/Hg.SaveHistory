@@ -63,7 +63,6 @@
     <Compile Include="Scripts\DataSetDoom.cs" />
     <Compile Include="Scripts\DataSetSatisfactory.cs" />
     <Compile Include="Scripts\DataSetWatcherDoom.cs" />
-    <Compile Include="Scripts\EngineScriptSetupTests.cs" />
     <Compile Include="Scripts\EngineScriptTests.cs" />
     <Compile Include="Scripts\EngineScriptTestsDoom.cs" />
     <Compile Include="Scripts\EngineScriptTestsSatisfactory.cs" />

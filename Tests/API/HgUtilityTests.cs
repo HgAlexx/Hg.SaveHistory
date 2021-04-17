@@ -1,19 +1,13 @@
-﻿using NUnit.Framework;
-using Hg.SaveHistory.API;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Hg.SaveHistory.Utilities;
+using NUnit.Framework;
 
 namespace Hg.SaveHistory.API.Tests
 {
-    [TestFixture()]
+    [TestFixture]
     public class HgUtilityTests
     {
-
         [OneTimeSetUp]
         public void Setup()
         {
@@ -29,7 +23,7 @@ namespace Hg.SaveHistory.API.Tests
             Directory.Delete(path, true);
         }
 
-        [Test()]
+        [Test]
         public void HashFileTest()
         {
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Data", @"HgUtility", @"HashFile.txt");
@@ -38,7 +32,7 @@ namespace Hg.SaveHistory.API.Tests
             Assert.AreEqual(@"2e99758548972a8e8822ad47fa1017ff72f06f3ff6a016851f45c398732bc50c", hash);
         }
 
-        [Test()]
+        [Test]
         public void HashStringTest()
         {
             string hash = HgUtility.HashString(@"this is a test");
@@ -46,37 +40,37 @@ namespace Hg.SaveHistory.API.Tests
             Assert.AreEqual(@"2e99758548972a8e8822ad47fa1017ff72f06f3ff6a016851f45c398732bc50c", hash);
         }
 
-        [Test()]
+        [Test]
         public void IsValidFileNameTest()
         {
             //Assert.Fail();
         }
 
-        [Test()]
+        [Test]
         public void IsValidPathTest()
         {
             //Assert.Fail();
         }
 
-        [Test()]
+        [Test]
         public void SafeFileNameTest()
         {
             //Assert.Fail();
         }
 
-        [Test()]
+        [Test]
         public void SafePathTest()
         {
             //Assert.Fail();
         }
 
-        [Test()]
+        [Test]
         public void SleepTest()
         {
             //Assert.Fail();
         }
 
-        [Test()]
+        [Test]
         public void StringEndsWithTest()
         {
             string input = @"this is a test";
@@ -85,7 +79,7 @@ namespace Hg.SaveHistory.API.Tests
             Assert.IsFalse(HgUtility.StringEndsWith(input, @"plop"));
         }
 
-        [Test()]
+        [Test]
         public void StringSplitTest()
         {
             string input = @"this is a test";
@@ -110,7 +104,7 @@ namespace Hg.SaveHistory.API.Tests
             Assert.AreEqual(5, values.Length);
         }
 
-        [Test()]
+        [Test]
         public void StringStartsWithTest()
         {
             string input = @"this is a test";
@@ -119,7 +113,7 @@ namespace Hg.SaveHistory.API.Tests
             Assert.IsFalse(HgUtility.StringStartsWith(input, @"plop"));
         }
 
-        [Test()]
+        [Test]
         public void StringTrimTest()
         {
             string input = @" this is a test ";

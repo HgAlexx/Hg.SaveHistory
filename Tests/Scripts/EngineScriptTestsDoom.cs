@@ -6,7 +6,9 @@ using System.Threading;
 using Hg.SaveHistory.API;
 using Hg.SaveHistory.Managers;
 using Hg.SaveHistory.Types;
+using Hg.SaveHistory.Utilities;
 using NUnit.Framework;
+using Logger = Hg.SaveHistory.Utilities.Logger;
 
 namespace Tests.Scripts
 {
@@ -16,8 +18,28 @@ namespace Tests.Scripts
     [TestFixture]
     public class EngineScriptTestsDoom : EngineScriptTests
     {
+        [OneTimeSetUp]
+        public void Setup()
+        {
+            Logger.Level = LogLevel.None;
+        }
+
+        [OneTimeTearDown]
+        public void TearDown()
+        {
+            // Delete all scripts data folders
+            string[] paths = {@"DOOM2016", @"DOOMEternal"};
+
+            foreach (var p in paths)
+            {
+                string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Data", p);
+
+                Directory.Delete(path, true);
+            }
+        }
+
         /// <summary>
-        /// Remove bits after milliseconds
+        ///     Remove bits after milliseconds
         /// </summary>
         /// <param name="dt"></param>
         /// <returns></returns>
@@ -269,7 +291,7 @@ namespace Tests.Scripts
 
                 Assert.DoesNotThrow(() =>
                 {
-                    luaManager.ActiveEngine.ActionSnapshotBackup(ActionSource.HotKey, (files.Value.SnapshotDeath != ""));
+                    luaManager.ActiveEngine.ActionSnapshotBackup(ActionSource.HotKey, files.Value.SnapshotDeath != "");
                 });
 
                 Assert.AreEqual(1, luaManager.ActiveEngine.Snapshots.Count);

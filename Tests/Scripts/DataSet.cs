@@ -5,6 +5,7 @@ namespace Tests.Scripts
     public class DataSet
     {
         #region Fields & Properties
+
         public string Author { get; set; }
         public bool CanAutoDetect { get; set; }
 

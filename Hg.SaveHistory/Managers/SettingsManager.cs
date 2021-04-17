@@ -31,7 +31,10 @@ namespace Hg.SaveHistory.Managers
         public event SettingEventHandler PinnedProfilesChanged;
         public event SettingEventHandler RecentProfilesChanged;
 
+        public event SettingEventHandler SaveSizeAndPositionChanged;
+
         public event SettingEventHandler ScreenshotQualityChanged;
+        public event SettingEventHandler SnapToScreenEdgesChanged;
 
         public event SettingEventHandler SortKindChanged;
         public event SettingEventHandler SortOrderChanged;
@@ -103,6 +106,12 @@ namespace Hg.SaveHistory.Managers
 
         public List<HotKeyToAction> HotKeyToActions => _settings.HotKeyToActions;
 
+        public Point? Location
+        {
+            get => _settings.Location;
+            set => _settings.Location = value;
+        }
+
         public MessageMode NotificationMode
         {
             get => _settings.NotificationMode;
@@ -118,6 +127,16 @@ namespace Hg.SaveHistory.Managers
 
         public List<string> RecentProfiles => _settings.RecentProfiles;
 
+        public bool SaveSizeAndPosition
+        {
+            get => _settings.SaveSizeAndPosition;
+            set
+            {
+                _settings.SaveSizeAndPosition = value;
+                SaveSizeAndPositionChanged?.Invoke();
+            }
+        }
+
         public ScreenshotQuality ScreenshotQuality
         {
             get => _settings.ScreenshotQuality;
@@ -125,6 +144,22 @@ namespace Hg.SaveHistory.Managers
             {
                 _settings.ScreenshotQuality = value;
                 ScreenshotQualityChanged?.Invoke();
+            }
+        }
+
+        public Size? Size
+        {
+            get => _settings.Size;
+            set => _settings.Size = value;
+        }
+
+        public bool SnapToScreenEdges
+        {
+            get => _settings.SnapToScreenEdges;
+            set
+            {
+                _settings.SnapToScreenEdges = value;
+                SnapToScreenEdgesChanged?.Invoke();
             }
         }
 
@@ -429,6 +464,9 @@ namespace Hg.SaveHistory.Managers
 
             PinnedProfilesChanged?.Invoke();
             RecentProfilesChanged?.Invoke();
+
+            SaveSizeAndPositionChanged?.Invoke();
+            SnapToScreenEdgesChanged?.Invoke();
 
             ScreenshotQualityChanged?.Invoke();
 

@@ -40,7 +40,7 @@ namespace Tests.Scripts
                 Watchers = new Dictionary<int, DataSetWatcherDoom>()
             };
 
-            var watcher = new DataSetWatcherDoom()
+            var watcher = new DataSetWatcherDoom
             {
                 SnapshotSaveAt = new DateTime(2020, 06, 19, 03, 24, 03),
                 SnapshotDifficulty = "I'm too young to die",
@@ -60,7 +60,7 @@ namespace Tests.Scripts
             };
             set.Watchers.Add(1, watcher);
 
-            watcher = new DataSetWatcherDoom()
+            watcher = new DataSetWatcherDoom
             {
                 SnapshotSaveAt = new DateTime(2020, 06, 19, 03, 24, 03),
                 SnapshotDifficulty = "I'm too young to die",
@@ -103,7 +103,7 @@ namespace Tests.Scripts
                 Watchers = new Dictionary<int, DataSetWatcherDoom>()
             };
 
-            watcher = new DataSetWatcherDoom()
+            watcher = new DataSetWatcherDoom
             {
                 SnapshotSaveAt = new DateTime(2020, 06, 27, 01, 16, 44, 948),
                 SnapshotDifficulty = "Hurt me plenty",
@@ -143,7 +143,7 @@ namespace Tests.Scripts
                 Watchers = new Dictionary<int, DataSetWatcherDoom>()
             };
 
-            watcher = new DataSetWatcherDoom()
+            watcher = new DataSetWatcherDoom
             {
                 SnapshotSaveAt = new DateTime(2020, 06, 27, 0, 44, 12, 444),
                 SnapshotDifficulty = "Hurt me plenty",
