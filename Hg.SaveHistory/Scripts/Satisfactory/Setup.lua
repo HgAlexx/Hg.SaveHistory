@@ -4,8 +4,13 @@ Logger.Information("Engine.Name=",engine.Name,", Engine.Title=",engine.Title)
 
 
 -- Setup engine
+
+-- client process
 engine:AddProcessName("UE4-Win64-Shipping")
 engine:AddProcessName("FactoryGame-Win64-Shipping")
+
+-- server process
+engine:AddProcessName("UE4Server-Win64-Shipping")
 
 
 -- Setup settings
@@ -36,6 +41,12 @@ setting.OnAutoDetect = function()
     for i = 0, dirs.Length-1 do
         directory = dirs[i]
         if (string.match(directory.Name, "^([%x]+)$")) then -- match hexadecimal
+            directoryInfo = nil
+            local fullname = directory.FullName
+            directory = nil
+            return fullname
+        end
+        if (directory.Name == "server") then -- match special "server" folder name
             directoryInfo = nil
             local fullname = directory.FullName
             directory = nil

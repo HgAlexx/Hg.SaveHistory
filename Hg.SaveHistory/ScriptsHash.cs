@@ -24,7 +24,7 @@ namespace Hg.SaveHistory
             {"DOOMEternal\\Utility.lua","3d1837390bb53c3e9459afc6a38289b1bc6443ae4c23be07eca53e7e8f38e758"},
             {"Satisfactory\\Engine.lua","193265e8d597613aa5878ad70b885cddc2e382951d325e2f5e7b5dae35192323"},
             {"Satisfactory\\Satisfactory.toc","f9935001bd02d9ecf0fd4bbd8d5810aaab87d261d1a3283d504615785eb6fb0e"},
-            {"Satisfactory\\Setup.lua","cb4966e526ff8307d02d95c8ac91e4b8d6101fdd267858ff961d6c1b06f7f0d8"},
+            {"Satisfactory\\Setup.lua","476c33278d67696df8ddbb786a250c955a85d93fcfa6a2ea1f3dbb77eb02c14a"},
             {"Satisfactory\\Utility.lua","3d1837390bb53c3e9459afc6a38289b1bc6443ae4c23be07eca53e7e8f38e758"}
         };
     }

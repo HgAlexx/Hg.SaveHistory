@@ -34,7 +34,7 @@ Thank you!
 #### Games
 - DOOM 2016
 - DOOM Eternal, with DLC1 and DLC2
-- Satisfactory
+- Satisfactory (client and server)
 
 #### Applications
 - None yet
@@ -157,6 +157,11 @@ The first beta tester was [RedW4rr10r](https://www.twitch.tv/redw4rr10r) who fou
 
 
 # Version History
+
+## v0.7.3
+
+- \* Fix issue #2: Unable to change screenshot settings
+- \+ Add support for Satisfactory dedicated server
 
 ## v0.7.2
 

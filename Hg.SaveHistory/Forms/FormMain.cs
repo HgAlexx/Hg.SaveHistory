@@ -2986,5 +2986,29 @@ namespace Hg.SaveHistory.Forms
         }
 
         #endregion
+
+        private void jpgmediumToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.ScreenshotQuality = ScreenshotQuality.Jpg;
+            jpgmediumToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Jpg;
+            giflowSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Gif;
+            pnghugeSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Png;
+        }
+
+        private void giflowSizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.ScreenshotQuality = ScreenshotQuality.Gif;
+            jpgmediumToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Jpg;
+            giflowSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Gif;
+            pnghugeSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Png;
+        }
+
+        private void pnghugeSizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.ScreenshotQuality = ScreenshotQuality.Png;
+            jpgmediumToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Jpg;
+            giflowSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Gif;
+            pnghugeSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Png;
+        }
     }
 }

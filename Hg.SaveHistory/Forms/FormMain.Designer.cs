@@ -296,21 +296,21 @@
             // activeToolStripMenuItem
             // 
             this.activeToolStripMenuItem.Name = "activeToolStripMenuItem";
-            this.activeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.activeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.activeToolStripMenuItem.Text = "Enabled";
             this.activeToolStripMenuItem.Click += new System.EventHandler(this.activeToolStripMenuItem_Click);
             // 
             // soundToolStripMenuItem
             // 
             this.soundToolStripMenuItem.Name = "soundToolStripMenuItem";
-            this.soundToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.soundToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.soundToolStripMenuItem.Text = "Sound";
             this.soundToolStripMenuItem.Click += new System.EventHandler(this.soundToolStripMenuItem_Click);
             // 
             // setKeysToolStripMenuItem
             // 
             this.setKeysToolStripMenuItem.Name = "setKeysToolStripMenuItem";
-            this.setKeysToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
+            this.setKeysToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.setKeysToolStripMenuItem.Text = "Assign hot keys";
             this.setKeysToolStripMenuItem.Click += new System.EventHandler(this.setKeysToolStripMenuItem_Click);
             // 
@@ -326,44 +326,47 @@
             // messageBoxToolStripMenuItem
             // 
             this.messageBoxToolStripMenuItem.Name = "messageBoxToolStripMenuItem";
-            this.messageBoxToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.messageBoxToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.messageBoxToolStripMenuItem.Text = "Message box";
             this.messageBoxToolStripMenuItem.Click += new System.EventHandler(this.messageBoxToolStripMenuItem_Click);
             // 
             // statusBarToolStripMenuItem
             // 
             this.statusBarToolStripMenuItem.Name = "statusBarToolStripMenuItem";
-            this.statusBarToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
+            this.statusBarToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.statusBarToolStripMenuItem.Text = "Status bar";
             this.statusBarToolStripMenuItem.Click += new System.EventHandler(this.statusBarToolStripMenuItem_Click);
             // 
             // screenshotsQualityToolStripMenuItem
             // 
             this.screenshotsQualityToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.jpgmediumToolStripMenuItem,
             this.giflowSizeToolStripMenuItem,
+            this.jpgmediumToolStripMenuItem,
             this.pnghugeSizeToolStripMenuItem});
             this.screenshotsQualityToolStripMenuItem.Name = "screenshotsQualityToolStripMenuItem";
             this.screenshotsQualityToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.screenshotsQualityToolStripMenuItem.Text = "Screenshots quality";
+            this.screenshotsQualityToolStripMenuItem.Text = "Screenshots format";
             // 
             // jpgmediumToolStripMenuItem
             // 
             this.jpgmediumToolStripMenuItem.Name = "jpgmediumToolStripMenuItem";
-            this.jpgmediumToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
-            this.jpgmediumToolStripMenuItem.Text = "Jpg (small size)";
+            this.jpgmediumToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            this.jpgmediumToolStripMenuItem.Text = "Jpg (small size, medium quality)";
+            this.jpgmediumToolStripMenuItem.Click += new System.EventHandler(this.jpgmediumToolStripMenuItem_Click);
             // 
             // giflowSizeToolStripMenuItem
             // 
             this.giflowSizeToolStripMenuItem.Name = "giflowSizeToolStripMenuItem";
-            this.giflowSizeToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
-            this.giflowSizeToolStripMenuItem.Text = "Gif (medium size)";
+            this.giflowSizeToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            this.giflowSizeToolStripMenuItem.Text = "Gif (medium size, low quality)";
+            this.giflowSizeToolStripMenuItem.Click += new System.EventHandler(this.giflowSizeToolStripMenuItem_Click);
             // 
             // pnghugeSizeToolStripMenuItem
             // 
             this.pnghugeSizeToolStripMenuItem.Name = "pnghugeSizeToolStripMenuItem";
-            this.pnghugeSizeToolStripMenuItem.Size = new System.Drawing.Size(167, 22);
-            this.pnghugeSizeToolStripMenuItem.Text = "Png (huge size)";
+            this.pnghugeSizeToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            this.pnghugeSizeToolStripMenuItem.Text = "Png (huge size, high quality)";
+            this.pnghugeSizeToolStripMenuItem.Click += new System.EventHandler(this.pnghugeSizeToolStripMenuItem_Click);
             // 
             // snapshotToolStripMenuItem
             // 
