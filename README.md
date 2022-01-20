@@ -158,6 +158,11 @@ The first beta tester was [RedW4rr10r](https://www.twitch.tv/redw4rr10r) who fou
 
 # Version History
 
+## v0.7.4
+
+- \* Satisfactory: add small sleep on autobackup event before processing the file
+- \* Fix ByteMe name and stream link in About box
+
 ## v0.7.3
 
 - \* Fix issue #2: Unable to change screenshot settings

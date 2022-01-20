@@ -376,6 +376,10 @@ local watcherOnEvent = function(eventType, event)
     if not isAutosave or includeAutosave then -- if auto save
         -- actionable event occured
         _watcherLastEvent = DateTime.UtcNow
+
+        -- wait a bit to be sure file is saved to disk
+        HgUtility.Sleep(250)
+
         -- backup
         local status = snapshotBackup(ActionSource.AutoBackup, event.Name, isAutosave)
         engine:AutoBackupOccurred(status)

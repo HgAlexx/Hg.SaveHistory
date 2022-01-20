@@ -161,8 +161,7 @@
             this.textBoxContributor.TabIndex = 25;
             this.textBoxContributor.TabStop = false;
             this.textBoxContributor.Text = "Special thanks:\r\n- IAmAllstin - https://www.twitch.tv/iamallstin\r\n- RedW4rr10r - " +
-    "https://www.twitch.tv/redw4rr10r\r\n- x_ByteMe_x - https://www.twitch.tv/x_byteme_" +
-    "x\r\n";
+    "https://www.twitch.tv/redw4rr10r\r\n- ByteMe - https://www.twitch.tv/byteme\r\n";
             // 
             // About
             // 
