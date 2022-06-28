@@ -123,6 +123,13 @@ This can happens if the target folder is currently open in a windows explorer (e
 This may be the case if steam is installed inside "Program Files". You can either move your steam installation folder or launch SaveHistory as administrator.
 
 
+2. Screenshots are not working
+
+Sadly I didn't found a way to take screenshot of vulkan fullscreen games, so for these only windowed will work, or using opengl.
+
+This apply to Doom 2016 and Doom Eternal.
+
+
 ## TODO:
 
 - Write guide and API documentation for the creation of third party engines
