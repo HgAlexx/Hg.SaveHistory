@@ -351,12 +351,12 @@ local watcherOnEvent = function(eventType, event)
 
     local isAutosave = false
 
-    if string.match(event.Name, "^.+_autosave_[012]?_BAK[0-9]+%.sav$") then
+    if string.match(event.Name, "^.+_autosave_[0-9]+_BAK[0-9]+%.sav$") then
         Logger.Debug("watcherOnEvent: excluded file")
         return
     end
 
-    if string.match(event.Name, "^.+_autosave_[012]?%.sav$") then
+    if string.match(event.Name, "^.+_autosave_[0-9]+%.sav$") then
         isAutosave = true
     end
 

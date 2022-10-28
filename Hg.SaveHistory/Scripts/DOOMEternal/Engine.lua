@@ -304,17 +304,19 @@ local snapshotBackup = function(actionSouce)
             Logger.Debug("sourcePath=" .. slotPath)
             Logger.Debug("targetPath=" .. targetPath)
 
+            --[[
             local canCopy = function(filename, mode) -- canCopy callback
                 if mode == BackupHelperCanCopyMode.Copy then
                     return not ns.StringEndsWith(filename, "-BACKUP")
                 end
             end
+            --]]
 
             Logger.Debug("BackupHelper.CopyFiles: start")
             local copyFiles = BackupHelper.CopyFiles(
                 slotPath,
                 targetPath,
-                canCopy,
+                nil,
                 nil,
                 true,
                 false

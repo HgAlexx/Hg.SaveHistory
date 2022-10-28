@@ -165,6 +165,12 @@ The first beta tester was [RedW4rr10r](https://www.twitch.tv/redw4rr10r) who fou
 
 # Version History
 
+## v0.7.5
+
+- \* Updated NuGet packages
+- \* DOOM Eternal: remove filter on "-BACKUP" file
+- \* Satisfactory: fix issue when more than 3 autosaves are kept (server)
+
 ## v0.7.4
 
 - \* Satisfactory: add small sleep on autobackup event before processing the file
