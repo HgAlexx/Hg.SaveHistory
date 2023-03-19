@@ -35,6 +35,7 @@ Thank you!
 - DOOM 2016
 - DOOM Eternal, with DLC1 and DLC2
 - Satisfactory (client and server)
+- Elden Ring
 
 #### Applications
 - None yet
@@ -138,7 +139,7 @@ This apply to Doom 2016 and Doom Eternal.
 
 ## About Hg.SaveHistory
 
-This tool is the second iteration of the same idea. It is based on Hg.DoomHistory which had most of the same features but was only working with Doom 2016.
+This tool is the second iteration of the same idea. It is based on [Hg.DoomHistory](https://github.com/HgAlexx/Hg.DoomHistory/) which had most of the same features but was only working with Doom 2016.
 
 Now the tool support a script system, using lua, which allow to add support for any game and any application!
 
@@ -151,19 +152,13 @@ Alpha testers:
 - [IAmAllstin](https://www.twitch.tv/iamallstin): The origin slayer
 
 
-
-## About [Hg.DoomHistory](https://github.com/HgAlexx/Hg.DoomHistory/)
-
-I got the idea while watching [IAmAllstin](https://www.twitch.tv/iamallstin) streaming doom. He was spending a lot of time copy/pasting save files to be able to pratice part of the game for his Ultra-Nightmare run.
-
-Since I was also planning to do Doom on Ultra-Nightmare, I was going to need a way to back my save files too.
-
-The first beta tester was [RedW4rr10r](https://www.twitch.tv/redw4rr10r) who found the first bug and made good improvements suggestions.
-
-[ByteMe](https://www.twitch.tv/byteme) who also made good improvements suggestions (global hot keys).
-
-
 # Version History
+
+## v0.7.6
+
+- \+ Added support for Elden ring
+- \* Updated NuGet packages
+- \* Other small improvements
 
 ## v0.7.5
 
