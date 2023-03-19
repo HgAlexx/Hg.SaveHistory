@@ -277,7 +277,6 @@ local snapshotBackup = function(actionSouce, isDeath)
             Logger.Debug("BackupHelper.CopyFiles: end")
 
             if copyFiles then
-
                 -- autobackup: screenshot
                 if actionSouce == ActionSource.AutoBackup then
                     local screenshot = engine:SettingByName("Screenshot").Value

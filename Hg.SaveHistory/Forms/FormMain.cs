@@ -1,4 +1,12 @@
-﻿using System;
+﻿using FontAwesome.Sharp;
+using Hg.SaveHistory.API;
+using Hg.SaveHistory.Controls;
+using Hg.SaveHistory.Managers;
+using Hg.SaveHistory.Types;
+using Hg.SaveHistory.Utilities;
+using Hg.SaveHistory.Wizards;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -9,14 +17,6 @@ using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
-using FontAwesome.Sharp;
-using Hg.SaveHistory.API;
-using Hg.SaveHistory.Controls;
-using Hg.SaveHistory.Managers;
-using Hg.SaveHistory.Types;
-using Hg.SaveHistory.Utilities;
-using Hg.SaveHistory.Wizards;
-using Newtonsoft.Json.Linq;
 using Logger = Hg.SaveHistory.Utilities.Logger;
 
 namespace Hg.SaveHistory.Forms
@@ -573,23 +573,33 @@ namespace Hg.SaveHistory.Forms
 
             if (tabControlSaves.SelectedTab == tabPageActiveSaves)
             {
-                foreach (ListViewItem selectedItem in listViewSnapshot.SelectedItems)
+                Cursor.Current = Cursors.WaitCursor;
+                try
                 {
-                    if (selectedItem.Tag is EngineSnapshot snapshot)
+                    foreach (ListViewItem selectedItem in listViewSnapshot.SelectedItems)
                     {
-                        if (snapshot.Status == EngineSnapshotStatus.Active)
+                        if (selectedItem.Tag is EngineSnapshot snapshot)
                         {
-                            if (!snapshot.Compressed)
+                            if (snapshot.Status == EngineSnapshotStatus.Active)
                             {
-                                ZipSnapshot(snapshot);
-                            }
+                                if (!snapshot.Compressed)
+                                {
+                                    Message("Archiving snapshot " + snapshot + " ... Please wait.", "", MessageType.Information, MessageMode.Status);
+                                    ZipSnapshot(snapshot);
+                                }
 
-                            snapshot.Status = EngineSnapshotStatus.Archived;
+                                snapshot.Status = EngineSnapshotStatus.Archived;
+                            }
                         }
                     }
-                }
 
-                _luaManager?.ActiveEngine?.SnapshotsChanges();
+                    _luaManager?.ActiveEngine?.SnapshotsChanges();
+                }
+                finally
+                {
+                    Cursor.Current = Cursors.Default;
+                    Message("Ready", "", MessageType.Information, MessageMode.Status);
+                }
             }
             else if (tabControlSaves.SelectedTab == tabPageArchivedSaves)
             {
@@ -597,23 +607,33 @@ namespace Hg.SaveHistory.Forms
             }
             else if (tabControlSaves.SelectedTab == tabPageDeletedSaves)
             {
-                foreach (ListViewItem selectedItem in listViewDeleted.SelectedItems)
+                Cursor.Current = Cursors.WaitCursor;
+                try
                 {
-                    if (selectedItem.Tag is EngineSnapshot snapshot)
+                    foreach (ListViewItem selectedItem in listViewDeleted.SelectedItems)
                     {
-                        if (snapshot.Status == EngineSnapshotStatus.Deleted)
+                        if (selectedItem.Tag is EngineSnapshot snapshot)
                         {
-                            if (!snapshot.Compressed)
+                            if (snapshot.Status == EngineSnapshotStatus.Deleted)
                             {
-                                ZipSnapshot(snapshot);
-                            }
+                                if (!snapshot.Compressed)
+                                {
+                                    Message("Archiving snapshot " + snapshot + " ... Please wait.", "", MessageType.Information, MessageMode.Status);
+                                    ZipSnapshot(snapshot);
+                                }
 
-                            snapshot.Status = EngineSnapshotStatus.Archived;
+                                snapshot.Status = EngineSnapshotStatus.Archived;
+                            }
                         }
                     }
-                }
 
-                _luaManager?.ActiveEngine?.SnapshotsChanges();
+                    _luaManager?.ActiveEngine?.SnapshotsChanges();
+                }
+                finally
+                {
+                    Cursor.Current = Cursors.Default;
+                    Message("Ready", "", MessageType.Information, MessageMode.Status);
+                }
             }
         }
 
@@ -757,43 +777,62 @@ namespace Hg.SaveHistory.Forms
             }
             else if (tabControlSaves.SelectedTab == tabPageArchivedSaves)
             {
-                foreach (ListViewItem selectedItem in listViewArchived.SelectedItems)
+                Cursor.Current = Cursors.WaitCursor;
+                try
                 {
-                    if (selectedItem.Tag is EngineSnapshot snapshot)
+                    foreach (ListViewItem selectedItem in listViewArchived.SelectedItems)
                     {
-                        if (snapshot.Status == EngineSnapshotStatus.Archived)
+                        if (selectedItem.Tag is EngineSnapshot snapshot)
                         {
-                            if (snapshot.Compressed)
+                            if (snapshot.Status == EngineSnapshotStatus.Archived)
                             {
-                                UnzipSnapshot(snapshot);
+                                if (snapshot.Compressed)
+                                {
+                                    Message("Activing snapshot " + snapshot + " ... Please wait.", "", MessageType.Information, MessageMode.Status);
+                                    UnzipSnapshot(snapshot);
+                                }
+                                snapshot.Status = EngineSnapshotStatus.Active;
                             }
-
-                            snapshot.Status = EngineSnapshotStatus.Active;
                         }
                     }
-                }
 
-                _luaManager?.ActiveEngine?.SnapshotsChanges();
+                    _luaManager?.ActiveEngine?.SnapshotsChanges();
+                }
+                finally
+                {
+                    Cursor.Current = Cursors.Default;
+                    Message("Ready", "", MessageType.Information, MessageMode.Status);
+                }
             }
             else if (tabControlSaves.SelectedTab == tabPageDeletedSaves)
             {
-                foreach (ListViewItem selectedItem in listViewDeleted.SelectedItems)
+                Cursor.Current = Cursors.WaitCursor;
+                try
                 {
-                    if (selectedItem.Tag is EngineSnapshot snapshot)
+                    foreach (ListViewItem selectedItem in listViewDeleted.SelectedItems)
                     {
-                        if (snapshot.Status == EngineSnapshotStatus.Deleted)
+                        if (selectedItem.Tag is EngineSnapshot snapshot)
                         {
-                            if (snapshot.Compressed)
+                            if (snapshot.Status == EngineSnapshotStatus.Deleted)
                             {
-                                UnzipSnapshot(snapshot);
-                            }
+                                if (snapshot.Compressed)
+                                {
+                                    Message("Activing snapshot " + snapshot + " ... Please wait.", "", MessageType.Information, MessageMode.Status);
+                                    UnzipSnapshot(snapshot);
+                                }
 
-                            snapshot.Status = EngineSnapshotStatus.Active;
+                                snapshot.Status = EngineSnapshotStatus.Active;
+                            }
                         }
                     }
-                }
 
-                _luaManager?.ActiveEngine?.SnapshotsChanges();
+                    _luaManager?.ActiveEngine?.SnapshotsChanges();
+                }
+                finally
+                {
+                    Cursor.Current = Cursors.Default;
+                    Message("Ready", "", MessageType.Information, MessageMode.Status);
+                }
             }
         }
 
@@ -1469,10 +1508,6 @@ namespace Hg.SaveHistory.Forms
 
         private void listViewSnapshot_SelectedIndexChanged(object sender, EventArgs e)
         {
-            buttonActionRestore.Enabled = false;
-            buttonActionArchive.Enabled = false;
-            buttonActionDelete.Enabled = false;
-
             contextMenu.Enabled = false;
 
             toolStripMenuItemRestore.Text = "Restore";
@@ -1498,6 +1533,7 @@ namespace Hg.SaveHistory.Forms
                 }
                 else
                 {
+                    buttonActionRestore.Enabled = false;
                     SetSnapshotInfo(null);
                 }
 
@@ -1532,6 +1568,12 @@ namespace Hg.SaveHistory.Forms
                 {
                     listViewSnapshot.HideSelection = false;
                 }
+            }
+            else
+            {
+                buttonActionRestore.Enabled = false;
+                buttonActionArchive.Enabled = false;
+                buttonActionDelete.Enabled = false;
             }
         }
 
@@ -2562,8 +2604,6 @@ namespace Hg.SaveHistory.Forms
 
         private void SetSnapshotInfo(EngineSnapshot snapshot)
         {
-            // Logger.Information(MethodBase.GetCurrentMethod().Name, " ", engine);
-
             _selectedSnapshot = snapshot;
             if (_selectedSnapshot != null)
             {
@@ -2655,12 +2695,23 @@ namespace Hg.SaveHistory.Forms
                 pictureBoxScreenshot.ImageLocation = null;
                 if (_selectedSnapshot.HasScreenshot && !string.IsNullOrEmpty(snapshot.ScreenshotFilename))
                 {
-                    string path = Path.Combine(_luaManager.ActiveEngine.SnapshotsFolder, snapshot.RelativePath,
-                        snapshot.ScreenshotFilename);
+                    string path = Path.Combine(_luaManager.ActiveEngine.SnapshotsFolder, snapshot.RelativePath, snapshot.ScreenshotFilename);
                     if (File.Exists(path))
                     {
                         pictureBoxScreenshot.ImageLocation = path;
+                        pictureBoxScreenshot.Visible = true;
+                        labelScreenshotInfo.Visible = false;
                     }
+                    else
+                    {
+                        pictureBoxScreenshot.Visible = false;
+                        labelScreenshotInfo.Visible = true;
+                    }
+                }
+                else
+                {
+                    pictureBoxScreenshot.Visible = false;
+                    labelScreenshotInfo.Visible = true;
                 }
             }
             else
@@ -2680,6 +2731,8 @@ namespace Hg.SaveHistory.Forms
                 textBoxNotes.Enabled = false;
 
                 pictureBoxScreenshot.ImageLocation = null;
+                pictureBoxScreenshot.Visible = false;
+                labelScreenshotInfo.Visible = true;
             }
         }
 

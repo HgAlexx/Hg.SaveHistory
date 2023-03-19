@@ -51,8 +51,8 @@
             this.messageBoxToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.statusBarToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.screenshotsQualityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.jpgmediumToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.giflowSizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.jpgmediumToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.pnghugeSizeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.snapshotToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.soundNotificationToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -130,6 +130,7 @@
             this.tabPageUsage = new System.Windows.Forms.TabPage();
             this.richTextBoxUsage = new System.Windows.Forms.RichTextBox();
             this.imageListMessageType = new System.Windows.Forms.ImageList(this.components);
+            this.labelScreenshotInfo = new System.Windows.Forms.Label();
             this.statusStrip1.SuspendLayout();
             this.menuStrip.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBoxScreenshot)).BeginInit();
@@ -290,27 +291,27 @@
             this.soundToolStripMenuItem,
             this.setKeysToolStripMenuItem});
             this.hotKeysToolStripMenuItem.Name = "hotKeysToolStripMenuItem";
-            this.hotKeysToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.hotKeysToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.hotKeysToolStripMenuItem.Text = "Hot keys";
             // 
             // activeToolStripMenuItem
             // 
             this.activeToolStripMenuItem.Name = "activeToolStripMenuItem";
-            this.activeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.activeToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.activeToolStripMenuItem.Text = "Enabled";
             this.activeToolStripMenuItem.Click += new System.EventHandler(this.activeToolStripMenuItem_Click);
             // 
             // soundToolStripMenuItem
             // 
             this.soundToolStripMenuItem.Name = "soundToolStripMenuItem";
-            this.soundToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.soundToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.soundToolStripMenuItem.Text = "Sound";
             this.soundToolStripMenuItem.Click += new System.EventHandler(this.soundToolStripMenuItem_Click);
             // 
             // setKeysToolStripMenuItem
             // 
             this.setKeysToolStripMenuItem.Name = "setKeysToolStripMenuItem";
-            this.setKeysToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.setKeysToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.setKeysToolStripMenuItem.Text = "Assign hot keys";
             this.setKeysToolStripMenuItem.Click += new System.EventHandler(this.setKeysToolStripMenuItem_Click);
             // 
@@ -320,20 +321,20 @@
             this.messageBoxToolStripMenuItem,
             this.statusBarToolStripMenuItem});
             this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(180, 22);
+            this.toolStripMenuItem3.Size = new System.Drawing.Size(176, 22);
             this.toolStripMenuItem3.Text = "Notification mode";
             // 
             // messageBoxToolStripMenuItem
             // 
             this.messageBoxToolStripMenuItem.Name = "messageBoxToolStripMenuItem";
-            this.messageBoxToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.messageBoxToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.messageBoxToolStripMenuItem.Text = "Message box";
             this.messageBoxToolStripMenuItem.Click += new System.EventHandler(this.messageBoxToolStripMenuItem_Click);
             // 
             // statusBarToolStripMenuItem
             // 
             this.statusBarToolStripMenuItem.Name = "statusBarToolStripMenuItem";
-            this.statusBarToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.statusBarToolStripMenuItem.Size = new System.Drawing.Size(143, 22);
             this.statusBarToolStripMenuItem.Text = "Status bar";
             this.statusBarToolStripMenuItem.Click += new System.EventHandler(this.statusBarToolStripMenuItem_Click);
             // 
@@ -344,15 +345,8 @@
             this.jpgmediumToolStripMenuItem,
             this.pnghugeSizeToolStripMenuItem});
             this.screenshotsQualityToolStripMenuItem.Name = "screenshotsQualityToolStripMenuItem";
-            this.screenshotsQualityToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.screenshotsQualityToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.screenshotsQualityToolStripMenuItem.Text = "Screenshots format";
-            // 
-            // jpgmediumToolStripMenuItem
-            // 
-            this.jpgmediumToolStripMenuItem.Name = "jpgmediumToolStripMenuItem";
-            this.jpgmediumToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
-            this.jpgmediumToolStripMenuItem.Text = "Jpg (small size, medium quality)";
-            this.jpgmediumToolStripMenuItem.Click += new System.EventHandler(this.jpgmediumToolStripMenuItem_Click);
             // 
             // giflowSizeToolStripMenuItem
             // 
@@ -360,6 +354,13 @@
             this.giflowSizeToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
             this.giflowSizeToolStripMenuItem.Text = "Gif (medium size, low quality)";
             this.giflowSizeToolStripMenuItem.Click += new System.EventHandler(this.giflowSizeToolStripMenuItem_Click);
+            // 
+            // jpgmediumToolStripMenuItem
+            // 
+            this.jpgmediumToolStripMenuItem.Name = "jpgmediumToolStripMenuItem";
+            this.jpgmediumToolStripMenuItem.Size = new System.Drawing.Size(243, 22);
+            this.jpgmediumToolStripMenuItem.Text = "Jpg (small size, medium quality)";
+            this.jpgmediumToolStripMenuItem.Click += new System.EventHandler(this.jpgmediumToolStripMenuItem_Click);
             // 
             // pnghugeSizeToolStripMenuItem
             // 
@@ -377,7 +378,7 @@
             this.toolStripSeparator3,
             this.highlightColorToolStripMenuItem});
             this.snapshotToolStripMenuItem.Name = "snapshotToolStripMenuItem";
-            this.snapshotToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.snapshotToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.snapshotToolStripMenuItem.Text = "Snapshot";
             // 
             // soundNotificationToolStripMenuItem
@@ -419,7 +420,7 @@
             this.saveSizeAndPositionToolStripMenuItem,
             this.snapToScreenEdgesToolStripMenuItem});
             this.othersToolStripMenuItem.Name = "othersToolStripMenuItem";
-            this.othersToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.othersToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.othersToolStripMenuItem.Text = "Others";
             // 
             // saveSizeAndPositionToolStripMenuItem
@@ -439,12 +440,12 @@
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(173, 6);
             // 
             // clearSettingsToolStripMenuItem
             // 
             this.clearSettingsToolStripMenuItem.Name = "clearSettingsToolStripMenuItem";
-            this.clearSettingsToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.clearSettingsToolStripMenuItem.Size = new System.Drawing.Size(176, 22);
             this.clearSettingsToolStripMenuItem.Text = "Clear settings";
             this.clearSettingsToolStripMenuItem.Click += new System.EventHandler(this.clearSettingsToolStripMenuItem_Click);
             // 
@@ -997,6 +998,7 @@
             // 
             // tabPageScreenshot
             // 
+            this.tabPageScreenshot.Controls.Add(this.labelScreenshotInfo);
             this.tabPageScreenshot.Controls.Add(this.pictureBoxScreenshot);
             this.tabPageScreenshot.Location = new System.Drawing.Point(4, 22);
             this.tabPageScreenshot.Name = "tabPageScreenshot";
@@ -1172,6 +1174,19 @@
             this.imageListMessageType.Images.SetKeyName(2, "messagebox-question.png");
             this.imageListMessageType.Images.SetKeyName(3, "messagebox-exclamation.png");
             // 
+            // labelScreenshotInfo
+            // 
+            this.labelScreenshotInfo.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.labelScreenshotInfo.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.labelScreenshotInfo.ForeColor = System.Drawing.SystemColors.GrayText;
+            this.labelScreenshotInfo.Location = new System.Drawing.Point(3, 3);
+            this.labelScreenshotInfo.Name = "labelScreenshotInfo";
+            this.labelScreenshotInfo.Size = new System.Drawing.Size(357, 268);
+            this.labelScreenshotInfo.TabIndex = 2;
+            this.labelScreenshotInfo.Text = "No screenshot to display";
+            this.labelScreenshotInfo.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.labelScreenshotInfo.Visible = false;
+            // 
             // FormMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -1337,6 +1352,7 @@
         private System.Windows.Forms.ToolStripMenuItem othersToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem saveSizeAndPositionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem snapToScreenEdgesToolStripMenuItem;
+        private System.Windows.Forms.Label labelScreenshotInfo;
     }
 }
 
