@@ -9,11 +9,13 @@ namespace Hg.SaveHistory.API
 
         public string Caption = "";
 
-        [JsonIgnore] public LuaFunction OnToString = null;
+        [JsonIgnore]
+        public LuaFunction OnToString = null;
 
         public bool ShowInDetails = false;
 
-        [JsonIgnore] public string ToStringFormat;
+        [JsonIgnore]
+        public string ToStringFormat;
 
         #endregion
 

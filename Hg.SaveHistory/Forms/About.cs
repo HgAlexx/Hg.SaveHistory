@@ -42,7 +42,7 @@ namespace Hg.SaveHistory.Forms
                     .GetCustomAttributes(typeof(AssemblyTitleAttribute), false);
                 if (attributes.Length > 0)
                 {
-                    AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute) attributes[0];
+                    AssemblyTitleAttribute titleAttribute = (AssemblyTitleAttribute)attributes[0];
                     if (titleAttribute.Title != "")
                     {
                         return titleAttribute.Title;
@@ -73,7 +73,7 @@ namespace Hg.SaveHistory.Forms
                     return "";
                 }
 
-                return ((AssemblyDescriptionAttribute) attributes[0]).Description;
+                return ((AssemblyDescriptionAttribute)attributes[0]).Description;
             }
         }
 
@@ -88,7 +88,7 @@ namespace Hg.SaveHistory.Forms
                     return "";
                 }
 
-                return ((AssemblyProductAttribute) attributes[0]).Product;
+                return ((AssemblyProductAttribute)attributes[0]).Product;
             }
         }
 
@@ -103,7 +103,7 @@ namespace Hg.SaveHistory.Forms
                     return "";
                 }
 
-                return ((AssemblyCopyrightAttribute) attributes[0]).Copyright;
+                return ((AssemblyCopyrightAttribute)attributes[0]).Copyright;
             }
         }
 
@@ -118,7 +118,7 @@ namespace Hg.SaveHistory.Forms
                     return "";
                 }
 
-                return ((AssemblyTrademarkAttribute) attributes[0]).Trademark;
+                return ((AssemblyTrademarkAttribute)attributes[0]).Trademark;
             }
         }
 

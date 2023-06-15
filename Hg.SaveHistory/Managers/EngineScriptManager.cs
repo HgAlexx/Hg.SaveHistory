@@ -27,7 +27,7 @@ namespace Hg.SaveHistory.Managers
                 {
                     string fileRelativePath = Path.Combine(dirInfo.Name, fileInfo.Name);
 
-                    engineScript = new EngineScript {Name = filename};
+                    engineScript = new EngineScript { Name = filename };
 
 
                     var engineScriptFile = new EngineScriptFile

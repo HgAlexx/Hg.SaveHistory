@@ -13,7 +13,7 @@ namespace Hg.SaveHistory.API
 
         public static bool CopyFile(string sourceFullName, string targetFullName, bool overrideIfExists, bool withBackup)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             Logger.Debug("sourcePath: ", sourceFullName);
             Logger.Debug("targetPath: ", targetFullName);
@@ -93,7 +93,6 @@ namespace Hg.SaveHistory.API
                         if (File.Exists(name))
                         {
                             File.Move(name, targetFullName);
-                            canRestore = false;
                         }
                     }
 
@@ -115,7 +114,7 @@ namespace Hg.SaveHistory.API
         public static bool CopyFiles(string sourcePath, string targetPath, LuaFunction canCopy, LuaFunction mustWait, bool overrideIfExists,
             bool withBackup)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             Logger.Debug("sourcePath: ", sourcePath);
             Logger.Debug("targetPath: ", targetPath);
@@ -171,7 +170,7 @@ namespace Hg.SaveHistory.API
                     {
                         foreach (var fileInfo in target.GetFiles())
                         {
-                            if (canCopy == null || canCopy.Call(fileInfo.Name, BackupHelperCanCopyMode.Backup).First() is bool b && b)
+                            if (canCopy == null || (canCopy.Call(fileInfo.Name, BackupHelperCanCopyMode.Backup).First() is bool b && b))
                             {
                                 string name = fileInfo.FullName + ".hg.bak";
                                 fileInfo.MoveTo(name);
@@ -193,7 +192,7 @@ namespace Hg.SaveHistory.API
                 {
                     foreach (var fileInfo in source.GetFiles())
                     {
-                        if (canCopy == null || canCopy.Call(fileInfo.Name, BackupHelperCanCopyMode.Copy).First() is bool b && b)
+                        if (canCopy == null || (canCopy.Call(fileInfo.Name, BackupHelperCanCopyMode.Copy).First() is bool b && b))
                         {
                             fileInfo.CopyTo(Path.Combine(target.FullName, fileInfo.Name), overrideIfExists);
                         }
@@ -225,7 +224,7 @@ namespace Hg.SaveHistory.API
                         {
                             if (!fileInfo.Name.EndsWith(".hg.bak") &&
                                 (canCopy == null ||
-                                 canCopy.Call(fileInfo.Name, BackupHelperCanCopyMode.Copy).First() is bool b && b))
+                                 (canCopy.Call(fileInfo.Name, BackupHelperCanCopyMode.Copy).First() is bool b && b)))
                             {
                                 fileInfo.Delete();
                             }

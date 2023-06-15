@@ -9,22 +9,22 @@ namespace Hg.SaveHistory.API
 
         public static void Debug(params object[] objects)
         {
-            HostLogger.Debug(new object[] {"Script: "}.Concat(objects).ToArray());
+            HostLogger.Debug(new object[] { "Script: " }.Concat(objects).ToArray());
         }
 
         public static void Error(params object[] objects)
         {
-            HostLogger.Error(new object[] {"Script: "}.Concat(objects).ToArray());
+            HostLogger.Error(new object[] { "Script: " }.Concat(objects).ToArray());
         }
 
         public static void Information(params object[] objects)
         {
-            HostLogger.Information(new object[] {"Script: "}.Concat(objects).ToArray());
+            HostLogger.Information(new object[] { "Script: " }.Concat(objects).ToArray());
         }
 
         public static void Warning(params object[] objects)
         {
-            HostLogger.Warning(new object[] {"Script: "}.Concat(objects).ToArray());
+            HostLogger.Warning(new object[] { "Script: " }.Concat(objects).ToArray());
         }
 
         #endregion

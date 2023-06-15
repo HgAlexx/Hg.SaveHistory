@@ -76,7 +76,7 @@ namespace Hg.SaveHistory.Managers
 
         public void Release()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             _exiting = true;
 

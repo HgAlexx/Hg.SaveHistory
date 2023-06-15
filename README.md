@@ -25,6 +25,7 @@ Thank you!
 - Can take screenshot on automatic backup (if supported by engine)
 - Events Sound notifications
 - Attach notes to snapshots
+- Automatic snaphots cleanup
 
 
 ## Supported Games and Applications
@@ -48,7 +49,7 @@ Thank you!
 
 Just unzip and run executable!
 
-(or you can download the source code, examine and compile it yourself)
+(or you can download the source, examine and compile it yourself)
 
 ## Setup
 
@@ -106,9 +107,17 @@ To unpin a profile, click the trash can icon.
 - "Snapshots"
   - "Auto backup sound notification": play a sound on successful auto backup
   - "Auto select last backup": Switch to Active tab and highlight last snapshot on auto backup
-  - "Highlight selected": Highlight select snapshot when app is not focus
+  - "Highlight selected": Highlight select snapshot when app is not focused
   - "Choose highlight color": open the color selection window
+- "Others"
+  - "Save window size and position"
+  - "Snap to screen edges"
 - "Clear settings": this will reset all global settings
+#### Profile
+- "Auto cleanup snapshots":
+  - "Enabled": Active or deactive auto cleanup of snapshots
+  - "Configure": Open the auto cleanup settings window
+- "Show nuked snapshots": Open nuked snapshots window which allow to forget them
 #### Tools
 - "Open debug console": for debug purpose only
 #### Help
@@ -153,6 +162,14 @@ Alpha testers:
 
 
 # Version History
+
+
+## v0.8.0
+
+- \+ Added Auto Cleanup Snapshots feature
+- \+ Added window to forget Nuked snapshots
+- \* Updated NuGet packages
+- \* Other small improvements
 
 ## v0.7.6
 

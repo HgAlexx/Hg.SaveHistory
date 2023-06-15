@@ -196,7 +196,7 @@ namespace Hg.SaveHistory.Utilities
                 _formException = new FormException();
             }
 
-            _formException.ErrorDetails.Add(new Error {Title = exception.Message, Content = content});
+            _formException.ErrorDetails.Add(new Error { Title = exception.Message, Content = content });
             _formException.LoadCombobox();
 
             if (!_formException.Visible)

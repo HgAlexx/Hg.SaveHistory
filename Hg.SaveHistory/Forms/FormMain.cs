@@ -1,12 +1,4 @@
-﻿using FontAwesome.Sharp;
-using Hg.SaveHistory.API;
-using Hg.SaveHistory.Controls;
-using Hg.SaveHistory.Managers;
-using Hg.SaveHistory.Types;
-using Hg.SaveHistory.Utilities;
-using Hg.SaveHistory.Wizards;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
@@ -17,6 +9,14 @@ using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Windows.Forms;
+using FontAwesome.Sharp;
+using Hg.SaveHistory.API;
+using Hg.SaveHistory.Controls;
+using Hg.SaveHistory.Managers;
+using Hg.SaveHistory.Types;
+using Hg.SaveHistory.Utilities;
+using Hg.SaveHistory.Wizards;
+using Newtonsoft.Json.Linq;
 using Logger = Hg.SaveHistory.Utilities.Logger;
 
 namespace Hg.SaveHistory.Forms
@@ -30,17 +30,16 @@ namespace Hg.SaveHistory.Forms
         private readonly object _restoreSaveLock = new object();
 
         private readonly SettingsManager _settingsManager;
+
         private readonly Version _version;
 
         private ProfileFile _activeProfileFile;
 
         private bool _autoBackupEnabled;
 
-
         private int _borderOffset;
 
         private Comparison<EngineSnapshot> _comparer;
-
 
         private FormDebugConsole _debugConsole;
 
@@ -51,7 +50,9 @@ namespace Hg.SaveHistory.Forms
         private LuaManager _luaManager;
 
         private EngineSnapshot _selectedSnapshot;
+
         private string _sortKey;
+
         private SortOrder _sortOrder = SortOrder.Ascending;
 
         private WatcherManager _watcherManager;
@@ -91,19 +92,21 @@ namespace Hg.SaveHistory.Forms
             {
                 highlightSelectedToolStripMenuItem.Checked = _settingsManager.HighlightSelectedSnapshot;
 
-                if (_activeProfileFile != null)
+                if (_activeProfileFile == null)
                 {
-                    listViewSnapshot_SelectedIndexChanged(null, null);
+                    return;
+                }
 
-                    if (!_settingsManager.HighlightSelectedSnapshot)
-                    {
-                        listViewSnapshot.Items.Cast<ListViewItem>()
-                            .ToList().ForEach(item =>
-                            {
-                                item.BackColor = listViewSnapshot.BackColor;
-                                item.ForeColor = listViewSnapshot.ForeColor;
-                            });
-                    }
+                listViewSnapshot_SelectedIndexChanged(null, null);
+
+                if (!_settingsManager.HighlightSelectedSnapshot)
+                {
+                    listViewSnapshot.Items.Cast<ListViewItem>()
+                        .ToList().ForEach(item =>
+                        {
+                            item.BackColor = listViewSnapshot.BackColor;
+                            item.ForeColor = listViewSnapshot.ForeColor;
+                        });
                 }
             };
 
@@ -142,7 +145,9 @@ namespace Hg.SaveHistory.Forms
 
             _settingsManager.HotKeysActiveChanged += () =>
             {
-                activeToolStripMenuItem.Checked = _settingsManager.HotKeysActive;
+                hotKeysToolStripMenuItem.Checked = _settingsManager.HotKeysActive;
+                enabledHotKeysToolStripMenuItem.Checked = _settingsManager.HotKeysActive;
+
                 if (_settingsManager.HotKeysActive)
                 {
                     _hotKeysManager?.Hook();
@@ -178,6 +183,8 @@ namespace Hg.SaveHistory.Forms
 
             HideProfilePage();
             HideReadMePage();
+
+            profileToolStripMenuItem.Enabled = false;
         }
 
         public void CategorySelectNext()
@@ -190,11 +197,13 @@ namespace Hg.SaveHistory.Forms
             int current = comboBoxCategories.SelectedIndex;
             current++;
 
-            if (current >= 0 && current < comboBoxCategories.Items.Count)
+            if (current < 0 || current >= comboBoxCategories.Items.Count)
             {
-                comboBoxCategories.SelectedIndex = current;
-                comboBoxCategories_SelectionChangeCommitted(null, null);
+                return;
             }
+
+            comboBoxCategories.SelectedIndex = current;
+            comboBoxCategories_SelectionChangeCommitted(null, null);
         }
 
         public void CategorySelectPrevious()
@@ -207,11 +216,13 @@ namespace Hg.SaveHistory.Forms
             int current = comboBoxCategories.SelectedIndex;
             current--;
 
-            if (current >= 0 && current < comboBoxCategories.Items.Count)
+            if (current < 0 || current >= comboBoxCategories.Items.Count)
             {
-                comboBoxCategories.SelectedIndex = current;
-                comboBoxCategories_SelectionChangeCommitted(null, null);
+                return;
             }
+
+            comboBoxCategories.SelectedIndex = current;
+            comboBoxCategories_SelectionChangeCommitted(null, null);
         }
 
         public IntPtr GetProcessPtr()
@@ -224,16 +235,18 @@ namespace Hg.SaveHistory.Forms
             var processPtr = IntPtr.Zero;
             foreach (var process in Process.GetProcesses())
             {
-                if (_luaManager.ActiveEngine.ProcessNames.Contains(process.ProcessName))
+                if (!_luaManager.ActiveEngine.ProcessNames.Contains(process.ProcessName))
                 {
-                    processPtr = process.MainWindowHandle;
-                    if (processPtr == IntPtr.Zero)
-                    {
-                        processPtr = process.Handle;
-                    }
-
-                    break;
+                    continue;
                 }
+
+                processPtr = process.MainWindowHandle;
+                if (processPtr == IntPtr.Zero)
+                {
+                    processPtr = process.Handle;
+                }
+
+                break;
             }
 
             return processPtr;
@@ -245,7 +258,6 @@ namespace Hg.SaveHistory.Forms
 
             return Screen.AllScreens.Select(screen => screen.Bounds).Aggregate(Rectangle.Union).Contains(rect);
         }
-
 
         public void SnapshotSelectActiveTab()
         {
@@ -357,6 +369,248 @@ namespace Hg.SaveHistory.Forms
             }
         }
 
+        internal DialogResult Message(string text, string caption, MessageType type, MessageMode mode)
+        {
+            DialogResult dialogResult = DialogResult.None;
+
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { dialogResult = Message(text, caption, type, mode); }));
+            }
+            else
+            {
+                if ((mode == MessageMode.User && _settingsManager.NotificationMode == MessageMode.MessageBox) ||
+                    mode == MessageMode.MessageBox)
+                {
+                    if (type != MessageType.None)
+                    {
+                        MessageBoxButtons button = MessageBoxButtons.OK;
+                        MessageBoxIcon icon = MessageBoxIcon.Information;
+                        switch (type)
+                        {
+                            case MessageType.Error:
+                                button = MessageBoxButtons.OK;
+                                icon = MessageBoxIcon.Error;
+                                break;
+                            case MessageType.Information:
+                                button = MessageBoxButtons.OK;
+                                icon = MessageBoxIcon.Information;
+                                break;
+                            case MessageType.Question:
+                                button = MessageBoxButtons.YesNoCancel;
+                                icon = MessageBoxIcon.Question;
+                                break;
+                            case MessageType.Warning:
+                                button = MessageBoxButtons.OK;
+                                icon = MessageBoxIcon.Warning;
+                                break;
+                        }
+
+                        dialogResult = MessageBox.Show(text, caption, button, icon);
+                    }
+                }
+
+                if ((mode == MessageMode.User && _settingsManager.NotificationMode == MessageMode.Status) ||
+                    mode == MessageMode.Status)
+                {
+                    toolStripStatus.Image = null;
+
+                    switch (type)
+                    {
+                        case MessageType.Error:
+                            SetToolStripStatusStyle(toolStripStatus, IconChar.TimesCircle, Color.Red);
+                            break;
+                        case MessageType.Information:
+                            SetToolStripStatusStyle(toolStripStatus, IconChar.ExclamationCircle, Color.Blue);
+                            break;
+                        case MessageType.Question:
+                            SetToolStripStatusStyle(toolStripStatus, IconChar.QuestionCircle, Color.Blue);
+                            break;
+                        case MessageType.Warning:
+                            SetToolStripStatusStyle(toolStripStatus, IconChar.ExclamationTriangle, Color.Orange);
+                            break;
+                    }
+
+                    toolStripStatus.Text = text;
+                }
+            }
+
+            return dialogResult;
+        }
+
+        internal void RefreshSnapshotsListView(ListView listView, EngineSnapshotStatus status, EngineSnapshotCategory category)
+        {
+            if (_luaManager == null)
+            {
+                return;
+            }
+
+            listView.BeginUpdate();
+
+            try
+            {
+                int selected = -1;
+
+                if (listView.SelectedItems.Count > 0)
+                {
+                    selected = listView.SelectedIndices[0];
+                }
+
+                listView.Items.Clear();
+
+                foreach (var snapshot in _luaManager.ActiveEngine.Snapshots)
+                {
+                    if (category != null && category.Id != 0 && snapshot.CategoryId != category.Id)
+                    {
+                        continue;
+                    }
+
+                    var listViewItem = new ListViewItem();
+                    bool first = true;
+
+                    foreach (var columnDefinition in _luaManager.ActiveEngine.SnapshotColumnsDefinition.OrderBy(c => c.Order))
+                    {
+                        string value = "";
+                        switch (columnDefinition.Key)
+                        {
+                            case "SavedAt":
+                                value = snapshot.SavedAt.ToString(snapshot.SavedAtToStringFormat);
+                                break;
+                            case "Notes":
+                                value = snapshot.Notes?.Split('\n').FirstOrDefault();
+                                break;
+                            default:
+                                if (snapshot.CustomValues.TryGetValue(columnDefinition.Key, out var snapshotCustomValue))
+                                {
+                                    value = snapshotCustomValue.ToString();
+                                }
+
+                                break;
+                        }
+
+                        if (first)
+                        {
+                            listViewItem.Text = value;
+                            first = false;
+                        }
+                        else
+                        {
+                            listViewItem.SubItems.Add(value);
+                        }
+                    }
+
+                    listViewItem.Tag = snapshot;
+
+                    if (snapshot.Status == status)
+                    {
+                        listView.Items.Add(listViewItem);
+                    }
+                }
+
+                // Auto Select Last Snapshot
+                if (status == EngineSnapshotStatus.Active)
+                {
+                    AutoSelectLastSnapshot(listView);
+                }
+
+                AutoResizeColumns(listView);
+
+                ListViewSetSelected(listView, selected);
+            }
+            finally
+            {
+                listView.EndUpdate();
+            }
+        }
+
+        internal void SetSnapshotDetails(ListView listView, EngineSnapshot snapshot)
+        {
+            if (snapshot == null)
+            {
+                return;
+            }
+
+            listView.Enabled = true;
+            listView.BeginUpdate();
+            try
+            {
+                listView.Items.Clear();
+
+                var names = new List<string>();
+
+                foreach (var columnDefinition in _luaManager.ActiveEngine.SnapshotColumnsDefinition.OrderBy(c => c.Order))
+                {
+                    ListViewItem listViewItem = null;
+                    switch (columnDefinition.Key)
+                    {
+                        case "SavedAt":
+                            listViewItem = CreateItem("Saved At",
+                                snapshot.SavedAt.ToString(snapshot.SavedAtToStringFormat));
+                            break;
+                        case "Notes":
+                            listViewItem = CreateItem("Notes", snapshot.Notes ?? "");
+                            break;
+                        default:
+                            if (snapshot.CustomValues.TryGetValue(columnDefinition.Key, out var customValue))
+                            {
+                                if (customValue.ShowInDetails)
+                                {
+                                    names.Add(columnDefinition.Key);
+                                    if (string.IsNullOrEmpty(customValue.Caption))
+                                    {
+                                        listViewItem = CreateItem(columnDefinition.Key, customValue.ToString());
+                                    }
+                                    else
+                                    {
+                                        listViewItem = CreateItem(customValue.Caption, customValue.ToString());
+                                    }
+                                }
+                            }
+
+                            break;
+                    }
+
+                    if (listViewItem != null)
+                    {
+                        listView.Items.Add(listViewItem);
+                    }
+                }
+
+                foreach (var pair in snapshot.CustomValues.Where(pair => !names.Contains(pair.Key)))
+                {
+                    names.Add(pair.Key);
+                    ListViewItem listViewItem = null;
+
+                    var custom = pair.Value;
+                    if (custom.ShowInDetails)
+                    {
+                        if (string.IsNullOrEmpty(custom.Caption))
+                        {
+                            listViewItem = CreateItem(pair.Key, custom.ToString());
+                        }
+                        else
+                        {
+                            listViewItem = CreateItem(custom.Caption, custom.ToString());
+                        }
+                    }
+
+                    if (listViewItem == null)
+                    {
+                        continue;
+                    }
+
+                    names.Add(listViewItem.Text);
+                    listView.Items.Add(listViewItem);
+                }
+
+                AutoResizeColumns(listView);
+            }
+            finally
+            {
+                listView.EndUpdate();
+            }
+        }
+
         private void aboutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             About about = new About();
@@ -449,11 +703,15 @@ namespace Hg.SaveHistory.Forms
 
                         try
                         {
-                            if (_luaManager.ActiveEngine.ActionSnapshotRestore(actionSource, snapshot))
+                            if (UnzipSnapshot(snapshot))
                             {
-                                Message("The restoration has been successful", "Restoration Complete", MessageType.Information,
-                                    MessageMode.User);
-                                return true;
+                                if (_luaManager.ActiveEngine.ActionSnapshotRestore(actionSource, snapshot))
+                                {
+                                    Message("The restoration has been successful", "Restoration Complete",
+                                        MessageType.Information,
+                                        MessageMode.User);
+                                    return true;
+                                }
                             }
                         }
                         finally
@@ -510,12 +768,6 @@ namespace Hg.SaveHistory.Forms
             return true;
         }
 
-        private void activeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            _settingsManager.HotKeysActive = !_settingsManager.HotKeysActive;
-            activeToolStripMenuItem.Checked = _settingsManager.HotKeysActive;
-        }
-
         private void ApplyStyle()
         {
             SetButtonStyle(buttonNewProject, IconChar.File, Color.Teal);
@@ -558,6 +810,29 @@ namespace Hg.SaveHistory.Forms
             listView.EndUpdate();
         }
 
+        private void AutoSelectLastSnapshot(ListView listView)
+        {
+            if (!_settingsManager.AutoSelectLastSnapshot || _luaManager.ActiveEngine.LastSnapshot == null)
+            {
+                return;
+            }
+
+            foreach (ListViewItem item in listView.Items)
+            {
+                if (item.Tag != _luaManager.ActiveEngine.LastSnapshot)
+                {
+                    continue;
+                }
+
+                listView.SelectedIndices.Clear();
+                SetSnapshotInfo(_luaManager.ActiveEngine.LastSnapshot);
+                item.Selected = true;
+                item.Focused = true;
+                _luaManager.ActiveEngine.LastSnapshot = null;
+                break;
+            }
+        }
+
         private void autoSelectLastToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _settingsManager.AutoSelectLastSnapshot = !_settingsManager.AutoSelectLastSnapshot;
@@ -578,18 +853,16 @@ namespace Hg.SaveHistory.Forms
                 {
                     foreach (ListViewItem selectedItem in listViewSnapshot.SelectedItems)
                     {
-                        if (selectedItem.Tag is EngineSnapshot snapshot)
+                        if (selectedItem.Tag is EngineSnapshot snapshot && snapshot.Status == EngineSnapshotStatus.Active)
                         {
-                            if (snapshot.Status == EngineSnapshotStatus.Active)
+                            if (!snapshot.Compressed)
                             {
-                                if (!snapshot.Compressed)
-                                {
-                                    Message("Archiving snapshot " + snapshot + " ... Please wait.", "", MessageType.Information, MessageMode.Status);
-                                    ZipSnapshot(snapshot);
-                                }
-
-                                snapshot.Status = EngineSnapshotStatus.Archived;
+                                Message("Archiving snapshot " + snapshot + " ... Please wait.", "", MessageType.Information,
+                                    MessageMode.Status);
+                                ZipSnapshot(snapshot);
                             }
+
+                            snapshot.Status = EngineSnapshotStatus.Archived;
                         }
                     }
 
@@ -618,7 +891,8 @@ namespace Hg.SaveHistory.Forms
                             {
                                 if (!snapshot.Compressed)
                                 {
-                                    Message("Archiving snapshot " + snapshot + " ... Please wait.", "", MessageType.Information, MessageMode.Status);
+                                    Message("Archiving snapshot " + snapshot + " ... Please wait.", "", MessageType.Information,
+                                        MessageMode.Status);
                                     ZipSnapshot(snapshot);
                                 }
 
@@ -644,7 +918,7 @@ namespace Hg.SaveHistory.Forms
 
         private void buttonActionAuto_Paint(object sender, PaintEventArgs e)
         {
-            Button btn = (Button) sender;
+            Button btn = (Button)sender;
 
             Color color = Color.Gray;
             int border = 0;
@@ -742,25 +1016,28 @@ namespace Hg.SaveHistory.Forms
             else if (tabControlSaves.SelectedTab == tabPageDeletedSaves)
             {
                 if (Message("All selected snapshots will be deleted permanently, do you want to continue?", "Confirm Nuke launch?",
-                    MessageType.Question, MessageMode.MessageBox) == DialogResult.Yes)
+                        MessageType.Question, MessageMode.MessageBox) != DialogResult.Yes)
                 {
-                    foreach (ListViewItem selectedItem in listViewDeleted.SelectedItems)
+                    return;
+                }
+
+                foreach (ListViewItem selectedItem in listViewDeleted.SelectedItems)
+                {
+                    if (!(selectedItem.Tag is EngineSnapshot snapshot) || snapshot.Status != EngineSnapshotStatus.Deleted)
                     {
-                        if (selectedItem.Tag is EngineSnapshot snapshot)
-                        {
-                            if (snapshot.Status == EngineSnapshotStatus.Deleted)
-                            {
-                                if (SnapshotNuke(snapshot))
-                                {
-                                    snapshot.Status = EngineSnapshotStatus.Nuked;
-                                    _luaManager.ActiveEngine.Snapshots.Remove(snapshot);
-                                }
-                            }
-                        }
+                        continue;
                     }
 
-                    _luaManager.ActiveEngine.SnapshotsChanges();
+                    if (!SnapshotNuke(snapshot))
+                    {
+                        continue;
+                    }
+
+                    snapshot.Status = EngineSnapshotStatus.Nuked;
+                    //_luaManager.ActiveEngine.Snapshots.Remove(snapshot);
                 }
+
+                _luaManager.ActiveEngine.SnapshotsChanges();
             }
         }
 
@@ -788,9 +1065,11 @@ namespace Hg.SaveHistory.Forms
                             {
                                 if (snapshot.Compressed)
                                 {
-                                    Message("Activing snapshot " + snapshot + " ... Please wait.", "", MessageType.Information, MessageMode.Status);
+                                    Message("Activating snapshot " + snapshot + " ... Please wait.", "", MessageType.Information,
+                                        MessageMode.Status);
                                     UnzipSnapshot(snapshot);
                                 }
+
                                 snapshot.Status = EngineSnapshotStatus.Active;
                             }
                         }
@@ -817,7 +1096,8 @@ namespace Hg.SaveHistory.Forms
                             {
                                 if (snapshot.Compressed)
                                 {
-                                    Message("Activing snapshot " + snapshot + " ... Please wait.", "", MessageType.Information, MessageMode.Status);
+                                    Message("Activating snapshot " + snapshot + " ... Please wait.", "", MessageType.Information,
+                                        MessageMode.Status);
                                     UnzipSnapshot(snapshot);
                                 }
 
@@ -855,14 +1135,14 @@ namespace Hg.SaveHistory.Forms
                 string url = "https://api.github.com/repos/HgAlexx/Hg.SaveHistory/releases/latest";
                 if (_version.Major < 1)
                 {
-                    url = "https://api.github.com/repos/HgAlexx/Hg.SaveHistory/releases";
+                    // url = "https://api.github.com/repos/HgAlexx/Hg.SaveHistory/releases";
                 }
 
-                HttpWebRequest request = (HttpWebRequest) WebRequest.Create(url);
+                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                 request.UserAgent = $"Hg.SaveHistory/{versionFormatted} ({Environment.OSVersion}) By: HgAlexx";
 
 
-                HttpWebResponse response = (HttpWebResponse) request.GetResponse();
+                HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     Stream stream = response.GetResponseStream();
@@ -882,26 +1162,21 @@ namespace Hg.SaveHistory.Forms
                 Version maxVersion = _version;
                 try
                 {
-                    var json = JArray.Parse(responseString);
+                    var obj = JObject.Parse(responseString);
+                    string value = obj.Value<string>("tag_name");
+                    value = value.Substring(1); // strip "v" prefix
 
-                    foreach (var obj in json)
+                    if (value.Contains("_")) // strip "_beta" suffix
                     {
-                        string value = obj.Value<string>("tag_name");
+                        value = value.Substring(0, value.IndexOf("_", StringComparison.Ordinal));
+                    }
 
-                        value = value.Substring(1); // strip "v" prefix
-
-                        if (value.Contains("_")) // strip "_beta" suffix
+                    var v = new Version(value);
+                    if (v > _version)
+                    {
+                        if (v > maxVersion)
                         {
-                            value = value.Substring(0, value.IndexOf("_", StringComparison.Ordinal));
-                        }
-
-                        var v = new Version(value);
-                        if (v > _version)
-                        {
-                            if (v > maxVersion)
-                            {
-                                maxVersion = v;
-                            }
+                            maxVersion = v;
                         }
                     }
                 }
@@ -913,7 +1188,7 @@ namespace Hg.SaveHistory.Forms
                 if (maxVersion > _version)
                 {
                     if (Message("A new version is available, do you want to open the release page?",
-                        "New version available!", MessageType.Question, MessageMode.MessageBox) == DialogResult.Yes)
+                            "New version available!", MessageType.Question, MessageMode.MessageBox) == DialogResult.Yes)
                     {
                         Process.Start("https://github.com/HgAlexx/Hg.SaveHistory/releases");
                     }
@@ -931,10 +1206,214 @@ namespace Hg.SaveHistory.Forms
             }
         }
 
+        private void CleanSnapshots()
+        {
+            if (_activeProfileFile == null || !_activeProfileFile.AutoCleanupBackup)
+            {
+                return;
+            }
+
+            SetProgressBarVisibility(true);
+            Thread.Sleep(100);
+
+            // Oldest first
+            var comparer = GetSnapshotComparer("SavedAt", SortOrder.Ascending);
+            _luaManager.ActiveEngine.Snapshots.Sort(comparer);
+
+            CleanupSnapshotsCore(
+                _activeProfileFile.AutoCleanupBackupArchive,
+                EngineSnapshotStatus.Active,
+                EngineSnapshotStatus.Archived);
+            CleanupSnapshotsCore(
+                _activeProfileFile.AutoCleanupBackupDelete,
+                EngineSnapshotStatus.Archived,
+                EngineSnapshotStatus.Deleted);
+            CleanupSnapshotsCore(
+                _activeProfileFile.AutoCleanupBackupNuke,
+                EngineSnapshotStatus.Deleted,
+                EngineSnapshotStatus.Nuked);
+
+            SetProgressBarVisibility(false);
+            Thread.Sleep(100);
+
+            SortSnapshots();
+        }
+
+        private void CleanupSnapshotsCore(SettingsAutoCleanupBackup settings, EngineSnapshotStatus statusLookup,
+            EngineSnapshotStatus statusTarget)
+        {
+            if (!settings.Enabled)
+            {
+                return;
+            }
+
+            Message($"Processing auto cleanup of {EngineSnapshotStatusToString(statusLookup)} snapshots...",
+                "Working..",
+                MessageType.Information,
+                MessageMode.Status);
+
+            var snapshots = _luaManager.ActiveEngine.Snapshots.Where(s => s.Status == statusLookup).ToList();
+            foreach (var snapshot in snapshots)
+            {
+                string targetPath = Path.Combine(_luaManager.ActiveEngine.SnapshotsFolder, snapshot.RelativePath);
+                var directoryInfo = new DirectoryInfo(targetPath);
+                long size = 0;
+                if (!snapshot.Compressed)
+                {
+                    size = directoryInfo.GetDirectorySize();
+                }
+                else
+                {
+                    if (directoryInfo.Parent != null)
+                    {
+                        string archiveName = directoryInfo.Name + ".zip";
+                        string sourcePath = Path.Combine(directoryInfo.Parent.FullName, archiveName);
+                        var fileInfo = new FileInfo(sourcePath);
+                        size = fileInfo.Length;
+                    }
+                }
+
+                snapshot.Size = size;
+
+                if (settings.Modes.HasFlag(AutoCleanupMode.BySize))
+                {
+                    if (size > settings.Size)
+                    {
+                        snapshot.Status = statusTarget;
+                        snapshots.Remove(snapshot);
+                        if (statusTarget == EngineSnapshotStatus.Archived)
+                        {
+                            ZipSnapshot(snapshot);
+                        }
+
+                        if (statusTarget == EngineSnapshotStatus.Nuked)
+                        {
+                            SnapshotNuke(snapshot);
+                            //_luaManager.ActiveEngine.Snapshots.Remove(snapshot);
+                        }
+                    }
+                }
+
+                if (settings.Modes.HasFlag(AutoCleanupMode.ByAge))
+                {
+                    var timeSpan = DateTime.UtcNow - snapshot.SavedAt;
+                    if (timeSpan.TotalMinutes > settings.Age?.TotalMinutes)
+                    {
+                        snapshot.Status = statusTarget;
+                        snapshots.Remove(snapshot);
+                        if (statusTarget == EngineSnapshotStatus.Archived)
+                        {
+                            ZipSnapshot(snapshot);
+                        }
+
+                        if (statusTarget == EngineSnapshotStatus.Nuked)
+                        {
+                            SnapshotNuke(snapshot);
+                            //_luaManager.ActiveEngine.Snapshots.Remove(snapshot);
+                        }
+                    }
+                }
+            }
+
+            if (settings.Modes.HasFlag(AutoCleanupMode.ByCount))
+            {
+                void ProcessCountPerCategory(int? categoryId)
+                {
+                    while (snapshots.Count(s => categoryId == null || s.CategoryId == categoryId) > settings.Count)
+                    {
+                        var snapshot = snapshots.FirstOrDefault(s => categoryId == null || s.CategoryId == categoryId);
+                        if (snapshot == null)
+                        {
+                            continue;
+                        }
+
+                        snapshot.Status = statusTarget;
+                        snapshots.Remove(snapshot);
+                        if (statusTarget == EngineSnapshotStatus.Archived)
+                        {
+                            ZipSnapshot(snapshot);
+                        }
+
+                        if (statusTarget == EngineSnapshotStatus.Nuked)
+                        {
+                            SnapshotNuke(snapshot);
+                            //_luaManager.ActiveEngine.Snapshots.Remove(snapshot);
+                        }
+                    }
+                }
+
+                if (settings.PerCategory)
+                {
+                    ProcessCountPerCategory(0);
+                    foreach (var category in _luaManager.ActiveEngine.Categories)
+                    {
+                        if (category.Id != 0)
+                        {
+                            ProcessCountPerCategory(category.Id);
+                        }
+                    }
+                }
+                else
+                {
+                    ProcessCountPerCategory(null);
+                }
+            }
+
+            if (settings.Modes.HasFlag(AutoCleanupMode.ByTotalSize))
+            {
+                void ProcessTotalSizePerCategory(int? categoryId)
+                {
+                    while (snapshots.Where(s => categoryId == null || s.CategoryId == categoryId).Sum(snapshot => snapshot.Size) >=
+                           settings.TotalSize)
+                    {
+                        var snapshot = snapshots.FirstOrDefault(s => categoryId == null || s.CategoryId == categoryId);
+                        if (snapshot == null)
+                        {
+                            continue;
+                        }
+
+                        snapshot.Status = statusTarget;
+                        snapshots.Remove(snapshot);
+                        if (statusTarget == EngineSnapshotStatus.Archived)
+                        {
+                            ZipSnapshot(snapshot);
+                        }
+
+                        if (statusTarget == EngineSnapshotStatus.Nuked)
+                        {
+                            SnapshotNuke(snapshot);
+                            //_luaManager.ActiveEngine.Snapshots.Remove(snapshot);
+                        }
+                    }
+                }
+
+                if (settings.PerCategory)
+                {
+                    ProcessTotalSizePerCategory(0);
+                    foreach (var category in _luaManager.ActiveEngine.Categories)
+                    {
+                        if (category.Id != 0)
+                        {
+                            ProcessTotalSizePerCategory(category.Id);
+                        }
+                    }
+                }
+                else
+                {
+                    ProcessTotalSizePerCategory(null);
+                }
+            }
+
+            Message("",
+                "",
+                MessageType.Information,
+                MessageMode.Status);
+        }
+
         private void clearSettingsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Message("Are you sure you want to reset all global settings?", "Reset global settings?",
-                MessageType.Question, MessageMode.MessageBox) == DialogResult.Yes)
+                    MessageType.Question, MessageMode.MessageBox) == DialogResult.Yes)
             {
                 ReleaseHotKeysHook();
 
@@ -948,7 +1427,7 @@ namespace Hg.SaveHistory.Forms
 
         private void CloseProfile()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             if (_activeProfileFile == null)
             {
@@ -984,6 +1463,8 @@ namespace Hg.SaveHistory.Forms
             {
                 column.Tag = null;
             }
+
+            profileToolStripMenuItem.Enabled = false;
 
             listViewSnapshot.Clear();
             listViewArchived.Clear();
@@ -1037,6 +1518,18 @@ namespace Hg.SaveHistory.Forms
             return delta > 0 && delta <= 10;
         }
 
+        private void configureToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormSettingsAutoCleanup formSettings = new FormSettingsAutoCleanup(
+                _activeProfileFile.AutoCleanupBackupArchive,
+                _activeProfileFile.AutoCleanupBackupDelete,
+                _activeProfileFile.AutoCleanupBackupNuke);
+            if (formSettings.ShowDialog(this) == DialogResult.OK)
+            {
+                SaveProfile();
+            }
+        }
+
         private void contextMenu_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
             contextMenu.Hide();
@@ -1056,7 +1549,6 @@ namespace Hg.SaveHistory.Forms
                 buttonActionDelete_Click(null, null);
             }
         }
-
 
         private void CreateHotKeysHook()
         {
@@ -1109,6 +1601,35 @@ namespace Hg.SaveHistory.Forms
             }
         }
 
+        private void enabledCleanupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _activeProfileFile.AutoCleanupBackup = !_activeProfileFile.AutoCleanupBackup;
+            autoCleanupBackupToolStripMenuItem.Checked = _activeProfileFile.AutoCleanupBackup;
+            enabledCleanupToolStripMenuItem.Checked = _activeProfileFile.AutoCleanupBackup;
+        }
+
+        private void enabledHotKeysToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.HotKeysActive = !_settingsManager.HotKeysActive;
+        }
+
+        private string EngineSnapshotStatusToString(EngineSnapshotStatus status)
+        {
+            switch (status)
+            {
+                case EngineSnapshotStatus.Active:
+                    return "Active";
+                case EngineSnapshotStatus.Archived:
+                    return "Archived";
+                case EngineSnapshotStatus.Deleted:
+                    return "Deleted";
+                case EngineSnapshotStatus.Nuked:
+                    return "Nuked";
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(status), status, null);
+            }
+        }
+
         private void FormMain_FormClosed(object sender, FormClosedEventArgs e)
         {
             _settingsManager.SaveSettings();
@@ -1147,13 +1668,13 @@ namespace Hg.SaveHistory.Forms
                 // Restore location from settings
                 if (_settingsManager.Location != null)
                 {
-                    Location = (Point) _settingsManager.Location;
+                    Location = (Point)_settingsManager.Location;
                 }
 
                 // Restore size from settings
                 if (_settingsManager.Size != null)
                 {
-                    Size = (Size) _settingsManager.Size;
+                    Size = (Size)_settingsManager.Size;
                 }
             }
 
@@ -1255,6 +1776,131 @@ namespace Hg.SaveHistory.Forms
             return null;
         }
 
+        private static Comparison<EngineSnapshot> GetSnapshotComparer(string sortKey, SortOrder sortOrder)
+        {
+            Comparison<EngineSnapshot> comparer;
+            switch (sortKey)
+            {
+                case "SavedAt":
+                    comparer = (s1, s2) =>
+                    {
+                        if (s1 == null && s2 == null)
+                        {
+                            return 0;
+                        }
+
+                        if (s1 == null)
+                        {
+                            return -1;
+                        }
+
+                        if (s2 == null)
+                        {
+                            return 1;
+                        }
+
+                        if (sortOrder == SortOrder.Ascending)
+                        {
+                            return DateTime.Compare(s1.SavedAt, s2.SavedAt);
+                        }
+
+                        return DateTime.Compare(s2.SavedAt, s1.SavedAt);
+                    };
+                    break;
+                case "Notes":
+                    comparer = (s1, s2) =>
+                    {
+                        if (s1 == null && s2 == null)
+                        {
+                            return 0;
+                        }
+
+                        if (s1 == null)
+                        {
+                            return -1;
+                        }
+
+                        if (s2 == null)
+                        {
+                            return 1;
+                        }
+
+                        if (sortOrder == SortOrder.Ascending)
+                        {
+                            return string.CompareOrdinal(s1.Notes ?? "", s2.Notes ?? "");
+                        }
+
+                        return string.CompareOrdinal(s2.Notes ?? "", s1.Notes ?? "");
+                    };
+                    break;
+                default:
+                    comparer = (s1, s2) =>
+                    {
+                        if (s1 == null && s2 == null)
+                        {
+                            return 0;
+                        }
+
+                        if (s1 == null)
+                        {
+                            return -1;
+                        }
+
+                        if (s2 == null)
+                        {
+                            return 1;
+                        }
+
+                        EngineSnapshotCustomValueBase c1 = null;
+                        if (s1.CustomValues.TryGetValue(sortKey, out var s1CustomValue))
+                        {
+                            c1 = s1CustomValue;
+                        }
+
+                        EngineSnapshotCustomValueBase c2 = null;
+                        if (s2.CustomValues.TryGetValue(sortKey, out var s2CustomValue))
+                        {
+                            c2 = s2CustomValue;
+                        }
+
+                        if (c1 == null && c2 == null)
+                        {
+                            return 0;
+                        }
+
+                        int result;
+                        if (c1 == null)
+                        {
+                            result = -1;
+                        }
+                        else if (c2 == null)
+                        {
+                            result = 1;
+                        }
+                        else
+                        {
+                            result = c1.CompareTo(c2);
+                        }
+
+                        if (sortOrder == SortOrder.Ascending)
+                        {
+                            return result;
+                        }
+
+                        return -result;
+                    };
+
+                    break;
+            }
+
+            return comparer;
+        }
+
+        private void giflowSizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.ScreenshotQuality = ScreenshotQuality.Gif;
+        }
+
         private void HideProfilePage()
         {
             tabControlMain.Controls.Remove(tabPageProfile);
@@ -1337,6 +1983,11 @@ namespace Hg.SaveHistory.Forms
                     SetAutoBackupMessage();
                 }
             };
+        }
+
+        private void jpgmediumToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.ScreenshotQuality = ScreenshotQuality.Jpg;
         }
 
         private void LinkLabelItemOnLinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
@@ -1579,7 +2230,7 @@ namespace Hg.SaveHistory.Forms
 
         private bool LoadProfile(ProfileFile profileFile, EngineScript engineScript)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             _luaManager = new LuaManager();
             _luaManager.LoadEngineAndProfile(engineScript, profileFile);
@@ -1594,33 +2245,34 @@ namespace Hg.SaveHistory.Forms
             // Load configuration controls
             foreach (var setting in _luaManager.ActiveEngine.Settings.Where(s => s.Kind == EngineSettingKind.Runtime).OrderBy(s => s.Index))
             {
-                if (setting is EngineSettingCombobox settingCombobox)
+                switch (setting)
                 {
-                    // todo
-                }
-
-                if (setting is EngineSettingFolderBrowser settingFolder)
-                {
-                    // todo
-                }
-
-                if (setting is EngineSettingCheckbox settingCheckbox)
-                {
-                    var checkBox = new CheckBox
-                        {AutoSize = false, Text = settingCheckbox.Caption, Checked = settingCheckbox.Value, Tag = settingCheckbox};
-
-                    checkBox.CheckedChanged += (sender, args) =>
+                    case EngineSettingCombobox settingCombobox:
+                        // todo
+                        break;
+                    case EngineSettingFolderBrowser settingFolder:
+                        // todo
+                        break;
+                    case EngineSettingCheckbox settingCheckbox:
                     {
-                        if (checkBox.Tag is EngineSettingCheckbox sc)
-                        {
-                            sc.Value = checkBox.Checked;
-                            sc = null;
-                        }
-                    };
+                        var checkBox = new CheckBox
+                            { AutoSize = false, Text = settingCheckbox.Caption, Checked = settingCheckbox.Value, Tag = settingCheckbox };
 
-                    toolTipHelp.SetToolTip(checkBox, settingCheckbox.HelpTooltip);
-                    flowLayoutPanelConfig.Controls.Add(checkBox);
-                    checkBox.AutoSize = true;
+                        checkBox.CheckedChanged += (sender, args) =>
+                        {
+                            if (!(checkBox.Tag is EngineSettingCheckbox sc))
+                            {
+                                return;
+                            }
+
+                            sc.Value = checkBox.Checked;
+                        };
+
+                        toolTipHelp.SetToolTip(checkBox, settingCheckbox.HelpTooltip);
+                        flowLayoutPanelConfig.Controls.Add(checkBox);
+                        checkBox.AutoSize = true;
+                        break;
+                    }
                 }
             }
 
@@ -1662,6 +2314,8 @@ namespace Hg.SaveHistory.Forms
 
             _luaManager.ActiveEngine.OnSnapshotsChanges += () =>
             {
+                CleanSnapshots();
+
                 SortSnapshots();
 
                 if (InvokeRequired)
@@ -1691,79 +2345,9 @@ namespace Hg.SaveHistory.Forms
                 }
             };
 
-
             _luaManager.ActiveEngine.OnInitialized?.Call();
 
             return true;
-        }
-
-        private DialogResult Message(string text, string caption, MessageType type, MessageMode mode)
-        {
-            DialogResult dialogResult = DialogResult.None;
-
-            if (InvokeRequired)
-            {
-                Invoke(new Action(() => { dialogResult = Message(text, caption, type, mode); }));
-            }
-            else
-            {
-                if (mode == MessageMode.User && _settingsManager.NotificationMode == MessageMode.MessageBox ||
-                    mode == MessageMode.MessageBox)
-                {
-                    if (type != MessageType.None)
-                    {
-                        MessageBoxButtons button = MessageBoxButtons.OK;
-                        MessageBoxIcon icon = MessageBoxIcon.Information;
-                        switch (type)
-                        {
-                            case MessageType.Error:
-                                button = MessageBoxButtons.OK;
-                                icon = MessageBoxIcon.Error;
-                                break;
-                            case MessageType.Information:
-                                button = MessageBoxButtons.OK;
-                                icon = MessageBoxIcon.Information;
-                                break;
-                            case MessageType.Question:
-                                button = MessageBoxButtons.YesNoCancel;
-                                icon = MessageBoxIcon.Question;
-                                break;
-                            case MessageType.Warning:
-                                button = MessageBoxButtons.OK;
-                                icon = MessageBoxIcon.Warning;
-                                break;
-                        }
-
-                        dialogResult = MessageBox.Show(text, caption, button, icon);
-                    }
-                }
-
-                if (mode == MessageMode.User && _settingsManager.NotificationMode == MessageMode.Status ||
-                    mode == MessageMode.Status)
-                {
-                    toolStripStatus.Image = null;
-
-                    switch (type)
-                    {
-                        case MessageType.Error:
-                            SetToolStripStatusStyle(toolStripStatus, IconChar.TimesCircle, Color.Red);
-                            break;
-                        case MessageType.Information:
-                            SetToolStripStatusStyle(toolStripStatus, IconChar.ExclamationCircle, Color.Blue);
-                            break;
-                        case MessageType.Question:
-                            SetToolStripStatusStyle(toolStripStatus, IconChar.QuestionCircle, Color.Blue);
-                            break;
-                        case MessageType.Warning:
-                            SetToolStripStatusStyle(toolStripStatus, IconChar.ExclamationTriangle, Color.Orange);
-                            break;
-                    }
-
-                    toolStripStatus.Text = text;
-                }
-            }
-
-            return dialogResult;
         }
 
         private void messageBoxToolStripMenuItem_Click(object sender, EventArgs e)
@@ -1775,7 +2359,7 @@ namespace Hg.SaveHistory.Forms
 
         private void NewProfileDialog()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             // Create new profile
             FormWizardNewProfile form = new FormWizardNewProfile(_engineScriptManager);
@@ -1956,7 +2540,7 @@ namespace Hg.SaveHistory.Forms
         private void OpenProfile(string path)
         {
             Logger.Information("---------------------------------Open---------------------------------");
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             Cursor.Current = Cursors.WaitCursor;
 
@@ -1976,6 +2560,10 @@ namespace Hg.SaveHistory.Forms
                         if (LoadProfile(profileFile, engineScript))
                         {
                             _activeProfileFile = profileFile;
+
+                            profileToolStripMenuItem.Enabled = true;
+                            autoCleanupBackupToolStripMenuItem.Checked = _activeProfileFile.AutoCleanupBackup;
+                            enabledCleanupToolStripMenuItem.Checked = _activeProfileFile.AutoCleanupBackup;
 
                             tabPageProfile.Text = @"Profile: " + profileFile.Name;
                             ShowProfilePage();
@@ -2027,7 +2615,7 @@ namespace Hg.SaveHistory.Forms
 
         private void OpenProfileDialog()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             if (openFileDialogProfile.ShowDialog(this) == DialogResult.OK)
             {
@@ -2062,9 +2650,14 @@ namespace Hg.SaveHistory.Forms
             }
         }
 
+        private void pnghugeSizeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.ScreenshotQuality = ScreenshotQuality.Png;
+        }
+
         private void RefreshCategories()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             if (_luaManager == null)
             {
@@ -2121,7 +2714,7 @@ namespace Hg.SaveHistory.Forms
 
         private void RefreshPinnedProfiles()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             panelPinnedList.Controls.Clear();
             foreach (string path in _settingsManager.PinnedProfiles.OrderByDescending(s => s))
@@ -2159,7 +2752,7 @@ namespace Hg.SaveHistory.Forms
 
         private void RefreshRecentProfiles()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             panelRecentList.Controls.Clear();
             foreach (string path in _settingsManager.RecentProfiles.OrderByDescending(s => s))
@@ -2207,36 +2800,36 @@ namespace Hg.SaveHistory.Forms
 
         private void RefreshSnapshotLists()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             if (_luaManager == null)
             {
                 return;
             }
 
+            var category = comboBoxCategories.SelectedItem as EngineSnapshotCategory;
+
             if (tabControlSaves.SelectedTab == tabPageActiveSaves)
             {
-                RefreshSnapshotsListView(listViewSnapshot, EngineSnapshotStatus.Active);
+                RefreshSnapshotsListView(listViewSnapshot, EngineSnapshotStatus.Active, category);
             }
 
             if (tabControlSaves.SelectedTab == tabPageArchivedSaves)
             {
-                RefreshSnapshotsListView(listViewArchived, EngineSnapshotStatus.Archived);
+                RefreshSnapshotsListView(listViewArchived, EngineSnapshotStatus.Archived, category);
             }
 
             if (tabControlSaves.SelectedTab == tabPageDeletedSaves)
             {
-                RefreshSnapshotsListView(listViewDeleted, EngineSnapshotStatus.Deleted);
+                RefreshSnapshotsListView(listViewDeleted, EngineSnapshotStatus.Deleted, category);
             }
 
             int active = 0;
             int archived = 0;
             int deleted = 0;
 
-            var category = comboBoxCategories.SelectedItem as EngineSnapshotCategory;
-
             foreach (var snapshot in _activeProfileFile.Snapshots.Where(snapshot =>
-                category == null || category.Id == 0 || snapshot.CategoryId == category.Id))
+                         category == null || category.Id == 0 || snapshot.CategoryId == category.Id))
             {
                 switch (snapshot.Status)
                 {
@@ -2257,102 +2850,6 @@ namespace Hg.SaveHistory.Forms
             tabPageDeletedSaves.Text = $@"Deleted ({deleted})";
         }
 
-        private void RefreshSnapshotsListView(ListView listView, EngineSnapshotStatus status)
-        {
-            if (_luaManager == null)
-            {
-                return;
-            }
-
-            listView.BeginUpdate();
-
-            try
-            {
-                int selected = -1;
-
-                if (listView.SelectedItems.Count > 0)
-                {
-                    selected = listView.SelectedIndices[0];
-                }
-
-                var category = comboBoxCategories.SelectedItem as EngineSnapshotCategory;
-
-                listView.Items.Clear();
-
-                foreach (var snapshot in _luaManager.ActiveEngine.Snapshots)
-                {
-                    if (category == null || category.Id == 0 || snapshot.CategoryId == category.Id)
-                    {
-                        var listViewItem = new ListViewItem();
-                        bool first = true;
-
-                        foreach (var columnDefinition in _luaManager.ActiveEngine.SnapshotColumnsDefinition.OrderBy(c => c.Order))
-                        {
-                            string value = "";
-                            switch (columnDefinition.Key)
-                            {
-                                case "SavedAt":
-                                    value = snapshot.SavedAt.ToString(snapshot.SavedAtToStringFormat);
-                                    break;
-                                case "Notes":
-                                    value = snapshot.Notes?.Split('\n').FirstOrDefault();
-                                    break;
-                                default:
-                                    if (snapshot.CustomValues.ContainsKey(columnDefinition.Key))
-                                    {
-                                        value = snapshot.CustomValues[columnDefinition.Key].ToString();
-                                    }
-                                    break;
-                            }
-
-                            if (first)
-                            {
-                                listViewItem.Text = value;
-                                first = false;
-                            }
-                            else
-                            {
-                                listViewItem.SubItems.Add(value);
-                            }
-                        }
-
-                        listViewItem.Tag = snapshot;
-
-                        if (snapshot.Status == status)
-                        {
-                            listView.Items.Add(listViewItem);
-                        }
-                    }
-                }
-
-                // Auto Select Last Snapshot
-                if (status == EngineSnapshotStatus.Active && _settingsManager.AutoSelectLastSnapshot &&
-                    _luaManager.ActiveEngine.LastSnapshot != null)
-                {
-                    foreach (ListViewItem item in listView.Items)
-                    {
-                        if (item.Tag == _luaManager.ActiveEngine.LastSnapshot)
-                        {
-                            listView.SelectedIndices.Clear();
-                            SetSnapshotInfo(_luaManager.ActiveEngine.LastSnapshot);
-                            item.Selected = true;
-                            item.Focused = true;
-                            _luaManager.ActiveEngine.LastSnapshot = null;
-                            break;
-                        }
-                    }
-                }
-
-                AutoResizeColumns(listView);
-
-                ListViewSetSelected(listView, selected);
-            }
-            finally
-            {
-                listView.EndUpdate();
-            }
-        }
-
         private void ReleaseHotKeysHook()
         {
             toolStripHotKey.Text = "Hot Keys: Idle";
@@ -2371,7 +2868,7 @@ namespace Hg.SaveHistory.Forms
 
         private void SaveProfile()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             if (_luaManager != null && _activeProfileFile != null)
             {
@@ -2455,127 +2952,14 @@ namespace Hg.SaveHistory.Forms
 
         private void SetComparer()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name, " ", _sortKey, " ", _sortOrder);
+            Logger.Information(MethodBase.GetCurrentMethod()?.Name, " ", _sortKey, " ", _sortOrder);
 
             if (_sortKey == null)
             {
                 _sortKey = "SavedAt";
             }
 
-            switch (_sortKey)
-            {
-                case "SavedAt":
-                    _comparer = (s1, s2) =>
-                    {
-                        if (s1 == null && s2 == null)
-                        {
-                            return 0;
-                        }
-
-                        if (s1 == null)
-                        {
-                            return -1;
-                        }
-
-                        if (s2 == null)
-                        {
-                            return 1;
-                        }
-
-                        if (_sortOrder == SortOrder.Ascending)
-                        {
-                            return DateTime.Compare(s1.SavedAt, s2.SavedAt);
-                        }
-
-                        return DateTime.Compare(s2.SavedAt, s1.SavedAt);
-                    };
-                    break;
-                case "Notes":
-                    _comparer = (s1, s2) =>
-                    {
-                        if (s1 == null && s2 == null)
-                        {
-                            return 0;
-                        }
-
-                        if (s1 == null)
-                        {
-                            return -1;
-                        }
-
-                        if (s2 == null)
-                        {
-                            return 1;
-                        }
-
-                        if (_sortOrder == SortOrder.Ascending)
-                        {
-                            return string.CompareOrdinal(s1.Notes ?? "", s2.Notes ?? "");
-                        }
-
-                        return string.CompareOrdinal(s2.Notes ?? "", s1.Notes ?? "");
-                    };
-                    break;
-                default:
-
-                    _comparer = (s1, s2) =>
-                    {
-                        if (s1 == null && s2 == null)
-                        {
-                            return 0;
-                        }
-
-                        if (s1 == null)
-                        {
-                            return -1;
-                        }
-
-                        if (s2 == null)
-                        {
-                            return 1;
-                        }
-
-                        EngineSnapshotCustomValueBase c1 = null;
-                        if (s1.CustomValues.ContainsKey(_sortKey))
-                        {
-                            c1 = s1.CustomValues[_sortKey];
-                        }
-
-                        EngineSnapshotCustomValueBase c2 = null;
-                        if (s2.CustomValues.ContainsKey(_sortKey))
-                        {
-                            c2 = s2.CustomValues[_sortKey];
-                        }
-
-                        if (c1 == null && c2 == null)
-                        {
-                            return 0;
-                        }
-
-                        int result;
-                        if (c1 == null)
-                        {
-                            result = -1;
-                        }
-                        else if (c2 == null)
-                        {
-                            result = 1;
-                        }
-                        else
-                        {
-                            result = c1.CompareTo(c2);
-                        }
-
-                        if (_sortOrder == SortOrder.Ascending)
-                        {
-                            return result;
-                        }
-
-                        return -result;
-                    };
-
-                    break;
-            }
+            _comparer = GetSnapshotComparer(_sortKey, _sortOrder);
         }
 
         private void setKeysToolStripMenuItem_Click(object sender, EventArgs e)
@@ -2602,92 +2986,22 @@ namespace Hg.SaveHistory.Forms
             pictureBox.SizeMode = PictureBoxSizeMode.CenterImage;
         }
 
+        private void SetProgressBarVisibility(bool visible)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { SetProgressBarVisibility(visible); }));
+            }
+
+            toolStripProgressBar.Visible = visible;
+        }
+
         private void SetSnapshotInfo(EngineSnapshot snapshot)
         {
             _selectedSnapshot = snapshot;
             if (_selectedSnapshot != null)
             {
-                listViewDetails.Enabled = true;
-                listViewDetails.BeginUpdate();
-                try
-                {
-                    listViewDetails.Items.Clear();
-
-                    List<string> names = new List<string>();
-
-                    foreach (var columnDefinition in _luaManager.ActiveEngine.SnapshotColumnsDefinition.OrderBy(c => c.Order))
-                    {
-                        ListViewItem listViewItem = null;
-                        switch (columnDefinition.Key)
-                        {
-                            case "SavedAt":
-                                listViewItem = CreateItem("Saved At",
-                                    _selectedSnapshot.SavedAt.ToString(_selectedSnapshot.SavedAtToStringFormat));
-                                break;
-                            case "Notes":
-                                listViewItem = CreateItem("Notes", _selectedSnapshot.Notes ?? "");
-                                break;
-                            default:
-                                if (_selectedSnapshot.CustomValues.ContainsKey(columnDefinition.Key))
-                                {
-                                    EngineSnapshotCustomValueBase custom = _selectedSnapshot.CustomValues[columnDefinition.Key];
-                                    if (custom.ShowInDetails)
-                                    {
-                                        names.Add(columnDefinition.Key);
-                                        if (string.IsNullOrEmpty(custom.Caption))
-                                        {
-                                            listViewItem = CreateItem(columnDefinition.Key, custom.ToString());
-                                        }
-                                        else
-                                        {
-                                            listViewItem = CreateItem(custom.Caption, custom.ToString());
-                                        }
-                                    }
-                                }
-
-                                break;
-                        }
-
-                        if (listViewItem != null)
-                        {
-                            listViewDetails.Items.Add(listViewItem);
-                        }
-                    }
-
-                    foreach (var pair in _selectedSnapshot.CustomValues)
-                    {
-                        if (!names.Contains(pair.Key))
-                        {
-                            names.Add(pair.Key);
-                            ListViewItem listViewItem = null;
-
-                            var custom = pair.Value;
-                            if (custom.ShowInDetails)
-                            {
-                                if (string.IsNullOrEmpty(custom.Caption))
-                                {
-                                    listViewItem = CreateItem(pair.Key, custom.ToString());
-                                }
-                                else
-                                {
-                                    listViewItem = CreateItem(custom.Caption, custom.ToString());
-                                }
-                            }
-
-                            if (listViewItem != null)
-                            {
-                                names.Add(listViewItem.Text);
-                                listViewDetails.Items.Add(listViewItem);
-                            }
-                        }
-                    }
-
-                    AutoResizeColumns(listViewDetails);
-                }
-                finally
-                {
-                    listViewDetails.EndUpdate();
-                }
+                SetSnapshotDetails(listViewDetails, _selectedSnapshot);
 
                 textBoxNotes.Enabled = true;
                 textBoxNotes.Text = _selectedSnapshot.Notes;
@@ -2695,7 +3009,8 @@ namespace Hg.SaveHistory.Forms
                 pictureBoxScreenshot.ImageLocation = null;
                 if (_selectedSnapshot.HasScreenshot && !string.IsNullOrEmpty(snapshot.ScreenshotFilename))
                 {
-                    string path = Path.Combine(_luaManager.ActiveEngine.SnapshotsFolder, snapshot.RelativePath, snapshot.ScreenshotFilename);
+                    string path = Path.Combine(_luaManager.ActiveEngine.SnapshotsFolder, snapshot.RelativePath,
+                        snapshot.ScreenshotFilename);
                     if (File.Exists(path))
                     {
                         pictureBoxScreenshot.ImageLocation = path;
@@ -2750,6 +3065,12 @@ namespace Hg.SaveHistory.Forms
             toolStripStatusLabel.TextImageRelation = TextImageRelation.ImageBeforeText;
         }
 
+        private void showNukedSnapshotsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormNukedSnapshots formNukedSnapshots = new FormNukedSnapshots(this, _luaManager);
+            formNukedSnapshots.ShowDialog(this);
+        }
+
         private void ShowProfilePage()
         {
             if (!tabControlMain.Controls.Contains(tabPageProfile))
@@ -2775,7 +3096,7 @@ namespace Hg.SaveHistory.Forms
 
         private bool SnapshotNuke(EngineSnapshot snapshot)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             try
             {
@@ -2821,7 +3142,7 @@ namespace Hg.SaveHistory.Forms
         private void snapToScreenEdgesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _settingsManager.SnapToScreenEdges = !_settingsManager.SnapToScreenEdges;
-            saveSizeAndPositionToolStripMenuItem.Checked = _settingsManager.SnapToScreenEdges;
+            snapshotToolStripMenuItem.Checked = _settingsManager.SnapToScreenEdges;
         }
 
         private void SortSnapshots()
@@ -2880,17 +3201,21 @@ namespace Hg.SaveHistory.Forms
 
         private void textBoxNotes_Leave(object sender, EventArgs e)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().Name, " ", _selectedSnapshot);
+            Logger.Information(MethodBase.GetCurrentMethod()?.Name, " ", _selectedSnapshot);
 
-            if (_selectedSnapshot != null)
+            if (_selectedSnapshot == null)
             {
-                if (_selectedSnapshot.Notes != textBoxNotes.Text)
-                {
-                    _selectedSnapshot.Notes = textBoxNotes.Text;
-                    SaveProfile();
-                    RefreshSnapshotLists();
-                }
+                return;
             }
+
+            if (_selectedSnapshot.Notes == textBoxNotes.Text)
+            {
+                return;
+            }
+
+            _selectedSnapshot.Notes = textBoxNotes.Text;
+            SaveProfile();
+            RefreshSnapshotLists();
         }
 
         private void toolStripMenuItem2_Click(object sender, EventArgs e)
@@ -2900,7 +3225,7 @@ namespace Hg.SaveHistory.Forms
 
         private bool UnzipSnapshot(EngineSnapshot snapshot)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             if (!snapshot.Compressed)
             {
@@ -2953,6 +3278,19 @@ namespace Hg.SaveHistory.Forms
             return true;
         }
 
+        private void UpdateProgressBar(int value, int max)
+        {
+            if (InvokeRequired)
+            {
+                Invoke(new Action(() => { UpdateProgressBar(value, max); }));
+            }
+            else
+            {
+                toolStripProgressBar.Maximum = max;
+                toolStripProgressBar.Value = value;
+            }
+        }
+
         private void UpdateSortOrder(string key)
         {
             if (_sortKey != key)
@@ -2975,7 +3313,7 @@ namespace Hg.SaveHistory.Forms
 
         private bool ZipSnapshot(EngineSnapshot snapshot)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             if (snapshot.Compressed)
             {
@@ -3039,29 +3377,5 @@ namespace Hg.SaveHistory.Forms
         }
 
         #endregion
-
-        private void jpgmediumToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            _settingsManager.ScreenshotQuality = ScreenshotQuality.Jpg;
-            jpgmediumToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Jpg;
-            giflowSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Gif;
-            pnghugeSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Png;
-        }
-
-        private void giflowSizeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            _settingsManager.ScreenshotQuality = ScreenshotQuality.Gif;
-            jpgmediumToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Jpg;
-            giflowSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Gif;
-            pnghugeSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Png;
-        }
-
-        private void pnghugeSizeToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            _settingsManager.ScreenshotQuality = ScreenshotQuality.Png;
-            jpgmediumToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Jpg;
-            giflowSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Gif;
-            pnghugeSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Png;
-        }
     }
 }

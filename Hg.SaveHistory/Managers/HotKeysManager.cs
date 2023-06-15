@@ -144,9 +144,9 @@ namespace Hg.SaveHistory.Managers
             if (code >= 0)
             {
                 KbDllHookStruct kbDllHookStruct =
-                    (KbDllHookStruct) Marshal.PtrToStructure(lParam, typeof(KbDllHookStruct));
+                    (KbDllHookStruct)Marshal.PtrToStructure(lParam, typeof(KbDllHookStruct));
 
-                Keys key = (Keys) kbDllHookStruct.vkCode;
+                Keys key = (Keys)kbDllHookStruct.vkCode;
 
                 KeyEventArgs keyEventArgs = new KeyEventArgs(key);
 
@@ -161,7 +161,7 @@ namespace Hg.SaveHistory.Managers
 
                 if (keyEventArgs.Handled)
                 {
-                    return (IntPtr) 1;
+                    return (IntPtr)1;
                 }
             }
 

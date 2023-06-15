@@ -207,7 +207,7 @@ namespace Hg.SaveHistory.Wizards
                 if (_selectedEngineScript.Official && _selectedEngineScript.IsAltered())
                 {
                     if (MessageBox.Show("Are you sure you want to use this altered engine ?", "Confirmation", MessageBoxButtons.OKCancel,
-                        MessageBoxIcon.Warning) == DialogResult.Cancel)
+                            MessageBoxIcon.Warning) == DialogResult.Cancel)
                     {
                         e.Cancel = true;
                         return;
@@ -217,7 +217,7 @@ namespace Hg.SaveHistory.Wizards
                 if (!_selectedEngineScript.Official)
                 {
                     if (MessageBox.Show("Are you sure you want to use this third party engine ?", "Confirmation",
-                        MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.Cancel)
+                            MessageBoxButtons.OKCancel, MessageBoxIcon.Warning) == DialogResult.Cancel)
                     {
                         e.Cancel = true;
                         return;
@@ -243,7 +243,7 @@ namespace Hg.SaveHistory.Wizards
         {
             try
             {
-                var profileFile = new ProfileFile {EngineScriptName = _selectedEngineScript.Name, Name = textBoxName.Text};
+                var profileFile = new ProfileFile { EngineScriptName = _selectedEngineScript.Name, Name = textBoxName.Text };
 
                 _luaManager.SaveSettings(profileFile);
 
@@ -254,7 +254,7 @@ namespace Hg.SaveHistory.Wizards
                 if (File.Exists(filePath))
                 {
                     if (MessageBox.Show(@"The file already exists, do you want to override it?", @"Confirmation", MessageBoxButtons.YesNo,
-                        MessageBoxIcon.Warning) == DialogResult.No)
+                            MessageBoxIcon.Warning) == DialogResult.No)
                     {
                         e.Cancel = true;
                         return;
@@ -276,44 +276,38 @@ namespace Hg.SaveHistory.Wizards
             wizardPageSave.AllowNext = false;
 
             // build summary
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             sb.AppendLine("-= Backup Profile Setup Summary =-");
             sb.AppendLine("");
             sb.AppendLine("Settings:");
 
             foreach (var setting in _luaManager.ActiveEngine.Settings.Where(s => s.Kind == EngineSettingKind.Setup).OrderBy(s => s.Index))
             {
-                if (setting is EngineSettingCombobox settingCombobox)
+                switch (setting)
                 {
-                    string s = "";
-                    if (settingCombobox.Values.ContainsKey(settingCombobox.Value))
+                    case EngineSettingCombobox settingCombobox:
                     {
-                        s = settingCombobox.Values[settingCombobox.Value];
+                        string s = "";
+                        if (settingCombobox.Values.TryGetValue(settingCombobox.Value, out var value))
+                        {
+                            s = value;
+                        }
+
+                        sb.AppendLine($"- {settingCombobox.Caption}: {s}");
+                        break;
                     }
-
-                    sb.AppendLine($"- {settingCombobox.Caption}: {s}");
-                }
-
-                if (setting is EngineSettingFolderBrowser settingFolder)
-                {
-                    sb.AppendLine($"- {settingFolder.Caption}: {settingFolder.Value}");
-                }
-
-                if (setting is EngineSettingCheckbox settingCheckbox)
-                {
-                    if (settingCheckbox.Value)
-                    {
+                    case EngineSettingFolderBrowser settingFolder:
+                        sb.AppendLine($"- {settingFolder.Caption}: {settingFolder.Value}");
+                        break;
+                    case EngineSettingCheckbox settingCheckbox when settingCheckbox.Value:
                         sb.AppendLine($"- {settingCheckbox.Caption}: Checked");
-                    }
-                    else
-                    {
+                        break;
+                    case EngineSettingCheckbox settingCheckbox:
                         sb.AppendLine($"- {settingCheckbox.Caption}: Unchecked");
-                    }
-                }
-
-                if (setting is EngineSettingTextbox settingTextbox)
-                {
-                    sb.AppendLine($"- {settingTextbox.Caption}: {settingTextbox.Value}");
+                        break;
+                    case EngineSettingTextbox settingTextbox:
+                        sb.AppendLine($"- {settingTextbox.Caption}: {settingTextbox.Value}");
+                        break;
                 }
             }
 
@@ -357,47 +351,51 @@ namespace Hg.SaveHistory.Wizards
             {
                 // TODO: missing settings types
 
-                if (setting is EngineSettingCombobox settingCombobox)
+                switch (setting)
                 {
-                    var control = new EngineSettingComboboxControl
+                    case EngineSettingCombobox settingCombobox:
                     {
-                        groupBoxCaption = {Text = settingCombobox.Caption}, labelDescription = {Text = settingCombobox.Description}
-                    };
-                    control.toolTipHelp.SetToolTip(control.comboBoxValues, settingCombobox.HelpTooltip);
-                    control.SetComboboxValues(settingCombobox.Values);
-                    control.SetValue(settingCombobox.Value);
-                    control.ValueChanged += () =>
-                    {
-                        settingCombobox.Value = control.Value;
-                        SettingsChanged(null, null);
-                    };
-
-                    panelSetup.Controls.Add(control);
-                    control.Dock = DockStyle.Top;
-                }
-
-                if (setting is EngineSettingFolderBrowser settingFolder)
-                {
-                    var control = new EngineSettingFolderBrowserControl
-                    {
-                        groupBoxCaption = {Text = settingFolder.Caption}, labelDescription = {Text = settingFolder.Description}
-                    };
-                    control.toolTipHelp.SetToolTip(control.textBoxFolderPath, settingFolder.HelpTooltip);
-                    control.buttonAutoDetect.Enabled = settingFolder.CanAutoDetect;
-                    control.buttonAutoDetect.Click += (o, args) =>
-                    {
-                        if (settingFolder.OnAutoDetect?.Call().First() is string result)
+                        var control = new EngineSettingComboboxControl
                         {
-                            control.textBoxFolderPath.Text = result;
-                        }
-                    };
-                    control.ValueChanged += () =>
+                            groupBoxCaption = { Text = settingCombobox.Caption }, labelDescription = { Text = settingCombobox.Description }
+                        };
+                        control.toolTipHelp.SetToolTip(control.comboBoxValues, settingCombobox.HelpTooltip);
+                        control.SetComboboxValues(settingCombobox.Values);
+                        control.SetValue(settingCombobox.Value);
+                        control.ValueChanged += () =>
+                        {
+                            settingCombobox.Value = control.Value;
+                            SettingsChanged(null, null);
+                        };
+
+                        panelSetup.Controls.Add(control);
+                        control.Dock = DockStyle.Top;
+                        break;
+                    }
+                    case EngineSettingFolderBrowser settingFolder:
                     {
-                        settingFolder.Value = control.Value;
-                        SettingsChanged(null, null);
-                    };
-                    panelSetup.Controls.Add(control);
-                    control.Dock = DockStyle.Top;
+                        var control = new EngineSettingFolderBrowserControl
+                        {
+                            groupBoxCaption = { Text = settingFolder.Caption }, labelDescription = { Text = settingFolder.Description }
+                        };
+                        control.toolTipHelp.SetToolTip(control.textBoxFolderPath, settingFolder.HelpTooltip);
+                        control.buttonAutoDetect.Enabled = settingFolder.CanAutoDetect;
+                        control.buttonAutoDetect.Click += (o, args) =>
+                        {
+                            if (settingFolder.OnAutoDetect?.Call().First() is string result)
+                            {
+                                control.textBoxFolderPath.Text = result;
+                            }
+                        };
+                        control.ValueChanged += () =>
+                        {
+                            settingFolder.Value = control.Value;
+                            SettingsChanged(null, null);
+                        };
+                        panelSetup.Controls.Add(control);
+                        control.Dock = DockStyle.Top;
+                        break;
+                    }
                 }
             }
         }

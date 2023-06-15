@@ -79,7 +79,8 @@ namespace Hg.SaveHistory.API
 
         public string Name { get; }
 
-        [LuaHide] public List<string> ProcessNames { get; } = new List<string>();
+        [LuaHide]
+        public List<string> ProcessNames { get; } = new List<string>();
 
         public ScreenshotHelper ScreenshotHelper { get; }
 
@@ -94,7 +95,8 @@ namespace Hg.SaveHistory.API
 
         public string Title { get; }
 
-        [LuaHide] public EngineWatcher Watcher { get; set; }
+        [LuaHide]
+        public EngineWatcher Watcher { get; set; }
 
         #endregion
 
@@ -138,9 +140,9 @@ namespace Hg.SaveHistory.API
         // Actions
         public bool ActionSnapshotBackup(ActionSource actionSource, params object[] args)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
-            args = new object[] {actionSource}.Concat(args).ToArray();
+            args = new object[] { actionSource }.Concat(args).ToArray();
             if (OnActionSnapshotBackup.Call(args).First() is bool b)
             {
                 return b;
@@ -151,9 +153,9 @@ namespace Hg.SaveHistory.API
 
         public bool ActionSnapshotRestore(ActionSource actionSource, EngineSnapshot snapshot, params object[] args)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
-            args = new object[] {actionSource, snapshot}.Concat(args).ToArray();
+            args = new object[] { actionSource, snapshot }.Concat(args).ToArray();
             if (OnActionSnapshotRestore.Call(args).First() is bool b)
             {
                 return b;
@@ -206,7 +208,7 @@ namespace Hg.SaveHistory.API
 
         public void CategoriesChanges()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             OnCategoriesChanges?.Invoke();
         }
@@ -265,7 +267,7 @@ namespace Hg.SaveHistory.API
 
         public void SnapshotsChanges()
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             OnSnapshotsChanges?.Invoke();
         }
@@ -278,7 +280,7 @@ namespace Hg.SaveHistory.API
 
         //    if (OnMessage != null)
         //    {
-        //        return Message(text, caption, type, mode);
+        //        return OnMessage(text, caption, type, mode);
         //    }
 
         //    return DialogResult.None;

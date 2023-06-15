@@ -12,6 +12,14 @@ namespace Hg.SaveHistory.Types
     {
         #region Fields & Properties
 
+        public bool AutoCleanupBackup = false;
+
+        public SettingsAutoCleanupBackup AutoCleanupBackupArchive = new SettingsAutoCleanupBackup { Enabled = true };
+
+        public SettingsAutoCleanupBackup AutoCleanupBackupDelete = new SettingsAutoCleanupBackup { Enabled = true };
+
+        public SettingsAutoCleanupBackup AutoCleanupBackupNuke = new SettingsAutoCleanupBackup { Enabled = false };
+
         // Name of engine script
         public string EngineScriptName;
 
@@ -31,7 +39,6 @@ namespace Hg.SaveHistory.Types
 
         public string SortKey = "SavedAt";
 
-        // Settings
         public SortOrder SortOrder = SortOrder.Ascending;
 
         #endregion
@@ -41,7 +48,8 @@ namespace Hg.SaveHistory.Types
         public static ProfileFile FromJson(string content)
         {
             ProfileFile profileFile =
-                JsonConvert.DeserializeObject<ProfileFile>(content, new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Auto});
+                JsonConvert.DeserializeObject<ProfileFile>(content,
+                    new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
             if (profileFile != null && string.IsNullOrEmpty(profileFile.SortKey))
             {
@@ -114,7 +122,7 @@ namespace Hg.SaveHistory.Types
         public static string ToJson(ProfileFile profileFile)
         {
             string content = JsonConvert.SerializeObject(profileFile, Formatting.Indented,
-                new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Auto});
+                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
             return content;
         }
 

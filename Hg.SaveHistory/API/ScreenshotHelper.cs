@@ -18,7 +18,8 @@ namespace Hg.SaveHistory.API
 
         private IntPtr _processPtr = IntPtr.Zero;
 
-        [LuaHide] public static ScreenshotQuality ScreenshotFormat { get; set; } = ScreenshotQuality.Png;
+        [LuaHide]
+        public static ScreenshotQuality ScreenshotFormat { get; set; } = ScreenshotQuality.Png;
 
         #endregion
 
@@ -31,7 +32,7 @@ namespace Hg.SaveHistory.API
 
         public bool Capture(Rectangle captureBounds, EngineSnapshot snapshot)
         {
-            Logger.Information(MethodBase.GetCurrentMethod().DeclaringType.Name, ".", MethodBase.GetCurrentMethod().Name);
+            Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
 
             try
             {
@@ -47,7 +48,7 @@ namespace Hg.SaveHistory.API
                 Bitmap bitmap = new Bitmap(captureBounds.Width, captureBounds.Height);
                 using (Graphics graphics = Graphics.FromImage(bitmap))
                 {
-                    graphics.CopyFromScreen(captureBounds.Location, Point.Empty, captureBounds.Size);
+                    graphics.CopyFromScreen(captureBounds.Location, Point.Empty, captureBounds.Size, CopyPixelOperation.SourceCopy);
                 }
 
                 string screenShotExtension;

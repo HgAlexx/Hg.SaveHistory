@@ -246,7 +246,7 @@ namespace Hg.SaveHistory.Utilities
                 return false;
             }
 
-            int value = (int) GetWindowLongPtr(handle, (int) Gwl.GWL_STYLE);
+            int value = (int)GetWindowLongPtr(handle, (int)Gwl.GWL_STYLE);
             return (value & WS_CAPTION) == WS_CAPTION;
         }
 

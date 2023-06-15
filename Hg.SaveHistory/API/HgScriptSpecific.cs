@@ -92,14 +92,12 @@ namespace Hg.SaveHistory.API
                         SatisfactoryHeaderData data = new SatisfactoryHeaderData();
 
                         // same variable to read binary value
-                        int int32Byte;
-                        long int64Byte;
                         string value;
 
                         // header version
-                        int32Byte = binaryReader.ReadInt32();
+                        // ReSharper disable once RedundantAssignment
+                        var int32Byte = binaryReader.ReadInt32();
                         // unused
-
                         // save version
                         int32Byte = binaryReader.ReadInt32();
                         data.SaveVersion = int32Byte;
@@ -133,10 +131,12 @@ namespace Hg.SaveHistory.API
                         }
 
                         // map name: size + data
+                        // ReSharper disable once RedundantAssignment
                         value = ReadString();
                         // unused
 
                         // map options: size + data
+                        // ReSharper disable once RedundantAssignment
                         value = ReadString();
                         // unused
 
@@ -149,7 +149,7 @@ namespace Hg.SaveHistory.API
                         data.PlayedTime = new TimeSpan(0, 0, int32Byte); // as seconds
 
                         // saved at
-                        int64Byte = binaryReader.ReadInt64();
+                        var int64Byte = binaryReader.ReadInt64();
                         data.SavedAt = new DateTime(int64Byte, DateTimeKind.Utc).ToLocalTime(); // as ticks
 
                         return data;

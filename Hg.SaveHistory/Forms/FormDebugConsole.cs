@@ -21,7 +21,7 @@ namespace Hg.SaveHistory.Forms
         public FormDebugConsole()
         {
             InitializeComponent();
-            _timer = new Timer {Enabled = false, Interval = 500};
+            _timer = new Timer { Enabled = false, Interval = 500 };
             _timer.Elapsed += (sender, args) => { RefreshList(); };
         }
 

@@ -1,4 +1,32 @@
 {
+  "AutoCleanupBackup": false,
+  "AutoCleanupBackupArchive": {
+    "Age": null,
+    "Count": 50,
+    "Enabled": true,
+    "Modes": 6,
+    "PerCategory": true,
+    "Size": null,
+    "TotalSize": 1048576000
+  },
+  "AutoCleanupBackupDelete": {
+    "Age": null,
+    "Count": 50,
+    "Enabled": true,
+    "Modes": 6,
+    "PerCategory": true,
+    "Size": null,
+    "TotalSize": 1048576000
+  },
+  "AutoCleanupBackupNuke": {
+    "Age": null,
+    "Count": 50,
+    "Enabled": false,
+    "Modes": 6,
+    "PerCategory": true,
+    "Size": null,
+    "TotalSize": 1048576000
+  },
   "EngineScriptName": "DOOM2016",
   "FilePath": "%SOURCEFOLDER%\\DOOM2016_Create.shp",
   "FirstTimeRun": true,

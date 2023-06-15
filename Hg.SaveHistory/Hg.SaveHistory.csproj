@@ -24,7 +24,8 @@
     <UpdateIntervalUnits>Days</UpdateIntervalUnits>
     <UpdatePeriodically>false</UpdatePeriodically>
     <UpdateRequired>false</UpdateRequired>
-    <MapFileExtensions>true</MapFileExtensions>
+    <MapFileExtensions>false</MapFileExtensions>
+    <OpenBrowserOnPublish>false</OpenBrowserOnPublish>
     <ApplicationRevision>0</ApplicationRevision>
     <ApplicationVersion>1.0.0.%2a</ApplicationVersion>
     <UseApplicationTrust>false</UseApplicationTrust>
@@ -50,6 +51,8 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>Resources\Images\omg.ico</ApplicationIcon>
@@ -64,34 +67,43 @@
   <PropertyGroup>
     <StartupObject>Hg.SaveHistory.Program</StartupObject>
   </PropertyGroup>
+  <PropertyGroup>
+    <GenerateManifests>false</GenerateManifests>
+  </PropertyGroup>
+  <PropertyGroup>
+    <TargetZone>LocalIntranet</TargetZone>
+  </PropertyGroup>
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="AeroWizard, Version=2.3.1.0, Culture=neutral, PublicKeyToken=915e74f5d64b8f37, processorArchitecture=MSIL">
       <HintPath>..\packages\AeroWizard.2.3.1\lib\net45\AeroWizard.dll</HintPath>
     </Reference>
     <Reference Include="BouncyCastle.Cryptography, Version=2.0.0.0, Culture=neutral, PublicKeyToken=072edcf4a5328938, processorArchitecture=MSIL">
-      <HintPath>..\packages\BouncyCastle.Cryptography.2.1.1\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
+      <HintPath>..\packages\BouncyCastle.Cryptography.2.2.1\lib\net461\BouncyCastle.Cryptography.dll</HintPath>
     </Reference>
     <Reference Include="FontAwesome.Sharp, Version=6.3.0.0, Culture=neutral, PublicKeyToken=d16d1e4e568ec10f, processorArchitecture=MSIL">
       <HintPath>..\packages\FontAwesome.Sharp.6.3.0\lib\net472\FontAwesome.Sharp.dll</HintPath>
     </Reference>
-    <Reference Include="KeraLua, Version=1.3.3.0, Culture=neutral, PublicKeyToken=6a194c04b9c89217, processorArchitecture=MSIL">
-      <HintPath>..\packages\KeraLua.1.3.3\lib\net46\KeraLua.dll</HintPath>
+    <Reference Include="KeraLua, Version=1.3.4.0, Culture=neutral, PublicKeyToken=6a194c04b9c89217, processorArchitecture=MSIL">
+      <HintPath>..\packages\KeraLua.1.3.4\lib\net46\KeraLua.dll</HintPath>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.13.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
-    <Reference Include="NLua, Version=1.6.2.0, Culture=neutral, PublicKeyToken=6a194c04b9c89217, processorArchitecture=MSIL">
-      <HintPath>..\packages\NLua.1.6.2\lib\net46\NLua.dll</HintPath>
+    <Reference Include="NLua, Version=1.6.3.0, Culture=neutral, PublicKeyToken=6a194c04b9c89217, processorArchitecture=MSIL">
+      <HintPath>..\packages\NLua.1.6.3\lib\net46\NLua.dll</HintPath>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Data" />
     <Reference Include="System.Design" />
     <Reference Include="System.IO.Compression.FileSystem" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xaml" />
+    <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
@@ -129,6 +141,12 @@
     <Compile Include="API\Logger.cs" />
     <Compile Include="API\MessageEventHandler.cs" />
     <Compile Include="API\ScreenshotHelper.cs" />
+    <Compile Include="Controls\AutoCleanupControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\AutoCleanupControl.Designer.cs">
+      <DependentUpon>AutoCleanupControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Controls\EngineSettingComboboxControl.cs">
       <SubType>UserControl</SubType>
     </Compile>
@@ -159,6 +177,18 @@
     <Compile Include="Forms\About.Designer.cs">
       <DependentUpon>About.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\FormNukedSnapshots.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormNukedSnapshots.Designer.cs">
+      <DependentUpon>FormNukedSnapshots.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\FormSettingsAutoCleanup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\FormSettingsAutoCleanup.Designer.cs">
+      <DependentUpon>FormSettingsAutoCleanup.cs</DependentUpon>
+    </Compile>
     <Compile Include="Types\AutoBackupStatus.cs" />
     <Compile Include="Managers\SoundManager.cs" />
     <Compile Include="Managers\WatcherManager.cs" />
@@ -167,6 +197,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Types\AutoCleanupMode.cs" />
     <Compile Include="Types\EngineScript.cs" />
     <Compile Include="Managers\EngineScriptManager.cs" />
     <Compile Include="Forms\FormDebugConsole.cs">
@@ -203,6 +234,8 @@
     <Compile Include="Types\ProfileSettingInteger.cs" />
     <Compile Include="Types\ProfileSettingString.cs" />
     <Compile Include="Types\ScreenshotQuality.cs" />
+    <Compile Include="Types\SettingsAutoCleanupBackup.cs" />
+    <Compile Include="Utilities\DirectoryInfoExtension.cs" />
     <Compile Include="Utilities\ExceptionHandler.cs" />
     <Compile Include="Utilities\FormHelper.cs" />
     <Compile Include="Utilities\Logger.cs" />
@@ -226,6 +259,9 @@
     <Compile Include="ScriptsHash.cs" />
     <Compile Include="Types\Settings.cs" />
     <Compile Include="Managers\SettingsManager.cs" />
+    <EmbeddedResource Include="Controls\AutoCleanupControl.resx">
+      <DependentUpon>AutoCleanupControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\EngineSettingComboboxControl.resx">
       <DependentUpon>EngineSettingComboboxControl.cs</DependentUpon>
     </EmbeddedResource>
@@ -247,6 +283,12 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormException.resx">
       <DependentUpon>FormException.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormNukedSnapshots.resx">
+      <DependentUpon>FormNukedSnapshots.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\FormSettingsAutoCleanup.resx">
+      <DependentUpon>FormSettingsAutoCleanup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\FormSettingsHotKeys.resx">
       <DependentUpon>FormSettingsHotKeys.cs</DependentUpon>
@@ -355,11 +397,26 @@
   <PropertyGroup>
     <PreBuildEvent>$(SolutionDir)\Hash\bin\Debug\Hash.exe $(ProjectDir)\Scripts $(ProjectDir)\ScriptsHash.cs</PreBuildEvent>
   </PropertyGroup>
-  <Import Project="..\packages\KeraLua.1.3.3\build\net46\KeraLua.targets" Condition="Exists('..\packages\KeraLua.1.3.3\build\net46\KeraLua.targets')" />
+  <Import Project="..\packages\KeraLua.1.3.4\build\net46\KeraLua.targets" Condition="Exists('..\packages\KeraLua.1.3.4\build\net46\KeraLua.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
       <ErrorText>Ce projet fait référence à des packages NuGet qui sont manquants sur cet ordinateur. Utilisez l'option de restauration des packages NuGet pour les télécharger. Pour plus d'informations, consultez http://go.microsoft.com/fwlink/?LinkID=322105. Le fichier manquant est : {0}.</ErrorText>
     </PropertyGroup>
-    <Error Condition="!Exists('..\packages\KeraLua.1.3.3\build\net46\KeraLua.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\KeraLua.1.3.3\build\net46\KeraLua.targets'))" />
+    <Error Condition="!Exists('..\packages\KeraLua.1.3.4\build\net46\KeraLua.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\KeraLua.1.3.4\build\net46\KeraLua.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PostBuildEvent>copy /Y "$(SolutionDir)LICENSE" "$(TargetDir)"
+copy /Y "$(SolutionDir)README.md" "$(TargetDir)"
+rmdir /s /q "$(TargetDir)\de"
+rmdir /s /q "$(TargetDir)\es"
+rmdir /s /q "$(TargetDir)\fr"
+rmdir /s /q "$(TargetDir)\it"
+rmdir /s /q "$(TargetDir)\pl"
+rmdir /s /q "$(TargetDir)\ru"
+rmdir /s /q "$(TargetDir)\zh-CN"
+rmdir /s /q "$(TargetDir)\zh-Hant"
+
+if $(ConfigurationName) == Release (powershell Compress-Archive -Path '$(TargetDir)*' -DestinationPath '$(TargetDir)\..\$(ProjectName)_v0.0.0.zip' -Force)
+</PostBuildEvent>
+  </PropertyGroup>
 </Project>

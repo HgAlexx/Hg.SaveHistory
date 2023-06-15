@@ -31,7 +31,7 @@ namespace Hg.SaveHistory.API
             WatchChanged = false;
             WatchRenamed = false;
             Filter = "*";
-            NotifyFilter = (int) (NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite);
+            NotifyFilter = (int)(NotifyFilters.FileName | NotifyFilters.DirectoryName | NotifyFilters.LastWrite);
             WatchParent = true;
             OnEvent = null;
             Path = null;

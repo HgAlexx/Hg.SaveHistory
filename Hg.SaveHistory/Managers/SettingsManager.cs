@@ -260,37 +260,38 @@ namespace Hg.SaveHistory.Managers
             if (File.Exists(_settingsFilePath))
             {
                 _settingsContent = File.ReadAllText(_settingsFilePath);
-                if (_settingsContent != "")
+                if (_settingsContent == "")
                 {
-                    try
+                    return;
+                }
+
+                try
+                {
+                    _settings = JsonConvert.DeserializeObject<Settings>(_settingsContent,
+                        new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
+
+                    if (_settings?.PinnedProfiles != null && _settings.PinnedProfiles.Count > 0)
                     {
-                        _settings = JsonConvert.DeserializeObject<Settings>(_settingsContent,
-                            new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Auto});
-
-                        if (_settings?.PinnedProfiles != null && _settings.PinnedProfiles.Count > 0)
-                        {
-                            _settings.PinnedProfiles.RemoveAll(path => !File.Exists(path));
-                        }
-
-
-                        if (_settings?.RecentProfiles != null && _settings.RecentProfiles.Count > 0)
-                        {
-                            _settings.RecentProfiles.RemoveAll(path => !File.Exists(path));
-                            _settings.RecentProfiles.RemoveAll(path => _settings.PinnedProfiles.Contains(path));
-                        }
-
-                        PinnedProfiles.Sort();
-
-
-                        CompleteHotKeyToActions();
-
-                        NotifyAll();
+                        _settings.PinnedProfiles.RemoveAll(path => !File.Exists(path));
                     }
-                    catch (Exception e)
+
+
+                    if (_settings?.RecentProfiles != null && _settings.RecentProfiles.Count > 0)
                     {
-                        Logger.Log("Error loading settings: " + e.Message, LogLevel.Debug);
-                        ResetSettings();
+                        _settings.RecentProfiles.RemoveAll(path => !File.Exists(path));
+                        _settings.RecentProfiles.RemoveAll(path => _settings.PinnedProfiles.Contains(path));
                     }
+
+                    PinnedProfiles.Sort();
+
+                    CompleteHotKeyToActions();
+
+                    NotifyAll();
+                }
+                catch (Exception e)
+                {
+                    Logger.Log("Error loading settings: " + e.Message, LogLevel.Debug);
+                    ResetSettings();
                 }
             }
             else
@@ -332,7 +333,7 @@ namespace Hg.SaveHistory.Managers
         public void SaveSettings()
         {
             _settingsContent = JsonConvert.SerializeObject(_settings, Formatting.Indented,
-                new JsonSerializerSettings {TypeNameHandling = TypeNameHandling.Auto});
+                new JsonSerializerSettings { TypeNameHandling = TypeNameHandling.Auto });
 
             string folder = Path.GetDirectoryName(_settingsFilePath);
             if (folder != null)

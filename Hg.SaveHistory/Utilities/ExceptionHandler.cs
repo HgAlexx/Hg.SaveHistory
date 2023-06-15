@@ -19,7 +19,7 @@ namespace Hg.SaveHistory.Utilities
 
         public static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Exception ex = (Exception) e.ExceptionObject;
+            Exception ex = (Exception)e.ExceptionObject;
             Logger.LogException(ex);
         }
 

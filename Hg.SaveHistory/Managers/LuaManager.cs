@@ -95,25 +95,25 @@ namespace Hg.SaveHistory.Managers
                 if (setting is EngineSettingCheckbox engineSettingCheckbox)
                 {
                     profileFile.Settings.Add(new ProfileSettingBoolean
-                        {Name = engineSettingCheckbox.Name, Value = engineSettingCheckbox.Value, Kind = engineSettingCheckbox.Kind});
+                        { Name = engineSettingCheckbox.Name, Value = engineSettingCheckbox.Value, Kind = engineSettingCheckbox.Kind });
                 }
 
                 if (setting is EngineSettingCombobox settingCombobox)
                 {
                     profileFile.Settings.Add(new ProfileSettingInteger
-                        {Name = settingCombobox.Name, Value = settingCombobox.Value, Kind = settingCombobox.Kind});
+                        { Name = settingCombobox.Name, Value = settingCombobox.Value, Kind = settingCombobox.Kind });
                 }
 
                 if (setting is EngineSettingFolderBrowser settingFolder)
                 {
                     profileFile.Settings.Add(new ProfileSettingString
-                        {Name = settingFolder.Name, Value = settingFolder.Value, Kind = settingFolder.Kind});
+                        { Name = settingFolder.Name, Value = settingFolder.Value, Kind = settingFolder.Kind });
                 }
 
                 if (setting is EngineSettingTextbox settingTextbox)
                 {
                     profileFile.Settings.Add(new ProfileSettingString
-                        {Name = settingTextbox.Name, Value = settingTextbox.Value, Kind = settingTextbox.Kind});
+                        { Name = settingTextbox.Name, Value = settingTextbox.Value, Kind = settingTextbox.Kind });
                 }
             }
         }

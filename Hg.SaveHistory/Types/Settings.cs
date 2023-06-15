@@ -11,7 +11,6 @@ namespace Hg.SaveHistory.Types
 
         public bool AutoBackupSoundNotification { get; set; }
 
-
         public bool AutoSelectLastSnapshot { get; set; }
 
         public bool HighlightSelectedSnapshot { get; set; }

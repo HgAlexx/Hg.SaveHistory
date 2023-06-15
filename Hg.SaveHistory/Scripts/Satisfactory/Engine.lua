@@ -219,17 +219,17 @@ local snapshotBackupOne = function(actionSouce, filename, isAutosave)
                 return false
             end
         else
+            if snapshot.Status == EngineSnapshotStatus.Active then
+                Logger.Information("snapshot: already known, status Active")
+            end
+            if snapshot.Status == EngineSnapshotStatus.Archived then
+                Logger.Information("snapshot: already known, status Archived")
+            end
             if snapshot.Status == EngineSnapshotStatus.Deleted then
-                Logger.Information("snapshot: restored to active")
-                snapshot.Status = EngineSnapshotStatus.Active
-                if actionSouce == ActionSource.AutoBackup or actionSouce == ActionSource.HotKey then
-                    -- it is up to the engine to set LastSnapshot to enable auto select feature
-                    engine.LastSnapshot = snapshot
-                    -- trigger UI refresh
-                    engine:SnapshotsChanges()
-                end
-            else
-                Logger.Information("snapshot: already known")
+                Logger.Information("snapshot: already known, status Deleted")
+            end
+            if snapshot.Status == EngineSnapshotStatus.Nuked then
+                Logger.Information("snapshot: already known, status Nuked")
             end
         end
 
@@ -253,7 +253,8 @@ local snapshotBackup = function(actionSouce, filename, isAutosave)
 
         local result = true
         for k, v in pairs(listPath) do
-            result = result and snapshotBackupOne(actionSouce, v, false)
+            local autosave = string.find(v, "_autosave_")
+            result = result and snapshotBackupOne(actionSouce, v, autosave)
         end
 
         -- rebuild category list
