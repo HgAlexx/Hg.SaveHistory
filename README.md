@@ -168,6 +168,7 @@ Alpha testers:
 
 - \+ Added Auto Cleanup Snapshots feature
 - \+ Added window to forget Nuked snapshots
+- \+ Remember last selected category per profile
 - \* Updated NuGet packages
 - \* Other small improvements
 

@@ -407,6 +407,7 @@
   <PropertyGroup>
     <PostBuildEvent>copy /Y "$(SolutionDir)LICENSE" "$(TargetDir)"
 copy /Y "$(SolutionDir)README.md" "$(TargetDir)"
+del /q "$(TargetDir)\$(ProjectName).log"
 rmdir /s /q "$(TargetDir)\de"
 rmdir /s /q "$(TargetDir)\es"
 rmdir /s /q "$(TargetDir)\fr"

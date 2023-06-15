@@ -30,6 +30,7 @@
   "EngineScriptName": "DOOMEternal",
   "FilePath": "%SOURCEFOLDER%\\DOOMEternal_Steam_Open.shp",
   "FirstTimeRun": true,
+  "LastSelectedCategory": -1,
   "Name": "DOOMEternal_Steam",
   "RootFolder": "%SOURCEFOLDER%",
   "Settings": [

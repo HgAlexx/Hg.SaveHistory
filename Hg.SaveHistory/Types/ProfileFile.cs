@@ -27,6 +27,8 @@ namespace Hg.SaveHistory.Types
 
         public bool FirstTimeRun = true;
 
+        public int LastSelectedCategory = -1;
+
         // Display name of profile
         public string Name;
 

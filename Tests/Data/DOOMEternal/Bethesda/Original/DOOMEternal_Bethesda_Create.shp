@@ -30,6 +30,7 @@
   "EngineScriptName": "DOOMEternal",
   "FilePath": "%SOURCEFOLDER%\\DOOMEternal_Bethesda_Create.shp",
   "FirstTimeRun": true,
+  "LastSelectedCategory": -1,
   "Name": "DOOMEternal_Bethesda",
   "RootFolder": null,
   "Settings": [

@@ -30,6 +30,7 @@
   "EngineScriptName": "DOOM2016",
   "FilePath": "%SOURCEFOLDER%\\DOOM2016_Create.shp",
   "FirstTimeRun": true,
+  "LastSelectedCategory": -1,
   "Name": "DOOM2016",
   "RootFolder": null,
   "Settings": [

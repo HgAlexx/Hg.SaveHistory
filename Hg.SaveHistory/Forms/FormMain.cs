@@ -458,13 +458,9 @@ namespace Hg.SaveHistory.Forms
 
                 listView.Items.Clear();
 
-                foreach (var snapshot in _luaManager.ActiveEngine.Snapshots)
+                foreach (var snapshot in _luaManager.ActiveEngine.Snapshots.Where(snapshot => 
+                             category == null || category.Id == 0 || snapshot.CategoryId == category.Id))
                 {
-                    if (category != null && category.Id != 0 && snapshot.CategoryId != category.Id)
-                    {
-                        continue;
-                    }
-
                     var listViewItem = new ListViewItem();
                     bool first = true;
 
@@ -1214,7 +1210,6 @@ namespace Hg.SaveHistory.Forms
             }
 
             SetProgressBarVisibility(true);
-            Thread.Sleep(100);
 
             // Oldest first
             var comparer = GetSnapshotComparer("SavedAt", SortOrder.Ascending);
@@ -1234,9 +1229,6 @@ namespace Hg.SaveHistory.Forms
                 EngineSnapshotStatus.Nuked);
 
             SetProgressBarVisibility(false);
-            Thread.Sleep(100);
-
-            SortSnapshots();
         }
 
         private void CleanupSnapshotsCore(SettingsAutoCleanupBackup settings, EngineSnapshotStatus statusLookup,
@@ -1508,6 +1500,11 @@ namespace Hg.SaveHistory.Forms
 
         private void comboBoxCategories_SelectionChangeCommitted(object sender, EventArgs e)
         {
+            if (comboBoxCategories.SelectedItem is EngineSnapshotCategory selection)
+            {
+                _activeProfileFile.LastSelectedCategory = selection.Id;
+            }
+            
             RefreshSnapshotLists();
         }
 
@@ -2674,6 +2671,10 @@ namespace Hg.SaveHistory.Forms
                 id = selection.Id;
                 selection = null;
             }
+            else if (_activeProfileFile.LastSelectedCategory != -1)
+            {
+                id = _activeProfileFile.LastSelectedCategory;
+            }
 
             comboBoxCategories.Items.Clear();
             foreach (var category in _luaManager.ActiveEngine.Categories)
@@ -2706,6 +2707,7 @@ namespace Hg.SaveHistory.Forms
                 if (category != null && comboBoxCategories.Items.Contains(category))
                 {
                     comboBoxCategories.SelectedItem = category;
+                    _activeProfileFile.LastSelectedCategory = category.Id;
                 }
             }
 
@@ -2828,7 +2830,7 @@ namespace Hg.SaveHistory.Forms
             int archived = 0;
             int deleted = 0;
 
-            foreach (var snapshot in _activeProfileFile.Snapshots.Where(snapshot =>
+            foreach (var snapshot in _luaManager.ActiveEngine.Snapshots.Where(snapshot =>
                          category == null || category.Id == 0 || snapshot.CategoryId == category.Id))
             {
                 switch (snapshot.Status)
@@ -2992,8 +2994,8 @@ namespace Hg.SaveHistory.Forms
             {
                 Invoke(new Action(() => { SetProgressBarVisibility(visible); }));
             }
-
-            toolStripProgressBar.Visible = visible;
+            else
+                toolStripProgressBar.Visible = visible;
         }
 
         private void SetSnapshotInfo(EngineSnapshot snapshot)

@@ -30,6 +30,7 @@
   "EngineScriptName": "Satisfactory",
   "FilePath": "%SOURCEFOLDER%\\Satisfactory_Create.shp",
   "FirstTimeRun": true,
+  "LastSelectedCategory": -1,
   "Name": "Satisfactory",
   "RootFolder": null,
   "Settings": [
