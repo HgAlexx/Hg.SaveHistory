@@ -170,7 +170,7 @@ Alpha testers:
 - \+ Added window to forget Nuked snapshots
 - \+ Remember last selected category per profile
 - \* Updated NuGet packages
-- \* Other small improvements
+- \* Other small improvements & fixes
 
 ## v0.7.6
 
