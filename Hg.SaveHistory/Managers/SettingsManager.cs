@@ -6,6 +6,7 @@ using System.Windows.Forms;
 using Hg.SaveHistory.Types;
 using Hg.SaveHistory.Utilities;
 using Newtonsoft.Json;
+using Path = System.IO.Path;
 
 namespace Hg.SaveHistory.Managers
 {
@@ -26,7 +27,11 @@ namespace Hg.SaveHistory.Managers
         public event SettingEventHandler HotKeysActiveChanged;
         public event SettingEventHandler HotKeysSoundChanged;
 
+        public event SettingEventHandler MinimizedToTrayChanged;
+        public event SettingEventHandler ShowTrayNotificationChanged;
+
         public event SettingEventHandler NotificationModeChanged;
+        public event SettingEventHandler OpenLastUsedProfileOnStartupChanged;
 
         public event SettingEventHandler PinnedProfilesChanged;
         public event SettingEventHandler RecentProfilesChanged;
@@ -38,6 +43,9 @@ namespace Hg.SaveHistory.Managers
 
         public event SettingEventHandler SortKindChanged;
         public event SettingEventHandler SortOrderChanged;
+
+        public event SettingEventHandler StartMinimizedChanged;
+        public event SettingEventHandler StartWithWindowsChanged;
 
         private Settings _settings;
 
@@ -106,10 +114,36 @@ namespace Hg.SaveHistory.Managers
 
         public List<HotKeyToAction> HotKeyToActions => _settings.HotKeyToActions;
 
+        public string LastUsedProfilePath
+        {
+            get => _settings.LastUsedProfilePath;
+            set => _settings.LastUsedProfilePath = value;
+        }
+
         public Point? Location
         {
             get => _settings.Location;
             set => _settings.Location = value;
+        }
+
+        public bool MinimizedToTray
+        {
+            get => _settings.MinimizedToTray;
+            set
+            {
+                _settings.MinimizedToTray = value;
+                MinimizedToTrayChanged?.Invoke();
+            }
+        }
+
+        public bool ShowTrayNotification
+        {
+            get => _settings.ShowTrayNotification;
+            set
+            {
+                _settings.ShowTrayNotification = value;
+                ShowTrayNotificationChanged?.Invoke();
+            }
         }
 
         public MessageMode NotificationMode
@@ -122,8 +156,17 @@ namespace Hg.SaveHistory.Managers
             }
         }
 
-        public List<string> PinnedProfiles => _settings.PinnedProfiles;
+        public bool OpenLastUsedProfileOnStartup
+        {
+            get => _settings.OpenLastUsedProfileOnStartup;
+            set
+            {
+                _settings.OpenLastUsedProfileOnStartup = value;
+                OpenLastUsedProfileOnStartupChanged?.Invoke();
+            }
+        }
 
+        public List<string> PinnedProfiles => _settings.PinnedProfiles;
 
         public List<string> RecentProfiles => _settings.RecentProfiles;
 
@@ -160,6 +203,26 @@ namespace Hg.SaveHistory.Managers
             {
                 _settings.SnapToScreenEdges = value;
                 SnapToScreenEdgesChanged?.Invoke();
+            }
+        }
+
+        public bool StartMinimized
+        {
+            get => _settings.StartMinimized;
+            set
+            {
+                _settings.StartMinimized = value;
+                StartMinimizedChanged?.Invoke();
+            }
+        }
+
+        public bool StartWithWindows
+        {
+            get => _settings.StartWithWindows;
+            set
+            {
+                _settings.StartWithWindows = value;
+                StartWithWindowsChanged?.Invoke();
             }
         }
 
@@ -224,7 +287,7 @@ namespace Hg.SaveHistory.Managers
 
             if (_settingsFilePath == "")
             {
-                DialogResult result = MessageBox.Show(
+                var result = MessageBox.Show(
                     @"Where do you want the application settings to be saved ?" + Environment.NewLine +
                     @"- In your Windows profile (Default mode) => click Yes" + Environment.NewLine +
                     @"- In the application directory (Portable mode) => click No",
@@ -280,6 +343,11 @@ namespace Hg.SaveHistory.Managers
                     {
                         _settings.RecentProfiles.RemoveAll(path => !File.Exists(path));
                         _settings.RecentProfiles.RemoveAll(path => _settings.PinnedProfiles.Contains(path));
+                    }
+
+                    if (!string.IsNullOrEmpty(_settings?.LastUsedProfilePath) && !File.Exists(_settings.LastUsedProfilePath))
+                    {
+                        _settings.LastUsedProfilePath = "";
                     }
 
                     PinnedProfiles.Sort();
@@ -473,6 +541,14 @@ namespace Hg.SaveHistory.Managers
 
             SortKindChanged?.Invoke();
             SortOrderChanged?.Invoke();
+
+            StartWithWindowsChanged?.Invoke();
+            StartMinimizedChanged?.Invoke();
+
+            MinimizedToTrayChanged?.Invoke();
+            ShowTrayNotificationChanged?.Invoke();
+
+            OpenLastUsedProfileOnStartupChanged?.Invoke();
         }
 
         #endregion

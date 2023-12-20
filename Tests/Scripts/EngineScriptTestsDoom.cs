@@ -67,11 +67,10 @@ namespace Tests.Scripts
         {
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Scripts", dataSetDoom.Name);
             DirectoryInfo directoryInfo = new DirectoryInfo(path);
-            Assert.IsNotNull(directoryInfo, "Scripts directory is null");
-            Assert.IsTrue(directoryInfo.Exists, "Scripts directory does not exist");
+            Assert.That(directoryInfo.Exists, "Scripts directory does not exist");
 
             EngineScript engineScript = EngineScriptManager.LoadEngineScript(directoryInfo);
-            Assert.IsNotNull(engineScript, "EngineScript not loaded properly");
+            Assert.That(engineScript != null, "EngineScript not loaded properly");
 
             if (!Directory.Exists(dataSetDoom.SourceFolder))
             {
@@ -88,13 +87,12 @@ namespace Tests.Scripts
             File.WriteAllText(profilePathSimulation, content);
 
             ProfileFile profileFile = ProfileFile.Load(profilePathSimulation);
-            Assert.IsNotNull(profileFile);
+            Assert.That(profileFile != null);
 
             LuaManager luaManager = new LuaManager();
-            Assert.IsNotNull(luaManager);
 
             bool loadEngine = luaManager.LoadEngineAndProfile(engineScript, profileFile);
-            Assert.IsTrue(loadEngine);
+            Assert.That(loadEngine);
 
             if (luaManager.ActiveEngine.OnOpened != null)
             {
@@ -121,7 +119,7 @@ namespace Tests.Scripts
                 Assert.DoesNotThrow(() => { luaManager.ActiveEngine.OnInitialized.Call(); });
             }
 
-            Assert.IsNotNull(luaManager.ActiveEngine.Watcher);
+            Assert.That(luaManager.ActiveEngine.Watcher != null);
 
             var setting = luaManager.ActiveEngine.SettingByName("IncludeDeath");
             if (setting is EngineSettingCheckbox s)
@@ -145,19 +143,19 @@ namespace Tests.Scripts
                 Assert.DoesNotThrow(() => { luaManager.ActiveEngine.OnLoaded.Call(); });
             }
 
-            Assert.AreEqual(1, catCount);
-            Assert.AreEqual(1, snapCount);
+            Assert.That(1 == catCount);
+            Assert.That(1 == snapCount);
 
             // End of open
 
-            Assert.AreEqual(AutoBackupStatus.Disabled, watcherManager.AutoBackupStatus);
+            Assert.That(AutoBackupStatus.Disabled == watcherManager.AutoBackupStatus);
 
             watcherManager.SetAutoBackup(true);
-            Assert.AreEqual(AutoBackupStatus.Waiting, watcherManager.AutoBackupStatus);
+            Assert.That(AutoBackupStatus.Waiting == watcherManager.AutoBackupStatus);
 
             Directory.CreateDirectory(Path.Combine(dataSetDoom.SourceFolder, @"GAME-AUTOSAVE0"));
             Thread.Sleep(100);
-            Assert.AreEqual(AutoBackupStatus.Enabled, watcherManager.AutoBackupStatus);
+            Assert.That(AutoBackupStatus.Enabled == watcherManager.AutoBackupStatus);
 
             string fileSource = Path.Combine(dataSetDoom.DataRoot, @"Original", @"GAME-AUTOSAVE0");
             string fileDest = Path.Combine(dataSetDoom.SourceFolder, @"GAME-AUTOSAVE0");
@@ -183,18 +181,18 @@ namespace Tests.Scripts
 
                 Thread.Sleep(500);
 
-                Assert.AreEqual(1, backupCount);
-                Assert.AreEqual(1, luaManager.ActiveEngine.Snapshots.Count);
+                Assert.That(1 == backupCount);
+                Assert.That(1 == luaManager.ActiveEngine.Snapshots.Count);
 
                 EngineSnapshot snapshot = luaManager.ActiveEngine.Snapshots.First();
-                Assert.AreSame(snapshot, luaManager.ActiveEngine.LastSnapshot);
+                Assert.That(snapshot == luaManager.ActiveEngine.LastSnapshot);
 
-                Assert.AreEqual(files.Value.SnapshotSaveAt, RoundSavedAt(snapshot.SavedAt));
-                Assert.AreEqual(files.Value.SnapshotDifficulty, snapshot.CustomValueByKey("Difficulty").ToString());
-                Assert.AreEqual(files.Value.SnapshotMapDesc, snapshot.CustomValueByKey("MapDesc").ToString());
-                Assert.AreEqual(files.Value.SnapshotMapName, snapshot.CustomValueByKey("MapName").ToString());
-                Assert.AreEqual(files.Value.SnapshotPlayedTime, snapshot.CustomValueByKey("PlayedTime").ToString());
-                Assert.AreEqual(files.Value.SnapshotDeath, snapshot.CustomValueByKey("Death").ToString());
+                Assert.That(files.Value.SnapshotSaveAt == RoundSavedAt(snapshot.SavedAt));
+                Assert.That(files.Value.SnapshotDifficulty == snapshot.CustomValueByKey("Difficulty").ToString());
+                Assert.That(files.Value.SnapshotMapDesc == snapshot.CustomValueByKey("MapDesc").ToString());
+                Assert.That(files.Value.SnapshotMapName == snapshot.CustomValueByKey("MapName").ToString());
+                Assert.That(files.Value.SnapshotPlayedTime == snapshot.CustomValueByKey("PlayedTime").ToString());
+                Assert.That(files.Value.SnapshotDeath == snapshot.CustomValueByKey("Death").ToString());
 
                 luaManager.ActiveEngine.Snapshots.Clear();
 
@@ -218,11 +216,10 @@ namespace Tests.Scripts
         {
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Scripts", dataSetDoom.Name);
             DirectoryInfo directoryInfo = new DirectoryInfo(path);
-            Assert.IsNotNull(directoryInfo, "Scripts directory is null");
-            Assert.IsTrue(directoryInfo.Exists, "Scripts directory does not exist");
+            Assert.That(directoryInfo.Exists, "Scripts directory does not exist");
 
             EngineScript engineScript = EngineScriptManager.LoadEngineScript(directoryInfo);
-            Assert.IsNotNull(engineScript, "EngineScript not loaded properly");
+            Assert.That(engineScript != null, "EngineScript not loaded properly");
 
             if (!Directory.Exists(dataSetDoom.SourceFolder))
             {
@@ -239,13 +236,12 @@ namespace Tests.Scripts
             File.WriteAllText(profilePathSimulation, content);
 
             ProfileFile profileFile = ProfileFile.Load(profilePathSimulation);
-            Assert.IsNotNull(profileFile);
+            Assert.That(profileFile != null);
 
             LuaManager luaManager = new LuaManager();
-            Assert.IsNotNull(luaManager);
 
             bool loadEngine = luaManager.LoadEngineAndProfile(engineScript, profileFile);
-            Assert.IsTrue(loadEngine);
+            Assert.That(loadEngine);
 
             if (luaManager.ActiveEngine.OnOpened != null)
             {
@@ -294,17 +290,17 @@ namespace Tests.Scripts
                     luaManager.ActiveEngine.ActionSnapshotBackup(ActionSource.HotKey, files.Value.SnapshotDeath != "");
                 });
 
-                Assert.AreEqual(1, luaManager.ActiveEngine.Snapshots.Count);
+                Assert.That(1 == luaManager.ActiveEngine.Snapshots.Count);
 
                 EngineSnapshot snapshot = luaManager.ActiveEngine.Snapshots.First();
-                Assert.AreSame(snapshot, luaManager.ActiveEngine.LastSnapshot);
+                Assert.That(snapshot == luaManager.ActiveEngine.LastSnapshot);
 
-                Assert.AreEqual(files.Value.SnapshotSaveAt, RoundSavedAt(snapshot.SavedAt));
-                Assert.AreEqual(files.Value.SnapshotDifficulty, snapshot.CustomValueByKey("Difficulty").ToString());
-                Assert.AreEqual(files.Value.SnapshotMapDesc, snapshot.CustomValueByKey("MapDesc").ToString());
-                Assert.AreEqual(files.Value.SnapshotMapName, snapshot.CustomValueByKey("MapName").ToString());
-                Assert.AreEqual(files.Value.SnapshotPlayedTime, snapshot.CustomValueByKey("PlayedTime").ToString());
-                Assert.AreEqual(files.Value.SnapshotDeath, snapshot.CustomValueByKey("Death").ToString());
+                Assert.That(files.Value.SnapshotSaveAt == RoundSavedAt(snapshot.SavedAt));
+                Assert.That(files.Value.SnapshotDifficulty == snapshot.CustomValueByKey("Difficulty").ToString());
+                Assert.That(files.Value.SnapshotMapDesc == snapshot.CustomValueByKey("MapDesc").ToString());
+                Assert.That(files.Value.SnapshotMapName == snapshot.CustomValueByKey("MapName").ToString());
+                Assert.That(files.Value.SnapshotPlayedTime == snapshot.CustomValueByKey("PlayedTime").ToString());
+                Assert.That(files.Value.SnapshotDeath == snapshot.CustomValueByKey("Death").ToString());
 
                 Assert.DoesNotThrow(() =>
                 {

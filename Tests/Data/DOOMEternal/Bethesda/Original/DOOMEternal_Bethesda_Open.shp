@@ -79,5 +79,6 @@
   ],
   "Snapshots": [],
   "SortKey": "SavedAt",
-  "SortOrder": 0
+  "SortOrder": 0,
+  "StartAutoBackupAfterOpening": false
 }

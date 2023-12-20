@@ -45,11 +45,8 @@ namespace Hg.SaveHistory.API
 
                 snapshot.HasScreenshot = false;
 
-                Bitmap bitmap = new Bitmap(captureBounds.Width, captureBounds.Height);
-                using (Graphics graphics = Graphics.FromImage(bitmap))
-                {
-                    graphics.CopyFromScreen(captureBounds.Location, Point.Empty, captureBounds.Size, CopyPixelOperation.SourceCopy);
-                }
+                //Bitmap bitmap = CaptureGraphic(captureBounds);
+                Bitmap bitmap = CaptureBitBlt(captureBounds);
 
                 string screenShotExtension;
                 ImageFormat screenShotFormat;
@@ -138,6 +135,50 @@ namespace Hg.SaveHistory.API
         public int TitleBarHeight()
         {
             return ScreenShots.GetTitleBarHeight();
+        }
+
+        private Bitmap CaptureBitBlt(Rectangle captureBounds)
+        {
+            if (captureBounds.Width == 0 || captureBounds.Height == 0)
+            {
+                return null;
+            }
+
+            IntPtr handle = GetProcessPtr();
+            // IntPtr handle = ScreenShots.GetDesktopWindow();
+            if (handle == IntPtr.Zero)
+            {
+                return null;
+            }
+
+            IntPtr hdcSrc = ScreenShots.GetWindowDC(handle);
+            IntPtr hdcDest = ScreenShots.CreateCompatibleDC(hdcSrc);
+            IntPtr hBitmap = ScreenShots.CreateCompatibleBitmap(hdcSrc, captureBounds.Width, captureBounds.Height);
+            IntPtr hOld = ScreenShots.SelectObject(hdcDest, hBitmap);
+
+            ScreenShots.BitBlt(hdcDest, 0, 0, captureBounds.Width, captureBounds.Height, hdcSrc, captureBounds.X, captureBounds.Y,
+                CopyPixelOperation.SourceCopy | CopyPixelOperation.CaptureBlt);
+
+            ScreenShots.SelectObject(hdcDest, hOld);
+            ScreenShots.DeleteDC(hdcDest);
+            ScreenShots.ReleaseDC(handle, hdcSrc);
+
+            Bitmap bmp = Image.FromHbitmap(hBitmap);
+
+            ScreenShots.DeleteObject(hBitmap);
+
+            return bmp;
+        }
+
+        private static Bitmap CaptureGraphic(Rectangle captureBounds)
+        {
+            Bitmap bitmap = new Bitmap(captureBounds.Width, captureBounds.Height);
+            using (Graphics graphics = Graphics.FromImage(bitmap))
+            {
+                graphics.CopyFromScreen(captureBounds.Location, Point.Empty, captureBounds.Size, CopyPixelOperation.SourceCopy);
+            }
+
+            return bitmap;
         }
 
         private IntPtr GetProcessPtr()

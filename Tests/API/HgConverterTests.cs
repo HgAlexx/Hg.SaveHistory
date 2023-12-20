@@ -10,10 +10,10 @@ namespace Tests.API
         [Test]
         public void DateTimeToUnixTest()
         {
-            ulong value = 1578960000;
+            long value = 1578960000;
             DateTime input = new DateTime(2020, 1, 14, 0, 0, 0, DateTimeKind.Utc);
             long output = HgConverter.DateTimeToUnix(input);
-            Assert.AreEqual(output, value);
+            Assert.That(output == value);
         }
 
         [Test]
@@ -21,7 +21,7 @@ namespace Tests.API
         {
             string input = Guid.NewGuid().ToString();
             Guid? output = HgConverter.StringToGuid(input);
-            Assert.AreEqual(input, output.ToString());
+            Assert.That(input == output.ToString());
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace Tests.API
             DateTime value = new DateTime(2020, 1, 14, 0, 0, 0, DateTimeKind.Utc);
             long input = 1578960000;
             DateTime output = HgConverter.UnixToDateTime(input);
-            Assert.AreEqual(value, output.ToUniversalTime());
+            Assert.That(value == output.ToUniversalTime());
         }
     }
 }

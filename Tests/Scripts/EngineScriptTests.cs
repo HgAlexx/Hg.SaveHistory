@@ -15,26 +15,25 @@ namespace Tests.Scripts
         {
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Scripts", dataSet.Name);
             DirectoryInfo directoryInfo = new DirectoryInfo(path);
-            Assert.IsNotNull(directoryInfo, "Scripts directory is null");
-            Assert.IsTrue(directoryInfo.Exists, "Scripts directory does not exist");
+            Assert.That(directoryInfo.Exists, "Scripts directory does not exist");
 
             EngineScript engineScript = EngineScriptManager.LoadEngineScript(directoryInfo);
-            Assert.IsNotNull(engineScript, "EngineScript not loaded properly");
+            Assert.That(engineScript != null, "EngineScript not loaded properly");
 
-            Assert.AreEqual(dataSet.Name, engineScript.Name);
-            Assert.AreEqual(dataSet.Title, engineScript.Title);
-            Assert.AreEqual(dataSet.Author, engineScript.Author);
+            Assert.That(dataSet.Name == engineScript.Name);
+            Assert.That(dataSet.Title == engineScript.Title);
+            Assert.That(dataSet.Author == engineScript.Author);
 
-            Assert.AreEqual(dataSet.FileCount, engineScript.Files.Count);
+            Assert.That(dataSet.FileCount == engineScript.Files.Count);
 
-            Assert.IsTrue(engineScript.IsValid());
-            Assert.IsFalse(engineScript.IsAltered(true));
-            Assert.IsTrue(engineScript.Official);
+            Assert.That(engineScript.IsValid());
+            Assert.That(!engineScript.IsAltered(true));
+            Assert.That(engineScript.Official);
 
             LuaManager luaManager = new LuaManager();
 
             bool loadEngine = luaManager.LoadEngine(engineScript);
-            Assert.IsTrue(loadEngine);
+            Assert.That(loadEngine);
 
             if (!Directory.Exists(dataSet.SourceFolder))
             {
@@ -43,7 +42,7 @@ namespace Tests.Scripts
 
             foreach (var setting in luaManager.ActiveEngine.Settings.Where(s => s.Kind == EngineSettingKind.Setup).OrderBy(s => -s.Index))
             {
-                Assert.IsTrue(dataSet.Settings.ContainsKey(setting.Name));
+                Assert.That(dataSet.Settings.ContainsKey(setting.Name));
                 if (setting is EngineSettingCombobox settingCombobox)
                 {
                     settingCombobox.Value = (int) dataSet.Settings[setting.Name];
@@ -51,15 +50,15 @@ namespace Tests.Scripts
 
                 if (setting is EngineSettingFolderBrowser settingFolder)
                 {
-                    Assert.IsTrue(settingFolder.CanAutoDetect == dataSet.CanAutoDetect);
+                    Assert.That(settingFolder.CanAutoDetect == dataSet.CanAutoDetect);
                     if (dataSet.CanAutoDetect)
                     {
-                        Assert.IsNotNull(settingFolder.OnAutoDetect);
+                        Assert.That(settingFolder.OnAutoDetect != null);
 
                         Assert.DoesNotThrow(() =>
                         {
                             string s = settingFolder.OnAutoDetect?.Call().FirstOrDefault() as string;
-                            Assert.IsNotNull(s);
+                            Assert.That(s != null);
                         });
                     }
 
@@ -67,12 +66,12 @@ namespace Tests.Scripts
                 }
             }
 
-            Assert.IsNotNull(luaManager.ActiveEngine.OnSetupValidate);
+            Assert.That(luaManager.ActiveEngine.OnSetupValidate != null);
             Assert.DoesNotThrow(() =>
             {
                 bool? b = luaManager.ActiveEngine.OnSetupValidate.Call().First() as bool?;
-                Assert.IsNotNull(b);
-                Assert.IsTrue(b.Value);
+                Assert.That(b != null);
+                Assert.That(b != null && b.Value);
             });
 
             if (luaManager.ActiveEngine.OnSetupSuggestProfileName != null)
@@ -80,9 +79,9 @@ namespace Tests.Scripts
                 Assert.DoesNotThrow(() =>
                 {
                     string s = luaManager.ActiveEngine.OnSetupSuggestProfileName.Call().First() as string;
-                    Assert.IsFalse(string.IsNullOrEmpty(s));
-                    Assert.IsTrue(HgUtility.IsValidFileName(s));
-                    Assert.AreEqual(dataSet.SuggestProfileName, s);
+                    Assert.That(!string.IsNullOrEmpty(s));
+                    Assert.That(HgUtility.IsValidFileName(s));
+                    Assert.That(dataSet.SuggestProfileName == s);
                 });
             }
 
@@ -91,7 +90,7 @@ namespace Tests.Scripts
                 Assert.DoesNotThrow(() =>
                 {
                     string s = luaManager.ActiveEngine.ReadMe.Call().First() as string;
-                    Assert.IsFalse(string.IsNullOrEmpty(s));
+                    Assert.That(!string.IsNullOrEmpty(s));
                 });
             }
 
@@ -112,7 +111,7 @@ namespace Tests.Scripts
 
             string produced = File.ReadAllText(filePath);
 
-            Assert.AreEqual(expected, produced);
+            Assert.That(expected == produced);
 
             luaManager.Release();
 
@@ -123,21 +122,21 @@ namespace Tests.Scripts
         {
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Scripts", dataSet.Name);
             DirectoryInfo directoryInfo = new DirectoryInfo(path);
-            Assert.IsNotNull(directoryInfo, "Scripts directory is null");
-            Assert.IsTrue(directoryInfo.Exists, "Scripts directory does not exist");
+            Assert.That(directoryInfo != null, "Scripts directory is null");
+            Assert.That(directoryInfo.Exists, "Scripts directory does not exist");
 
             EngineScript engineScript = EngineScriptManager.LoadEngineScript(directoryInfo);
-            Assert.IsNotNull(engineScript, "EngineScript not loaded properly");
+            Assert.That(engineScript != null, "EngineScript not loaded properly");
 
-            Assert.AreEqual(dataSet.Name, engineScript.Name);
-            Assert.AreEqual(dataSet.Title, engineScript.Title);
-            Assert.AreEqual(dataSet.Author, engineScript.Author);
+            Assert.That(dataSet.Name == engineScript.Name);
+            Assert.That(dataSet.Title == engineScript.Title);
+            Assert.That(dataSet.Author == engineScript.Author);
 
-            Assert.AreEqual(dataSet.FileCount, engineScript.Files.Count);
+            Assert.That(dataSet.FileCount == engineScript.Files.Count);
 
-            Assert.IsTrue(engineScript.IsValid());
-            Assert.IsFalse(engineScript.IsAltered(true));
-            Assert.IsTrue(engineScript.Official);
+            Assert.That(engineScript.IsValid());
+            Assert.That(!engineScript.IsAltered(true));
+            Assert.That(engineScript.Official);
 
             if (!Directory.Exists(dataSet.SourceFolder))
             {
@@ -154,13 +153,12 @@ namespace Tests.Scripts
             File.WriteAllText(profilePathSimulation, content);
 
             ProfileFile profileFile = ProfileFile.Load(profilePathSimulation);
-            Assert.IsNotNull(profileFile);
+            Assert.That(profileFile != null);
 
             LuaManager luaManager = new LuaManager();
-            Assert.IsNotNull(luaManager);
 
             bool loadEngine = luaManager.LoadEngineAndProfile(engineScript, profileFile);
-            Assert.IsTrue(loadEngine);
+            Assert.That(loadEngine);
 
             if (luaManager.ActiveEngine.OnOpened != null)
             {
@@ -185,8 +183,8 @@ namespace Tests.Scripts
                 Assert.DoesNotThrow(() => { luaManager.ActiveEngine.OnLoaded.Call(); });
             }
 
-            Assert.AreEqual(1, catCount);
-            Assert.AreEqual(1, snapCount);
+            Assert.That(1 == catCount);
+            Assert.That(1 == snapCount);
 
             // End of open
 
@@ -201,7 +199,7 @@ namespace Tests.Scripts
 
             string produced = File.ReadAllText(profilePathSimulation);
 
-            Assert.AreEqual(expected, produced);
+            Assert.That(expected == produced);
 
             luaManager.Release();
 

@@ -66,11 +66,10 @@ namespace Tests.Scripts
         {
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Scripts", dataSetSatisfactory.Name);
             DirectoryInfo directoryInfo = new DirectoryInfo(path);
-            Assert.IsNotNull(directoryInfo, "Scripts directory is null");
-            Assert.IsTrue(directoryInfo.Exists, "Scripts directory does not exist");
+            Assert.That(directoryInfo.Exists, "Scripts directory does not exist");
 
             EngineScript engineScript = EngineScriptManager.LoadEngineScript(directoryInfo);
-            Assert.IsNotNull(engineScript, "EngineScript not loaded properly");
+            Assert.That(engineScript != null, "EngineScript not loaded properly");
 
             if (!Directory.Exists(dataSetSatisfactory.SourceFolder))
             {
@@ -88,13 +87,12 @@ namespace Tests.Scripts
             File.WriteAllText(profilePathSimulation, content);
 
             ProfileFile profileFile = ProfileFile.Load(profilePathSimulation);
-            Assert.IsNotNull(profileFile);
+            Assert.That(profileFile != null);
 
             LuaManager luaManager = new LuaManager();
-            Assert.IsNotNull(luaManager);
 
             bool loadEngine = luaManager.LoadEngineAndProfile(engineScript, profileFile);
-            Assert.IsTrue(loadEngine);
+            Assert.That(loadEngine);
 
             if (luaManager.ActiveEngine.OnOpened != null)
             {
@@ -136,17 +134,17 @@ namespace Tests.Scripts
                     luaManager.ActiveEngine.ActionSnapshotBackup(ActionSource.HotKey, files.Value.SnapshotAutosave != "");
                 });
 
-                Assert.AreEqual(1, luaManager.ActiveEngine.Snapshots.Count);
+                Assert.That(1 == luaManager.ActiveEngine.Snapshots.Count);
 
                 EngineSnapshot snapshot = luaManager.ActiveEngine.Snapshots.First();
-                Assert.AreSame(snapshot, luaManager.ActiveEngine.LastSnapshot);
+                Assert.That(snapshot == luaManager.ActiveEngine.LastSnapshot);
 
-                Assert.AreEqual(files.Value.SnapshotSaveAt, RoundSavedAt(snapshot.SavedAt));
-                Assert.AreEqual(files.Value.SnapshotBuildVersion, snapshot.CustomValueByKey("BuildVersion").ToString());
-                Assert.AreEqual(files.Value.SnapshotSaveVersion, snapshot.CustomValueByKey("SaveVersion").ToString());
-                Assert.AreEqual(files.Value.SnapshotSessionName, snapshot.CustomValueByKey("SessionName").ToString());
-                Assert.AreEqual(files.Value.SnapshotPlayedTime, snapshot.CustomValueByKey("PlayedTime").ToString());
-                Assert.AreEqual(files.Value.SnapshotAutosave, snapshot.CustomValueByKey("Autosave").ToString());
+                Assert.That(files.Value.SnapshotSaveAt == RoundSavedAt(snapshot.SavedAt));
+                Assert.That(files.Value.SnapshotBuildVersion == snapshot.CustomValueByKey("BuildVersion").ToString());
+                Assert.That(files.Value.SnapshotSaveVersion == snapshot.CustomValueByKey("SaveVersion").ToString());
+                Assert.That(files.Value.SnapshotSessionName == snapshot.CustomValueByKey("SessionName").ToString());
+                Assert.That(files.Value.SnapshotPlayedTime == snapshot.CustomValueByKey("PlayedTime").ToString());
+                Assert.That(files.Value.SnapshotAutosave == snapshot.CustomValueByKey("Autosave").ToString());
 
                 Assert.DoesNotThrow(() =>
                 {
@@ -173,11 +171,10 @@ namespace Tests.Scripts
         {
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Scripts", dataSetSatisfactory.Name);
             DirectoryInfo directoryInfo = new DirectoryInfo(path);
-            Assert.IsNotNull(directoryInfo, "Scripts directory is null");
-            Assert.IsTrue(directoryInfo.Exists, "Scripts directory does not exist");
+            Assert.That(directoryInfo.Exists, "Scripts directory does not exist");
 
             EngineScript engineScript = EngineScriptManager.LoadEngineScript(directoryInfo);
-            Assert.IsNotNull(engineScript, "EngineScript not loaded properly");
+            Assert.That(engineScript != null, "EngineScript not loaded properly");
 
             if (!Directory.Exists(dataSetSatisfactory.SourceFolder))
             {
@@ -195,13 +192,12 @@ namespace Tests.Scripts
             File.WriteAllText(profilePathSimulation, content);
 
             ProfileFile profileFile = ProfileFile.Load(profilePathSimulation);
-            Assert.IsNotNull(profileFile);
+            Assert.That(profileFile != null);
 
             LuaManager luaManager = new LuaManager();
-            Assert.IsNotNull(luaManager);
 
             bool loadEngine = luaManager.LoadEngineAndProfile(engineScript, profileFile);
-            Assert.IsTrue(loadEngine);
+            Assert.That(loadEngine);
 
             if (luaManager.ActiveEngine.OnOpened != null)
             {
@@ -228,7 +224,7 @@ namespace Tests.Scripts
                 Assert.DoesNotThrow(() => { luaManager.ActiveEngine.OnInitialized.Call(); });
             }
 
-            Assert.IsNotNull(luaManager.ActiveEngine.Watcher);
+            Assert.That(luaManager.ActiveEngine.Watcher != null);
 
             var setting = luaManager.ActiveEngine.SettingByName("IncludeAutosave");
             if (setting is EngineSettingCheckbox s)
@@ -252,18 +248,18 @@ namespace Tests.Scripts
                 Assert.DoesNotThrow(() => { luaManager.ActiveEngine.OnLoaded.Call(); });
             }
 
-            Assert.AreEqual(1, catCount);
-            Assert.AreEqual(1, snapCount);
+            Assert.That(1 == catCount);
+            Assert.That(1 == snapCount);
 
             // End of open
 
-            Assert.AreEqual(AutoBackupStatus.Disabled, watcherManager.AutoBackupStatus);
+            Assert.That(AutoBackupStatus.Disabled == watcherManager.AutoBackupStatus);
 
             Thread.Sleep(100);
 
             watcherManager.SetAutoBackup(true);
 
-            Assert.AreEqual(AutoBackupStatus.Enabled, watcherManager.AutoBackupStatus);
+            Assert.That(AutoBackupStatus.Enabled == watcherManager.AutoBackupStatus);
 
             string fileSource = Path.Combine(dataSetSatisfactory.DataRoot, @"Original");
             string fileDest = dataSetSatisfactory.SourceFolder;
@@ -291,18 +287,18 @@ namespace Tests.Scripts
 
                 Thread.Sleep(500);
 
-                Assert.GreaterOrEqual(backupCount, 1);
-                Assert.AreEqual(1, luaManager.ActiveEngine.Snapshots.Count);
+                Assert.That(backupCount >= 1);
+                Assert.That(1 == luaManager.ActiveEngine.Snapshots.Count);
 
                 EngineSnapshot snapshot = luaManager.ActiveEngine.Snapshots.First();
-                Assert.AreSame(snapshot, luaManager.ActiveEngine.LastSnapshot);
+                Assert.That(snapshot == luaManager.ActiveEngine.LastSnapshot);
 
-                Assert.AreEqual(files.Value.SnapshotSaveAt, RoundSavedAt(snapshot.SavedAt));
-                Assert.AreEqual(files.Value.SnapshotBuildVersion, snapshot.CustomValueByKey("BuildVersion").ToString());
-                Assert.AreEqual(files.Value.SnapshotSaveVersion, snapshot.CustomValueByKey("SaveVersion").ToString());
-                Assert.AreEqual(files.Value.SnapshotSessionName, snapshot.CustomValueByKey("SessionName").ToString());
-                Assert.AreEqual(files.Value.SnapshotPlayedTime, snapshot.CustomValueByKey("PlayedTime").ToString());
-                Assert.AreEqual(files.Value.SnapshotAutosave, snapshot.CustomValueByKey("Autosave").ToString());
+                Assert.That(files.Value.SnapshotSaveAt == RoundSavedAt(snapshot.SavedAt));
+                Assert.That(files.Value.SnapshotBuildVersion == snapshot.CustomValueByKey("BuildVersion").ToString());
+                Assert.That(files.Value.SnapshotSaveVersion == snapshot.CustomValueByKey("SaveVersion").ToString());
+                Assert.That(files.Value.SnapshotSessionName == snapshot.CustomValueByKey("SessionName").ToString());
+                Assert.That(files.Value.SnapshotPlayedTime == snapshot.CustomValueByKey("PlayedTime").ToString());
+                Assert.That(files.Value.SnapshotAutosave == snapshot.CustomValueByKey("Autosave").ToString());
 
                 luaManager.ActiveEngine.Snapshots.Clear();
 

@@ -7,6 +7,7 @@ using System.IO.Compression;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Security.AccessControl;
 using System.Threading;
 using System.Windows.Forms;
 using FontAwesome.Sharp;
@@ -16,6 +17,7 @@ using Hg.SaveHistory.Managers;
 using Hg.SaveHistory.Types;
 using Hg.SaveHistory.Utilities;
 using Hg.SaveHistory.Wizards;
+using Microsoft.Win32;
 using Newtonsoft.Json.Linq;
 using Logger = Hg.SaveHistory.Utilities.Logger;
 
@@ -24,6 +26,8 @@ namespace Hg.SaveHistory.Forms
     public partial class FormMain : Form
     {
         #region Fields & Properties
+
+        private const int NotifyIconBalloonTimeout = 1500;
 
         private readonly EngineScriptManager _engineScriptManager;
 
@@ -134,6 +138,29 @@ namespace Hg.SaveHistory.Forms
                 snapToScreenEdgesToolStripMenuItem.Checked = _settingsManager.SnapToScreenEdges;
             };
 
+            _settingsManager.StartWithWindowsChanged += () =>
+            {
+                startWithWindowsToolStripMenuItem.Checked = _settingsManager.StartWithWindows;
+                CheckStartWithWindowsStatus();
+            };
+
+            _settingsManager.StartMinimizedChanged += () => { startMinimizedToolStripMenuItem.Checked = _settingsManager.StartMinimized; };
+
+            _settingsManager.MinimizedToTrayChanged += () =>
+            {
+                minimizedToTrayToolStripMenuItem.Checked = _settingsManager.MinimizedToTray;
+            };
+
+            _settingsManager.ShowTrayNotificationChanged += () =>
+            {
+                showTrayNotificationToolStripMenuItem.Checked = _settingsManager.ShowTrayNotification;
+            };
+
+            _settingsManager.OpenLastUsedProfileOnStartupChanged += () =>
+            {
+                openLastUsedProfileOnStartupToolStripMenuItem.Checked = _settingsManager.OpenLastUsedProfileOnStartup;
+            };
+
             _settingsManager.ScreenshotQualityChanged += () =>
             {
                 giflowSizeToolStripMenuItem.Checked = _settingsManager.ScreenshotQuality == ScreenshotQuality.Gif;
@@ -185,6 +212,58 @@ namespace Hg.SaveHistory.Forms
             HideReadMePage();
 
             profileToolStripMenuItem.Enabled = false;
+        }
+
+        private void CheckStartWithWindowsStatus()
+        {
+            if (_settingsManager == null)
+            {
+                return;
+            }
+
+            const string appName = @"Hg.SaveHistory";
+            const string registryKeyPath = @"SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run";
+
+            string appPath = Application.ExecutablePath;
+            try
+            {
+                var myKey = RegistryKey.OpenBaseKey(RegistryHive.CurrentUser, RegistryView.Default);
+                {
+                    using (var subKey = myKey.OpenSubKey(
+                               registryKeyPath,
+                               RegistryKeyPermissionCheck.ReadWriteSubTree, 
+                               RegistryRights.QueryValues | RegistryRights.SetValue))
+                    {
+                        if (subKey == null)
+                        {
+                            return;
+                        }
+
+                        if (!_settingsManager.StartWithWindows)
+                        {
+                            if (subKey.GetValueNames().Contains(appName))
+                            {
+                                subKey.DeleteValue(appName, false);
+                            }
+                        }
+
+                        if (_settingsManager.StartWithWindows)
+                        {
+                            if (!subKey.GetValueNames().Contains(appName))
+                            {
+                                subKey.SetValue(appName, "\"" + appPath + "\"", RegistryValueKind.String);
+                            }
+                        }
+
+                        subKey.Close();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Logger.Error("StartWithWindows: unable to register or unregister the application into the Windows registry.");
+                Logger.Error(ex.Message);
+            }
         }
 
         public void CategorySelectNext()
@@ -371,7 +450,7 @@ namespace Hg.SaveHistory.Forms
 
         internal DialogResult Message(string text, string caption, MessageType type, MessageMode mode)
         {
-            DialogResult dialogResult = DialogResult.None;
+            var dialogResult = DialogResult.None;
 
             if (InvokeRequired)
             {
@@ -379,6 +458,24 @@ namespace Hg.SaveHistory.Forms
             }
             else
             {
+                if (notifyIcon.Visible && !string.IsNullOrEmpty(text))
+                {
+                    switch (type)
+                    {
+                        case MessageType.Information:
+                            ShowNotificationBalloon(@"Information", text, ToolTipIcon.Info);
+                            break;
+                        case MessageType.Warning:
+                            ShowNotificationBalloon(@"Warning", text, ToolTipIcon.Warning);
+                            break;
+                        case MessageType.Error:
+                            ShowNotificationBalloon(@"Error", text, ToolTipIcon.Error);
+                            break;
+                    }
+
+                    return dialogResult;
+                }
+
                 if ((mode == MessageMode.User && _settingsManager.NotificationMode == MessageMode.MessageBox) ||
                     mode == MessageMode.MessageBox)
                 {
@@ -410,8 +507,7 @@ namespace Hg.SaveHistory.Forms
                     }
                 }
 
-                if ((mode == MessageMode.User && _settingsManager.NotificationMode == MessageMode.Status) ||
-                    mode == MessageMode.Status)
+                if ((mode == MessageMode.User && _settingsManager.NotificationMode == MessageMode.Status) || mode == MessageMode.Status)
                 {
                     toolStripStatus.Image = null;
 
@@ -458,7 +554,7 @@ namespace Hg.SaveHistory.Forms
 
                 listView.Items.Clear();
 
-                foreach (var snapshot in _luaManager.ActiveEngine.Snapshots.Where(snapshot => 
+                foreach (var snapshot in _luaManager.ActiveEngine.Snapshots.Where(snapshot =>
                              category == null || category.Id == 0 || snapshot.CategoryId == category.Id))
                 {
                     var listViewItem = new ListViewItem();
@@ -1129,14 +1225,9 @@ namespace Hg.SaveHistory.Forms
             try
             {
                 string url = "https://api.github.com/repos/HgAlexx/Hg.SaveHistory/releases/latest";
-                if (_version.Major < 1)
-                {
-                    // url = "https://api.github.com/repos/HgAlexx/Hg.SaveHistory/releases";
-                }
 
                 HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
                 request.UserAgent = $"Hg.SaveHistory/{versionFormatted} ({Environment.OSVersion}) By: HgAlexx";
-
 
                 HttpWebResponse response = (HttpWebResponse)request.GetResponse();
                 if (response.StatusCode == HttpStatusCode.OK)
@@ -1504,7 +1595,7 @@ namespace Hg.SaveHistory.Forms
             {
                 _activeProfileFile.LastSelectedCategory = selection.Id;
             }
-            
+
             RefreshSnapshotLists();
         }
 
@@ -1647,6 +1738,8 @@ namespace Hg.SaveHistory.Forms
             Text += @" - Development";
 #endif
 
+            notifyIcon.Text = Text;
+
             _settingsManager.DetectAndLoadFile();
 
             // Get default size and location
@@ -1687,18 +1780,45 @@ namespace Hg.SaveHistory.Forms
 #if DEBUG
             if (Debugger.IsAttached)
             {
-                debugConsoleToolStripMenuItem_Click(null, null);
+                // debugConsoleToolStripMenuItem_Click(null, null);
             }
 #endif
 
+            if (_settingsManager.OpenLastUsedProfileOnStartup && !string.IsNullOrEmpty(_settingsManager.LastUsedProfilePath))
+            {
+                OpenProfile(_settingsManager.LastUsedProfilePath, true);
+            }
+
             _loading = false;
+
+            if (_settingsManager.StartMinimized)
+            {
+                WindowState = FormWindowState.Minimized;
+            }
+        }
+
+        private void FormMain_Resize(object sender, EventArgs e)
+        {
+            if (WindowState != FormWindowState.Minimized)
+            {
+                return;
+            }
+
+            if (_settingsManager == null || !_settingsManager.MinimizedToTray)
+            {
+                return;
+            }
+
+            notifyIcon.Visible = true;
+            BeginInvoke(new MethodInvoker(Hide));
+
+            ShowNotificationBalloon(@"Information", @"Hg.SaveHistory has been minimized to tray.", ToolTipIcon.Info);
         }
 
         private void FormMain_ResizeBegin(object sender, EventArgs e)
         {
             tabControlMain?.SelectedTab?.SuspendLayout();
         }
-
 
         private void FormMain_ResizeEnd(object sender, EventArgs e)
         {
@@ -1758,6 +1878,7 @@ namespace Hg.SaveHistory.Forms
                 tabControlMain?.SelectedTab?.ResumeLayout();
             }
         }
+
 
         private EngineSnapshot GetSelectedActiveSnapshot()
         {
@@ -2354,6 +2475,11 @@ namespace Hg.SaveHistory.Forms
             statusBarToolStripMenuItem.Checked = _settingsManager.NotificationMode == MessageMode.Status;
         }
 
+        private void minimizedToTrayToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.MinimizedToTray = !_settingsManager.MinimizedToTray;
+        }
+
         private void NewProfileDialog()
         {
             Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
@@ -2375,6 +2501,13 @@ namespace Hg.SaveHistory.Forms
         private void newProfileToolStripMenuItem_Click(object sender, EventArgs e)
         {
             NewProfileDialog();
+        }
+
+        private void notifyIcon_MouseDoubleClick(object sender, MouseEventArgs e)
+        {
+            notifyIcon.Visible = false;
+            Show();
+            WindowState = FormWindowState.Normal;
         }
 
         private void OnKeyDown(object sender, KeyEventArgs e, HotKeyToAction hotKeyToAction)
@@ -2534,7 +2667,12 @@ namespace Hg.SaveHistory.Forms
             }
         }
 
-        private void OpenProfile(string path)
+        private void openLastUsedProfileOnStartupToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.OpenLastUsedProfileOnStartup = !_settingsManager.OpenLastUsedProfileOnStartup;
+        }
+
+        private void OpenProfile(string path, bool autoOpen = false)
         {
             Logger.Information("---------------------------------Open---------------------------------");
             Logger.Information(MethodBase.GetCurrentMethod()?.DeclaringType?.Name, ".", MethodBase.GetCurrentMethod()?.Name);
@@ -2556,11 +2694,13 @@ namespace Hg.SaveHistory.Forms
 
                         if (LoadProfile(profileFile, engineScript))
                         {
+                            _settingsManager.LastUsedProfilePath = path;
                             _activeProfileFile = profileFile;
 
                             profileToolStripMenuItem.Enabled = true;
                             autoCleanupBackupToolStripMenuItem.Checked = _activeProfileFile.AutoCleanupBackup;
                             enabledCleanupToolStripMenuItem.Checked = _activeProfileFile.AutoCleanupBackup;
+                            startAutoBackupAfterOpeningToolStripMenuItem.Checked = _activeProfileFile.StartAutoBackupAfterOpening;
 
                             tabPageProfile.Text = @"Profile: " + profileFile.Name;
                             ShowProfilePage();
@@ -2588,20 +2728,28 @@ namespace Hg.SaveHistory.Forms
                             InitWatcher();
 
                             _luaManager.ActiveEngine.OnLoaded?.Call();
+
+                            if (_activeProfileFile.StartAutoBackupAfterOpening)
+                            {
+                                buttonActionAuto_Click(buttonActionAuto, null);
+                            }
                         }
                         else
                         {
-                            Message(@"Unable to load profile", "Error", MessageType.Error, MessageMode.User);
+                            Message(@"Unable to load profile", "Error", MessageType.Error,
+                                autoOpen ? MessageMode.Status : MessageMode.User);
                         }
                     }
                     else
                     {
-                        Message(@"Unable to open profile: Engine not found", "Error", MessageType.Error, MessageMode.User);
+                        Message(@"Unable to open profile: Engine not found", "Error", MessageType.Error,
+                            autoOpen ? MessageMode.Status : MessageMode.User);
                     }
                 }
                 else
                 {
-                    Message(@"Unable to open profile: File not found", "Error", MessageType.Error, MessageMode.User);
+                    Message(@"Unable to open profile: File not found", "Error", MessageType.Error,
+                        autoOpen ? MessageMode.Status : MessageMode.User);
                 }
             }
             finally
@@ -2995,7 +3143,9 @@ namespace Hg.SaveHistory.Forms
                 Invoke(new Action(() => { SetProgressBarVisibility(visible); }));
             }
             else
+            {
                 toolStripProgressBar.Visible = visible;
+            }
         }
 
         private void SetSnapshotInfo(EngineSnapshot snapshot)
@@ -3067,6 +3217,29 @@ namespace Hg.SaveHistory.Forms
             toolStripStatusLabel.TextImageRelation = TextImageRelation.ImageBeforeText;
         }
 
+        private void ShowNotificationBalloon(string title, string text, ToolTipIcon icon)
+        {
+            if (!notifyIcon.Visible)
+            {
+                return;
+            }
+
+            if (!_settingsManager.ShowTrayNotification)
+            {
+                return;
+            }
+
+            if (string.IsNullOrEmpty(text))
+            {
+                return;
+            }
+
+            notifyIcon.BalloonTipTitle = title;
+            notifyIcon.BalloonTipIcon = icon;
+            notifyIcon.BalloonTipText = text;
+            notifyIcon.ShowBalloonTip(NotifyIconBalloonTimeout);
+        }
+
         private void showNukedSnapshotsToolStripMenuItem_Click(object sender, EventArgs e)
         {
             FormNukedSnapshots formNukedSnapshots = new FormNukedSnapshots(this, _luaManager);
@@ -3094,6 +3267,11 @@ namespace Hg.SaveHistory.Forms
                 // plain text for now
                 richTextBoxUsage.Text = content;
             }
+        }
+
+        private void showTrayNotificationToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.ShowTrayNotification = !_settingsManager.ShowTrayNotification;
         }
 
         private bool SnapshotNuke(EngineSnapshot snapshot)
@@ -3144,7 +3322,6 @@ namespace Hg.SaveHistory.Forms
         private void snapToScreenEdgesToolStripMenuItem_Click(object sender, EventArgs e)
         {
             _settingsManager.SnapToScreenEdges = !_settingsManager.SnapToScreenEdges;
-            snapshotToolStripMenuItem.Checked = _settingsManager.SnapToScreenEdges;
         }
 
         private void SortSnapshots()
@@ -3165,6 +3342,22 @@ namespace Hg.SaveHistory.Forms
         {
             _settingsManager.HotKeysSound = !_settingsManager.HotKeysSound;
             soundToolStripMenuItem.Checked = _settingsManager.HotKeysSound;
+        }
+
+        private void startAutoBackupAfterOpeningToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _activeProfileFile.StartAutoBackupAfterOpening = !_activeProfileFile.StartAutoBackupAfterOpening;
+            startAutoBackupAfterOpeningToolStripMenuItem.Checked = _activeProfileFile.StartAutoBackupAfterOpening;
+        }
+
+        private void startMinimizedToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.StartMinimized = !_settingsManager.StartMinimized;
+        }
+
+        private void startWithWindowsToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            _settingsManager.StartWithWindows = !_settingsManager.StartWithWindows;
         }
 
         private void statusBarToolStripMenuItem_Click(object sender, EventArgs e)

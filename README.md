@@ -103,6 +103,7 @@ To unpin a profile, click the trash can icon.
   - "Sound": Play a sound on successful or failed action
   - "Assign hot keys": Open the hot keys settings window
 - "Notification mode": this allow you to choose between messagebox or statusbar notifications
+  - "Show tray notification": While minimized, show notifications using the Windows notifaction center
 - "Screenshot quality": choose between Png, Jpg and Gif
 - "Snapshots"
   - "Auto backup sound notification": play a sound on successful auto backup
@@ -110,10 +111,15 @@ To unpin a profile, click the trash can icon.
   - "Highlight selected": Highlight select snapshot when app is not focused
   - "Choose highlight color": open the color selection window
 - "Others"
+  - "Open last used profile on startup"
+  - "Start minimized"
+  - "Start with Windows"
+  - "Minimized to tray"
   - "Save window size and position"
   - "Snap to screen edges"
 - "Clear settings": this will reset all global settings
 #### Profile
+- "Start auto-backup after opening"
 - "Auto cleanup snapshots":
   - "Enabled": Active or deactive auto cleanup of snapshots
   - "Configure": Open the auto cleanup settings window
@@ -135,9 +141,12 @@ This may be the case if steam is installed inside "Program Files". You can eithe
 
 2. Screenshots are not working
 
-Sadly I didn't found a way to take screenshot of vulkan fullscreen games, so for these only windowed will work, or using opengl.
+Some games do not allow to take screenshots programmatically, often as an anti-cheat protection.
 
-This apply to Doom 2016 and Doom Eternal.
+This sadly apply to Doom 2016 and Doom Eternal when using the Vulkan graphic engine.
+
+Other games like Satisfactory have no issue taking screenshots when using Vulkan.
+
 
 
 ## TODO:
@@ -163,6 +172,14 @@ Alpha testers:
 
 # Version History
 
+## v0.9.0
+
+- \+ Added Start with Windows feature
+- \+ Added Start minimized feature
+- \+ Added Start auto-backup feature
+- \+ Added Minimize to tray feature
+- \* Updated NuGet packages
+- \* Other small improvements & fixes
 
 ## v0.8.0
 

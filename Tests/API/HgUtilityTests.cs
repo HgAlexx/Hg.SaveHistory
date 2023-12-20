@@ -29,7 +29,7 @@ namespace Hg.SaveHistory.API.Tests
             string path = Path.Combine(TestContext.CurrentContext.TestDirectory, @"Data", @"HgUtility", @"HashFile.txt");
             string hash = HgUtility.HashFile(path);
 
-            Assert.AreEqual(@"2e99758548972a8e8822ad47fa1017ff72f06f3ff6a016851f45c398732bc50c", hash);
+            Assert.That(@"2e99758548972a8e8822ad47fa1017ff72f06f3ff6a016851f45c398732bc50c" == hash);
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace Hg.SaveHistory.API.Tests
         {
             string hash = HgUtility.HashString(@"this is a test");
 
-            Assert.AreEqual(@"2e99758548972a8e8822ad47fa1017ff72f06f3ff6a016851f45c398732bc50c", hash);
+            Assert.That(@"2e99758548972a8e8822ad47fa1017ff72f06f3ff6a016851f45c398732bc50c" == hash);
         }
 
         [Test]
@@ -75,8 +75,8 @@ namespace Hg.SaveHistory.API.Tests
         {
             string input = @"this is a test";
 
-            Assert.IsTrue(HgUtility.StringEndsWith(input, @"test"));
-            Assert.IsFalse(HgUtility.StringEndsWith(input, @"plop"));
+            Assert.That(HgUtility.StringEndsWith(input, @"test"));
+            Assert.That(!HgUtility.StringEndsWith(input, @"plop"));
         }
 
         [Test]
@@ -85,23 +85,23 @@ namespace Hg.SaveHistory.API.Tests
             string input = @"this is a test";
 
             string[] values = HgUtility.StringSplit(input, " ", StringSplitOptions.None);
-            Assert.AreEqual(4, values.Length);
+            Assert.That(4 == values.Length);
 
             input = @"this,is,another,test";
             values = HgUtility.StringSplit(input, ",", StringSplitOptions.None);
-            Assert.AreEqual(4, values.Length);
+            Assert.That(4 == values.Length);
 
             input = @"this,is,,another,test";
             values = HgUtility.StringSplit(input, ",", StringSplitOptions.None);
-            Assert.AreEqual(5, values.Length);
+            Assert.That(5 == values.Length);
 
             input = @"this,is,,another,test";
             values = HgUtility.StringSplit(input, ",", StringSplitOptions.RemoveEmptyEntries);
-            Assert.AreEqual(4, values.Length);
+            Assert.That(4 == values.Length);
 
             input = @"this is again, a test";
             values = HgUtility.StringSplit(input, " ,", StringSplitOptions.RemoveEmptyEntries);
-            Assert.AreEqual(5, values.Length);
+            Assert.That(5 == values.Length);
         }
 
         [Test]
@@ -109,8 +109,8 @@ namespace Hg.SaveHistory.API.Tests
         {
             string input = @"this is a test";
 
-            Assert.IsTrue(HgUtility.StringStartsWith(input, @"this"));
-            Assert.IsFalse(HgUtility.StringStartsWith(input, @"plop"));
+            Assert.That(HgUtility.StringStartsWith(input, @"this"));
+            Assert.That(!HgUtility.StringStartsWith(input, @"plop"));
         }
 
         [Test]
@@ -119,12 +119,12 @@ namespace Hg.SaveHistory.API.Tests
             string input = @" this is a test ";
             string value = HgUtility.StringTrim(input);
 
-            Assert.AreEqual(@"this is a test", value);
+            Assert.That(@"this is a test" == value);
 
             input = @"   this is a test   ";
             value = HgUtility.StringTrim(input);
 
-            Assert.AreEqual(@"this is a test", value);
+            Assert.That(@"this is a test" == value);
         }
     }
 }

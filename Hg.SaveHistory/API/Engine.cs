@@ -46,7 +46,6 @@ namespace Hg.SaveHistory.API
         /// </summary>
         public LuaFunction OnLoaded;
 
-
         public event MessageEventHandler OnMessage;
 
         /// <summary>

@@ -43,6 +43,8 @@ namespace Hg.SaveHistory.Types
 
         public SortOrder SortOrder = SortOrder.Ascending;
 
+        public bool StartAutoBackupAfterOpening = false;
+
         #endregion
 
         #region Members

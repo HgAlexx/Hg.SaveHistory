@@ -154,6 +154,22 @@ namespace Hg.SaveHistory.Utilities
 
         #region Members
 
+        [DllImport("gdi32.dll")]
+        public static extern bool BitBlt(IntPtr hdc, int nXDest, int nYDest, int nWidth, int nHeight, IntPtr hdcSrc, int nXSrc, int nYSrc,
+            CopyPixelOperation dwRop);
+
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr CreateCompatibleBitmap(IntPtr hdc, int nWidth, int nHeight);
+
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr CreateCompatibleDC(IntPtr hdc);
+
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteDC(IntPtr hDC);
+
+        [DllImport("gdi32.dll")]
+        public static extern bool DeleteObject(IntPtr hObject);
+
         /// <summary>
         ///     Client area bounds
         /// </summary>
@@ -172,6 +188,9 @@ namespace Hg.SaveHistory.Utilities
 
             return bounds;
         }
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetDesktopWindow();
 
         public static Rectangle GetSize(IntPtr handle)
         {
@@ -228,6 +247,9 @@ namespace Hg.SaveHistory.Utilities
             return bounds;
         }
 
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetWindowDC(IntPtr hWnd);
+
         // This static method redirect to the correct windows api based on 32/64 bits
         public static IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex)
         {
@@ -260,6 +282,12 @@ namespace Hg.SaveHistory.Utilities
 
             return handle == processPtr;
         }
+
+        [DllImport("user32.dll")]
+        public static extern int ReleaseDC(IntPtr hWnd, IntPtr hdc);
+
+        [DllImport("gdi32.dll")]
+        public static extern IntPtr SelectObject(IntPtr hdc, IntPtr hdo);
 
         [DllImport("user32.dll")]
         private static extern IntPtr GetClientRect(IntPtr hWnd, ref Rect rect);
